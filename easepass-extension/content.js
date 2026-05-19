@@ -1,11 +1,11 @@
 /*
- * SwitchFlow — content script (YouTube dwell clicking).
+ * EasePass — content script (YouTube dwell clicking).
  *
  * Runs only on youtube.com (per manifest match). When the cursor hovers
  * one of a curated list of YouTube targets (video thumbnails, player
  * buttons, search bar, subscribe/like) a circular progress ring appears
  * around the cursor and fills over the configured dwell time. When the
- * ring completes, SwitchFlow fires a real .click() on the target.
+ * ring completes, EasePass fires a real .click() on the target.
  *
  * Cursor leaves the target  → timer pauses, ring fades out.
  * Cursor returns within 1s → timer RESUMES from where it left off.
@@ -448,7 +448,7 @@
   }, true);
 
   // Mouseover: cursor entered a new element. Updates the status pill
-  // and, if it's a SwitchFlow target, starts (or resumes) a dwell.
+  // and, if it's a EasePass target, starts (or resumes) a dwell.
   document.addEventListener('mouseover', (e) => {
     if (!IS_YOUTUBE) return; // dwell-click runs only on YouTube
     if (!enabled) return;
@@ -556,7 +556,7 @@
       const c = getElementCenter(target.el);
       positionRing(ring, c.x, c.y);
       // One paint later → fade in.
-      requestAnimationFrame(() => ring.classList.add('switchflow-visible'));
+      requestAnimationFrame(() => ring.classList.add('easepass-visible'));
     }
 
     active = {
@@ -611,12 +611,12 @@
     // Green flash + completion burst (CSS-driven). Video targets only;
     // button targets have no ring to flash.
     if (ring) {
-      const progress = ring.querySelector('.switchflow-ring-progress');
-      const count    = ring.querySelector('.switchflow-ring-count');
-      progress.classList.add('switchflow-complete');
-      count.classList.add('switchflow-complete');
+      const progress = ring.querySelector('.easepass-ring-progress');
+      const count    = ring.querySelector('.easepass-ring-count');
+      progress.classList.add('easepass-complete');
+      count.classList.add('easepass-complete');
       count.textContent = '✓';
-      ring.classList.add('switchflow-completing');
+      ring.classList.add('easepass-completing');
     }
 
     // Pill: brief confirmation. The next mouseover (or page navigation)
@@ -654,7 +654,7 @@
 
     // Fade + remove only when a ring exists (video targets).
     if (ring) {
-      ring.classList.remove('switchflow-visible');
+      ring.classList.remove('easepass-visible');
       setTimeout(() => { if (ring.parentNode) ring.remove(); }, FADE_OUT_MS);
     }
   }
@@ -679,18 +679,18 @@
   function createRing() {
     const center = RING_BOX / 2; // 28
     const wrap = document.createElement('div');
-    wrap.className = 'switchflow-ring-container';
+    wrap.className = 'easepass-ring-container';
     wrap.innerHTML =
-      '<div class="switchflow-ring-halo"></div>' +
-      '<div class="switchflow-ring-ripple"></div>' +
-      '<svg class="switchflow-ring-svg" viewBox="0 0 ' + RING_BOX + ' ' + RING_BOX + '" aria-hidden="true">' +
-        '<circle class="switchflow-ring-track" cx="' + center + '" cy="' + center + '" r="' + RING_RADIUS + '"></circle>' +
-        '<circle class="switchflow-ring-progress" cx="' + center + '" cy="' + center + '" r="' + RING_RADIUS + '"' +
+      '<div class="easepass-ring-halo"></div>' +
+      '<div class="easepass-ring-ripple"></div>' +
+      '<svg class="easepass-ring-svg" viewBox="0 0 ' + RING_BOX + ' ' + RING_BOX + '" aria-hidden="true">' +
+        '<circle class="easepass-ring-track" cx="' + center + '" cy="' + center + '" r="' + RING_RADIUS + '"></circle>' +
+        '<circle class="easepass-ring-progress" cx="' + center + '" cy="' + center + '" r="' + RING_RADIUS + '"' +
         ' transform="rotate(-90 ' + center + ' ' + center + ')"' +
         ' stroke-dasharray="' + RING_CIRCUMFERENCE.toFixed(2) + '"' +
         ' stroke-dashoffset="' + RING_CIRCUMFERENCE.toFixed(2) + '"></circle>' +
       '</svg>' +
-      '<div class="switchflow-ring-count"></div>';
+      '<div class="easepass-ring-count"></div>';
     return wrap;
   }
 
@@ -702,8 +702,8 @@
 
   // Paint the ring's fill ratio and the countdown number.
   function paintRing(ring, ratio, msRemaining) {
-    const progress = ring.querySelector('.switchflow-ring-progress');
-    const count    = ring.querySelector('.switchflow-ring-count');
+    const progress = ring.querySelector('.easepass-ring-progress');
+    const count    = ring.querySelector('.easepass-ring-count');
 
     const offset = RING_CIRCUMFERENCE * (1 - ratio);
     progress.setAttribute('stroke-dashoffset', offset.toFixed(2));
@@ -736,14 +736,14 @@
   // Briefly show a centered toast confirming a state change.
   function showToast(text) {
     // Remove any existing toast first so successive presses replace cleanly.
-    document.querySelectorAll('.switchflow-toast').forEach(t => t.remove());
+    document.querySelectorAll('.easepass-toast').forEach(t => t.remove());
     const toast = document.createElement('div');
-    toast.className = 'switchflow-toast';
+    toast.className = 'easepass-toast';
     toast.textContent = text;
     document.documentElement.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('switchflow-toast-visible'));
+    requestAnimationFrame(() => toast.classList.add('easepass-toast-visible'));
     setTimeout(() => {
-      toast.classList.remove('switchflow-toast-visible');
+      toast.classList.remove('easepass-toast-visible');
       setTimeout(() => toast.remove(), 250);
     }, 1400);
   }
@@ -805,10 +805,10 @@
   function ensureStatus() {
     if (statusEl && document.documentElement.contains(statusEl)) return;
     statusEl = document.createElement('div');
-    statusEl.className = 'switchflow-status switchflow-status-idle';
+    statusEl.className = 'easepass-status easepass-status-idle';
     statusEl.innerHTML =
-      '<span class="switchflow-status-dot"></span>' +
-      '<span class="switchflow-status-text">' + STATUS_LABELS.idle + '</span>';
+      '<span class="easepass-status-dot"></span>' +
+      '<span class="easepass-status-text">' + STATUS_LABELS.idle + '</span>';
     document.documentElement.appendChild(statusEl);
     statusState = 'idle';
   }
@@ -816,12 +816,12 @@
   // Show the pill (creates it if needed). Idempotent.
   function showStatus() {
     ensureStatus();
-    requestAnimationFrame(() => statusEl.classList.add('switchflow-status-visible'));
+    requestAnimationFrame(() => statusEl.classList.add('easepass-status-visible'));
   }
 
   // Hide the pill (kept in DOM so reshowing is instant).
   function hideStatus() {
-    if (statusEl) statusEl.classList.remove('switchflow-status-visible');
+    if (statusEl) statusEl.classList.remove('easepass-status-visible');
   }
 
   // Set state ('idle' | 'something' | 'engaged') with optional dynamic
@@ -834,18 +834,18 @@
     if (stateChanged) {
       statusState = next;
       statusEl.classList.remove(
-        'switchflow-status-idle',
-        'switchflow-status-something',
-        'switchflow-status-engaged'
+        'easepass-status-idle',
+        'easepass-status-something',
+        'easepass-status-engaged'
       );
-      statusEl.classList.add('switchflow-status-' + next);
+      statusEl.classList.add('easepass-status-' + next);
     }
     // Decide what to put in the pill.
     const text = (customText !== undefined && customText !== null)
       ? customText
       : STATUS_LABELS[next];
     // Avoid touching the DOM if nothing actually changed.
-    const textEl = statusEl.querySelector('.switchflow-status-text');
+    const textEl = statusEl.querySelector('.easepass-status-text');
     if (textEl.textContent !== text) textEl.textContent = text;
   }
 
@@ -864,13 +864,13 @@
   // TEXT ACCESSIBILITY — runs on every site
   // Floating "Aa" button, slide-in panel, font/size/spacing/line-height
   // controls. Independent from the dwell-click system above. Settings
-  // persist via chrome.storage.local under "switchflow-text-settings"
+  // persist via chrome.storage.local under "easepass-text-settings"
   // and changes propagate to all open tabs via storage.onChanged.
   // ══════════════════════════════════════════
 
-  const TEXT_SETTINGS_KEY = 'switchflow-text-settings';
-  const TEXT_STYLE_TAG_ID = 'switchflow-text-styles';
-  const FONT_CDN_FLAG     = 'switchflow-font-cdns-loaded';
+  const TEXT_SETTINGS_KEY = 'easepass-text-settings';
+  const TEXT_STYLE_TAG_ID = 'easepass-text-styles';
+  const FONT_CDN_FLAG     = 'easepass-font-cdns-loaded';
 
   const TEXT_TAGS =
     'body, p, h1, h2, h3, h4, h5, h6, li, td, th, span, div, a, ' +
@@ -931,7 +931,7 @@
       const link = document.createElement('link');
       link.rel  = 'stylesheet';
       link.href = href;
-      link.dataset.switchflowFont = 'true';
+      link.dataset.easepassFont = 'true';
       try { document.head.appendChild(link); } catch (_) {}
     }
   }

@@ -1,5 +1,5 @@
 /*
- * SwitchFlow — content stylesheet (YouTube dwell clicking).
+ * EasePass — content stylesheet (YouTube dwell clicking).
  *
  * The progress ring overlay only. No styles touch YouTube's DOM.
  * Everything is fixed-positioned at the cursor with pointer-events
@@ -15,7 +15,7 @@
  * Single floating overlay. JS sets left/top each mousemove; translate
  * centers the ring on the cursor regardless of size.
  */
-.switchflow-ring-container {
+.easepass-ring-container {
   position: fixed !important;
   pointer-events: none !important;
   z-index: 2147483630 !important;
@@ -32,7 +32,7 @@
 }
 
 /* Visible state — applied one frame after creation so the fade-in plays. */
-.switchflow-ring-container.switchflow-visible {
+.easepass-ring-container.easepass-visible {
   opacity: 1 !important;
   transform: translate(-50%, -50%) scale(1) !important;
 }
@@ -42,7 +42,7 @@
  * any background), fades to transparent at the rim (so the user can
  * still see the underlying element through the edges of the ring).
  */
-.switchflow-ring-halo {
+.easepass-ring-halo {
   position: absolute !important;
   inset: 4px !important;
   border-radius: 50% !important;
@@ -59,7 +59,7 @@
 }
 
 /* ───────── Ripple — fires only on completion ───────── */
-.switchflow-ring-ripple {
+.easepass-ring-ripple {
   position: absolute !important;
   inset: 0 !important;
   border-radius: 50% !important;
@@ -69,7 +69,7 @@
 }
 
 /* ───────── Progress SVG ───────── */
-.switchflow-ring-svg {
+.easepass-ring-svg {
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
@@ -80,7 +80,7 @@
 }
 
 /* Gray dwell track, always visible while ring is up. */
-.switchflow-ring-track {
+.easepass-ring-track {
   fill: none !important;
   stroke: rgba(15, 20, 25, 0.20) !important;
   stroke-width: 3 !important;
@@ -88,7 +88,7 @@
 
 /* Blue progress arc — JS animates stroke-dashoffset.
  * Pre-rotated -90° in the SVG so the start of the stroke sits at 12 o'clock. */
-.switchflow-ring-progress {
+.easepass-ring-progress {
   fill: none !important;
   stroke: #0066FF !important;
   stroke-width: 5 !important;
@@ -98,12 +98,12 @@
 }
 
 /* Completion state — both arcs flip to green. */
-.switchflow-ring-progress.switchflow-complete {
+.easepass-ring-progress.easepass-complete {
   stroke: #22C55E !important;
 }
 
 /* ───────── Countdown number ───────── */
-.switchflow-ring-count {
+.easepass-ring-count {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
@@ -128,7 +128,7 @@
   transition: color 0.1s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
-.switchflow-ring-count.switchflow-complete {
+.easepass-ring-count.easepass-complete {
   color: #22C55E !important;
   transform: translate(-50%, -50%) scale(1.15) !important;
 }
@@ -138,15 +138,15 @@
  * ripple expands outward and fades. Removed via element.remove() after
  * the burst window.
  */
-.switchflow-ring-container.switchflow-completing {
+.easepass-ring-container.easepass-completing {
   transform: translate(-50%, -50%) scale(1.18) !important;
 }
 
-.switchflow-ring-container.switchflow-completing .switchflow-ring-ripple {
-  animation: switchflow-ripple 380ms ease-out forwards !important;
+.easepass-ring-container.easepass-completing .easepass-ring-ripple {
+  animation: easepass-ripple 380ms ease-out forwards !important;
 }
 
-@keyframes switchflow-ripple {
+@keyframes easepass-ripple {
   0%   { transform: scale(1);    opacity: 0.9; border-width: 4px; }
   60%  { opacity: 0.45;          border-width: 2px; }
   100% { transform: scale(1.9);  opacity: 0;    border-width: 1px; }
@@ -158,11 +158,11 @@
  *   idle      — gray   — cursor is over plain content
  *   something — amber  — cursor is over an interactive element we don't
  *                        dwell-click (so user knows we see it)
- *   engaged   — blue   — cursor is over a SwitchFlow target, ring active
+ *   engaged   — blue   — cursor is over a EasePass target, ring active
  *
  * Hidden entirely when the extension is disabled.
  */
-.switchflow-status {
+.easepass-status {
   position: fixed !important;
   top: 70px !important;            /* clear YouTube's masthead */
   left: 50% !important;
@@ -195,12 +195,12 @@
               background 0.22s ease !important;
 }
 
-.switchflow-status.switchflow-status-visible {
+.easepass-status.easepass-status-visible {
   opacity: 1 !important;
   transform: translateX(-50%) translateY(0) !important;
 }
 
-.switchflow-status-dot {
+.easepass-status-dot {
   width: 9px !important;
   height: 9px !important;
   border-radius: 50% !important;
@@ -211,28 +211,28 @@
 }
 
 /* ── State: idle ── */
-.switchflow-status-idle .switchflow-status-dot {
+.easepass-status-idle .easepass-status-dot {
   background: #94a3b8 !important;
 }
 
-/* ── State: something hovering (not a SwitchFlow target) ── */
-.switchflow-status-something {
+/* ── State: something hovering (not a EasePass target) ── */
+.easepass-status-something {
   background: rgba(28, 21, 14, 0.94) !important;
 }
-.switchflow-status-something .switchflow-status-dot {
+.easepass-status-something .easepass-status-dot {
   background: #F59E0B !important;
 }
 
 /* ── State: engaged (dwell active) ── */
-.switchflow-status-engaged {
+.easepass-status-engaged {
   background: rgba(0, 102, 255, 0.96) !important;
 }
-.switchflow-status-engaged .switchflow-status-dot {
+.easepass-status-engaged .easepass-status-dot {
   background: #ffffff !important;
-  animation: switchflow-status-pulse 900ms ease-in-out infinite alternate !important;
+  animation: easepass-status-pulse 900ms ease-in-out infinite alternate !important;
 }
 
-@keyframes switchflow-status-pulse {
+@keyframes easepass-status-pulse {
   from { transform: scale(0.85); opacity: 0.65; }
   to   { transform: scale(1.15); opacity: 1; }
 }
@@ -241,7 +241,7 @@
  * Centered horizontally at the top of the viewport. Fades in, holds,
  * fades out. Pointer-events disabled so it never blocks the page.
  */
-.switchflow-toast {
+.easepass-toast {
   position: fixed !important;
   top: 24px !important;
   left: 50% !important;
@@ -269,7 +269,7 @@
   transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
-.switchflow-toast.switchflow-toast-visible {
+.easepass-toast.easepass-toast-visible {
   opacity: 1 !important;
   transform: translateX(-50%) translateY(0) !important;
 }
@@ -278,36 +278,36 @@
  * Keep the ring functional but skip non-essential animations.
  */
 @media (prefers-reduced-motion: reduce) {
-  .switchflow-ring-container {
+  .easepass-ring-container {
     transition: opacity 0.1s ease !important;
     transform: translate(-50%, -50%) scale(1) !important;
   }
-  .switchflow-ring-container.switchflow-visible {
+  .easepass-ring-container.easepass-visible {
     transform: translate(-50%, -50%) scale(1) !important;
   }
-  .switchflow-ring-container.switchflow-completing {
+  .easepass-ring-container.easepass-completing {
     transform: translate(-50%, -50%) scale(1) !important;
   }
-  .switchflow-ring-count,
-  .switchflow-ring-count.switchflow-complete {
+  .easepass-ring-count,
+  .easepass-ring-count.easepass-complete {
     transform: translate(-50%, -50%) !important;
     transition: none !important;
   }
-  .switchflow-ring-progress {
+  .easepass-ring-progress {
     transition: stroke 0.1s ease !important;
   }
-  .switchflow-ring-container.switchflow-completing .switchflow-ring-ripple {
+  .easepass-ring-container.easepass-completing .easepass-ring-ripple {
     animation: none !important;
     opacity: 0 !important;
   }
-  .switchflow-toast {
+  .easepass-toast {
     transition: opacity 0.15s ease !important;
     transform: translateX(-50%) !important;
   }
-  .switchflow-toast.switchflow-toast-visible {
+  .easepass-toast.easepass-toast-visible {
     transform: translateX(-50%) !important;
   }
-  .switchflow-status-engaged .switchflow-status-dot {
+  .easepass-status-engaged .easepass-status-dot {
     animation: none !important;
     transform: scale(1) !important;
   }
@@ -316,13 +316,13 @@
 /* ══════════════════════════════════════════
    TEXT ACCESSIBILITY — floating "Aa" button + slide-in panel
    Runs on every site (not just YouTube). All identifiers use the
-   `switchflow-` prefix so they never collide with host page CSS,
+   `easepass-` prefix so they never collide with host page CSS,
    and every rule is !important + scoped to our own IDs so user-
    applied font/size overrides don't disfigure the panel itself.
    ══════════════════════════════════════════ */
 
 /* ───────── Floating "Aa" button (bottom-left) ───────── */
-#switchflow-aa-btn {
+#easepass-aa-btn {
   position: fixed !important;
   bottom: 1.5rem !important;
   left: 1.5rem !important;
@@ -353,15 +353,15 @@
   text-transform: none !important;
 }
 
-#switchflow-aa-btn:hover  { transform: scale(1.06) !important; background: #0050cc !important; }
-#switchflow-aa-btn:active { transform: scale(0.96) !important; }
-#switchflow-aa-btn:focus-visible {
+#easepass-aa-btn:hover  { transform: scale(1.06) !important; background: #0050cc !important; }
+#easepass-aa-btn:active { transform: scale(0.96) !important; }
+#easepass-aa-btn:focus-visible {
   outline: 3px solid #ffd400 !important;
   outline-offset: 3px !important;
 }
 
 /* ───────── Backdrop overlay behind panel ───────── */
-#switchflow-text-backdrop {
+#easepass-text-backdrop {
   position: fixed !important;
   inset: 0 !important;
   z-index: 2147483627 !important;
@@ -370,13 +370,13 @@
   pointer-events: none !important;
   transition: opacity 0.22s ease !important;
 }
-#switchflow-text-backdrop.switchflow-open {
+#easepass-text-backdrop.easepass-open {
   opacity: 1 !important;
   pointer-events: auto !important;
 }
 
 /* ───────── Slide-in panel from the left ───────── */
-#switchflow-text-panel {
+#easepass-text-panel {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -401,12 +401,12 @@
 
   font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
 }
-#switchflow-text-panel.switchflow-open { transform: translateX(0) !important; }
+#easepass-text-panel.easepass-open { transform: translateX(0) !important; }
 
 /* Always neutralize ALL font/spacing inheritance inside our own UI
  * so the user's chosen page font doesn't disfigure the panel. */
-#switchflow-text-panel,
-#switchflow-text-panel * {
+#easepass-text-panel,
+#easepass-text-panel * {
   font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
   letter-spacing: normal !important;
   word-spacing: normal !important;
@@ -642,9 +642,9 @@
 .sw-text-panel-footer a:hover { text-decoration: underline !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  #switchflow-aa-btn,
-  #switchflow-text-panel,
-  #switchflow-text-backdrop {
+  #easepass-aa-btn,
+  #easepass-text-panel,
+  #easepass-text-backdrop {
     transition: none !important;
   }
 }

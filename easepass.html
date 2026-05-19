@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SwitchFlow · A Chrome extension for switch-accessible web browsing</title>
+  <title>EasePass · A Chrome extension for switch-accessible web browsing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* SwitchFlow page-specific touches */
+    /* EasePass page-specific touches */
     .page-label {
       display: inline-block;
       font-size: 0.85rem;
@@ -48,8 +48,8 @@
       font-weight: 700;
     }
 
-    /* Accent the SwitchFlow hero h2-tier paragraph as a brand statement */
-    .switchflow-statement {
+    /* Accent the EasePass hero h2-tier paragraph as a brand statement */
+    .easepass-statement {
       max-width: 760px;
       margin: 3rem auto 0;
       text-align: center;
@@ -57,7 +57,7 @@
       line-height: 1.55;
       color: var(--text-muted);
     }
-    .switchflow-statement strong { color: var(--text); font-weight: 600; }
+    .easepass-statement strong { color: var(--text); font-weight: 600; }
 
     /* Demo placeholder */
     .demo-section {
@@ -185,7 +185,7 @@
     @media (max-width: 600px) {
       .product-hero h1 { font-size: clamp(2.6rem, 13vw, 4rem); }
       .page-label { font-size: 0.78rem; padding: 0.35rem 0.9rem; margin-bottom: 1.1rem; }
-      .switchflow-statement { margin-top: 2rem; font-size: 1.05rem; }
+      .easepass-statement { margin-top: 2rem; font-size: 1.05rem; }
 
       .demo-section { padding: 0 1.2rem 4rem; }
       .demo-box { padding: 3rem 1.5rem; border-radius: 20px; }
@@ -213,7 +213,7 @@
   <!-- HERO -->
   <section class="hero product-hero">
     <span class="page-label">Chrome extension · In development</span>
-    <h1>Switch<span class="accent">Flow.</span></h1>
+    <h1>Ease<span class="accent">Pass.</span></h1>
     <p class="hero-tagline">Switch-accessible web browsing in a Chrome extension. Press space to scan, press again to select. One key, the whole internet.</p>
     <div class="hero-links">
       <a href="#how" class="hero-link">How it works</a>
@@ -226,20 +226,20 @@
     <div class="demo-box">
       <div class="demo-icon" aria-hidden="true">▶</div>
       <h3>Demo video coming soon</h3>
-      <p>We're recording SwitchFlow in action — watch the highlight ring scan YouTube, drop into a region, and select a video with one key press.</p>
+      <p>We're recording EasePass in action — watch the highlight ring scan YouTube, drop into a region, and select a video with one key press.</p>
     </div>
   </section>
 
   <!-- MISSION -->
   <div class="mission">
     <h2>The web, navigable by <span class="accent">a single key.</span></h2>
-    <p>SwitchFlow groups every webpage into regions, then into elements, and lets students scan and select with one switch press. Built on <strong>Chrome's automation API</strong> so it works on real sites like YouTube and Wikipedia — not just demos.</p>
+    <p>EasePass groups every webpage into regions, then into elements, and lets students scan and select with one switch press. Built on <strong>Chrome's automation API</strong> so it works on real sites like YouTube and Wikipedia — not just demos.</p>
   </div>
 
-  <!-- AUDIENCES (who SwitchFlow serves) -->
+  <!-- AUDIENCES (who EasePass serves) -->
   <section class="audiences" id="for-whom">
     <h2>Built for <span class="accent">switch users.</span></h2>
-    <p>Anyone who can press a single button — spacebar, AbleNet switch, big button, or sip-and-puff — can browse with SwitchFlow.</p>
+    <p>Anyone who can press a single button — spacebar, AbleNet switch, big button, or sip-and-puff — can browse with EasePass.</p>
 
     <div class="audience-grid">
       <div class="audience-card">
@@ -265,7 +265,7 @@
       <div class="principle">
         <div class="principle-num">1</div>
         <h3>Press space to scan regions</h3>
-        <p>SwitchFlow highlights the page's regions in order: <strong>navigation, main content, sidebar, footer</strong>. One press moves to the next region.</p>
+        <p>EasePass highlights the page's regions in order: <strong>navigation, main content, sidebar, footer</strong>. One press moves to the next region.</p>
       </div>
       <div class="principle">
         <div class="principle-num">2</div>
@@ -280,7 +280,7 @@
       <div class="principle">
         <div class="principle-num">4</div>
         <h3>Built on Chrome's automation API</h3>
-        <p>SwitchFlow uses the accessibility tree the browser already builds — same source assistive tech relies on — so it finds real interactive targets, not just visual guesses.</p>
+        <p>EasePass uses the accessibility tree the browser already builds — same source assistive tech relies on — so it finds real interactive targets, not just visual guesses.</p>
       </div>
     </div>
   </section>
@@ -315,8 +315,8 @@
 
   <!-- COMPARISON -->
   <section class="audiences" id="compare" style="background: var(--bg-alt);">
-    <h2>How SwitchFlow <span class="accent">compares.</span></h2>
-    <p>ChromeOS has built-in switch access, and it works for system-level navigation. SwitchFlow is purpose-built for browsing the web.</p>
+    <h2>How EasePass <span class="accent">compares.</span></h2>
+    <p>ChromeOS has built-in switch access, and it works for system-level navigation. EasePass is purpose-built for browsing the web.</p>
 
     <div class="compare-grid">
       <div class="compare-card old">
@@ -329,7 +329,7 @@
         </ul>
       </div>
       <div class="compare-card new">
-        <h3>SwitchFlow</h3>
+        <h3>EasePass</h3>
         <ul>
           <li>Region-first scanning</li>
           <li>Spotlight Mode for visual clarity</li>
@@ -343,8 +343,8 @@
   <!-- COMPATIBILITY / STATUS -->
   <section class="products">
     <h2>Starting <span class="accent">where it matters most.</span></h2>
-    <p class="switchflow-statement">
-      The first release focuses on <strong>YouTube and Wikipedia</strong> — two of the highest-impact sites for student learning, curiosity, and entertainment. SwitchFlow is being co-developed with parents, students, and accessibility professionals so every region, every scan order, and every highlight is tuned to real classroom use.
+    <p class="easepass-statement">
+      The first release focuses on <strong>YouTube and Wikipedia</strong> — two of the highest-impact sites for student learning, curiosity, and entertainment. EasePass is being co-developed with parents, students, and accessibility professionals so every region, every scan order, and every highlight is tuned to real classroom use.
     </p>
 
     <div class="product-grid" style="margin-top: 4rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 900px;">
@@ -382,7 +382,7 @@
 
   <!-- CONTACT -->
   <section class="notify" id="contact">
-    <h2>Try the <span class="accent">SwitchFlow</span> pilot.</h2>
+    <h2>Try the <span class="accent">EasePass</span> pilot.</h2>
     <p>The Chrome extension is in active development. Sign up to test early builds, share feedback from real students, or just hear when it launches.</p>
 
     <div class="contact-grid">
@@ -428,7 +428,7 @@
 
         <div class="form-row">
           <label for="cf-message">Message</label>
-          <textarea id="cf-message" name="message" rows="4" required placeholder="Tell us about your interest in SwitchFlow."></textarea>
+          <textarea id="cf-message" name="message" rows="4" required placeholder="Tell us about your interest in EasePass."></textarea>
         </div>
 
         <button type="submit">Send message</button>

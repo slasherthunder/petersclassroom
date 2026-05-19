@@ -1,5 +1,5 @@
 /*
- * SwitchFlow — popup controller (dwell clicking).
+ * EasePass — popup controller (dwell clicking).
  *
  * Persists three settings to chrome.storage.local:
  *   - enabled         (boolean, master switch)
@@ -102,7 +102,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 // content script listens on. When the content script's storage.onChanged
 // handler fires, it re-applies the page-level CSS instantly.
 
-const TA_STORAGE_KEY = 'switchflow-text-settings';
+const TA_STORAGE_KEY = 'easepass-text-settings';
 const TA_DEFAULTS = {
   fontFamily:    'default',
   textSize:      100,

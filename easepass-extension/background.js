@@ -1,5 +1,5 @@
 /*
- * SwitchFlow — background service worker (Manifest V3).
+ * EasePass — background service worker (Manifest V3).
  *
  * Minimal responsibility:
  *   - On install, seed chrome.storage.local with default settings.
