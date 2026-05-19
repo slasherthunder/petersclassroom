@@ -1,0 +1,249 @@
+<!--
+  SwitchFlow — popup UI (dwell clicking for YouTube).
+
+  320px wide. Wordmark + tagline, master enable/disable toggle, two
+  dwell-time sliders (video and button), a short "How it works" block,
+  and a footer link back to petersclassroom.com. Lexend font, blue and
+  white. Fully keyboard navigable.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SwitchFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #0066FF;
+      --blue-deep:  #0050cc;
+      --green:      #22C55E;
+      --text:       #0f1419;
+      --text-muted: #5a6470;
+      --bg:         #ffffff;
+      --bg-soft:    #f1f6ff;
+      --border:     #e2e8ef;
+    }
+
+    html, body {
+      font-family: 'Lexend', -apple-system, BlinkMacSystemFont,
+                   "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      width: 320px;
+    }
+    body { padding: 22px; }
+
+    h1 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.018em;
+      margin-bottom: 0.18rem;
+      line-height: 1.05;
+    }
+    h1 .accent { color: var(--blue); }
+
+    .tagline {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.4rem;
+      line-height: 1.4;
+    }
+
+    /* ─── Toggle row ─── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.2rem;
+    }
+    .toggle-info { display: flex; flex-direction: column; min-width: 0; }
+    .toggle-info .label  { font-weight: 600; font-size: 0.98rem; }
+    .toggle-info .status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .toggle-info .status.on { color: var(--green); font-weight: 600; }
+
+    .toggle {
+      position: relative;
+      width: 50px; height: 28px;
+      background: #cdd5df;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 22px; height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .toggle[aria-checked="true"] { background: var(--blue); }
+    .toggle[aria-checked="true"]::after { transform: translateX(22px); }
+    .toggle:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
+    }
+
+    /* ─── Sliders ─── */
+    .slider-row { margin-bottom: 1.05rem; }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-weight: 600;
+      font-size: 0.94rem;
+      margin-bottom: 0.4rem;
+    }
+    .slider-label .value {
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+      height: 24px;
+    }
+    input[type="range"]:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    /* ─── How it works ─── */
+    .how {
+      background: var(--bg-soft);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 1rem;
+    }
+    .how h2 {
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+    .how ol {
+      list-style: none;
+      padding: 0;
+      counter-reset: how-step;
+    }
+    .how li {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--text);
+      padding-left: 1.95rem;
+      position: relative;
+      counter-increment: how-step;
+      margin-bottom: 4px;
+    }
+    .how li:last-child { margin-bottom: 0; }
+    .how li::before {
+      content: counter(how-step);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      margin-top: 1.3rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .footer a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <h1>Switch<span class="accent">Flow</span></h1>
+  <p class="tagline">Hover to click. No button needed.</p>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <span class="label">Dwell clicking</span>
+      <span id="status" class="status on">Active on YouTube</span>
+    </div>
+    <button id="toggle"
+            class="toggle"
+            role="switch"
+            aria-checked="true"
+            aria-label="Toggle dwell clicking"></button>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-label">
+      <label for="videoSpeed">Video dwell time</label>
+      <span class="value"><span id="videoVal">5000</span> ms</span>
+    </div>
+    <input type="range"
+           id="videoSpeed"
+           min="1000" max="8000" step="500"
+           value="5000"
+           aria-label="Video dwell time in milliseconds" />
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-label">
+      <label for="buttonSpeed">Button dwell time</label>
+      <span class="value"><span id="buttonVal">3000</span> ms</span>
+    </div>
+    <input type="range"
+           id="buttonSpeed"
+           min="500" max="5000" step="250"
+           value="3000"
+           aria-label="Button dwell time in milliseconds" />
+  </div>
+
+  <div class="how">
+    <h2>How it works</h2>
+    <ol>
+      <li>Hover over a video or button.</li>
+      <li>Watch the ring fill up.</li>
+      <li>It clicks automatically.</li>
+      <li>Tap <strong>Space</strong> any time to toggle on or off.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    From <a href="https://petersclassroom.com" target="_blank" rel="noopener noreferrer">Peter's Classroom</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,847 @@
+/*
+ * SwitchFlow — content script (YouTube dwell clicking).
+ *
+ * Runs only on youtube.com (per manifest match). When the cursor hovers
+ * one of a curated list of YouTube targets (video thumbnails, player
+ * buttons, search bar, subscribe/like) a circular progress ring appears
+ * around the cursor and fills over the configured dwell time. When the
+ * ring completes, SwitchFlow fires a real .click() on the target.
+ *
+ * Cursor leaves the target  → timer pauses, ring fades out.
+ * Cursor returns within 1s → timer RESUMES from where it left off.
+ * Cursor returns after 1s   → timer restarts from zero.
+ *
+ * No accidental clicks: even 1px outside the element ends the dwell.
+ * No YouTube DOM is modified — we only inject an overlay div.
+ */
+
+(function () {
+  'use strict';
+
+  // ───────── Constants ─────────
+
+  // Targets are matched in two ways and tried in priority order:
+  //
+  //   - DIRECT (entry.sel): closest(sel) finds the element itself or an
+  //     ancestor. The matched element is both the visual highlight and
+  //     the click target.
+  //   - WRAPPER (entry.wrap + entry.inner): closest(wrap) walks up to a
+  //     card-level wrapper, then querySelector(inner) looks INSIDE for
+  //     the actual anchor. The wrapper is the visual highlight (so the
+  //     ring centers on the whole card) and the inner anchor is what
+  //     gets clicked. This is required for modern split-link layouts
+  //     like yt-lockup-view-model where the <a href> only wraps the
+  //     title text and the thumbnail image sits outside that anchor.
+  //
+  // `minSize` is an optional size gate (applied to the visual element)
+  // so broad URL selectors don't fire on tiny text links in descriptions.
+  const TARGET_SELECTORS = [
+    // ─── Search bar (input element, needs explicit entry) ───
+    { sel: 'input#search', type: 'button' },
+
+    // ─── Generic button catch-all ───
+    // Any visible <button> or role="button" becomes a dwell target with
+    // the standard button dwell time. This single rule covers every
+    // YouTube control without enumeration: player buttons (play, mute,
+    // fullscreen, captions, settings, quality, theater, miniplayer,
+    // autoplay, …), subscribe, like / dislike, share, save, download,
+    // join, channel-page tabs, comment actions (heart, reply, more),
+    // filter chips, sidebar entries, 3-dot menus, notifications, the
+    // hamburger menu, and so on.
+    { sel: 'button:not([disabled]):not([aria-hidden="true"])',
+      type: 'button', minSize: { w: 22, h: 20 } },
+    { sel: '[role="button"]:not([aria-disabled="true"]):not([aria-hidden="true"])',
+      type: 'button', minSize: { w: 22, h: 20 } },
+    // YouTube's video player uses <div class="ytp-button"> for some
+    // controls instead of real <button> elements, so cover them too.
+    { sel: '#movie_player .ytp-button:not([aria-hidden="true"])',
+      type: 'button', minSize: { w: 22, h: 20 } },
+
+    // ─── Direct URL match — every YouTube video endpoint ───
+    // Covers cards where the <a> wraps the thumbnail itself.
+    { sel: 'a[href*="/watch?"]',  type: 'video', minSize: { w: 120, h: 60 } },
+    { sel: 'a[href*="/shorts/"]', type: 'video', minSize: { w: 80,  h: 80 } },
+    { sel: 'a[href*="/live/"]',   type: 'video', minSize: { w: 120, h: 60 } },
+    { sel: 'a[href*="/v/"]',      type: 'video', minSize: { w: 120, h: 60 } },
+    { sel: 'a[href*="/embed/"]',  type: 'video', minSize: { w: 120, h: 60 } },
+
+    // ─── Wrapper fallbacks — for split-link layouts ───
+    // Modern overhaul cards.
+    { wrap: 'yt-lockup-view-model',
+      inner: 'a[href*="/watch?"], a[href*="/shorts/"], a[href*="/live/"]',
+      type: 'video', minSize: { w: 100, h: 60 } },
+    // Standard home feed grid items.
+    { wrap: 'ytd-rich-item-renderer',
+      inner: 'a[href*="/watch?"], a[href*="/shorts/"]',
+      type: 'video', minSize: { w: 100, h: 60 } },
+    // Inner media component of the rich grid.
+    { wrap: 'ytd-rich-grid-media',
+      inner: 'a[href*="/watch?"]',
+      type: 'video', minSize: { w: 100, h: 60 } },
+    // Trending / editorial sections.
+    { wrap: 'ytd-rich-section-renderer',
+      inner: 'a[href*="/watch?"], a[href*="/shorts/"]',
+      type: 'video', minSize: { w: 100, h: 60 } },
+    // Watch-page suggested sidebar (classic).
+    { wrap: 'ytd-compact-video-renderer',
+      inner: 'a[href*="/watch?"]',
+      type: 'video', minSize: { w: 100, h: 50 } },
+    // Playlist panel queue beside the player.
+    { wrap: 'ytd-playlist-panel-video-renderer',
+      inner: 'a[href*="/watch?"]',
+      type: 'video', minSize: { w: 80, h: 40 } },
+    // Primary search-result list item.
+    { wrap: 'ytd-video-renderer',
+      inner: 'a[href*="/watch?"]',
+      type: 'video', minSize: { w: 120, h: 60 } },
+    // Channel-tab classic grid item.
+    { wrap: 'ytd-grid-video-renderer',
+      inner: 'a[href*="/watch?"]',
+      type: 'video', minSize: { w: 100, h: 60 } },
+    // Featured auto-playing spotlight on a channel page.
+    { wrap: 'ytd-channel-video-player-renderer',
+      inner: 'a[href*="/watch?"]',
+      type: 'video', minSize: { w: 200, h: 100 } },
+
+    // ─── Universal fallback (last resort) ───
+    // Walk up from the cursor and accept the smallest ancestor that
+    // (a) is at least card-sized AND (b) contains a watch/shorts/live
+    // anchor as a descendant. Catches layouts where the thumbnail image
+    // is a *sibling* of the anchor — hover-preview overlays, lockup
+    // view models where the anchor lives in a separate metadata block,
+    // and any future YouTube layout we haven't explicitly named.
+    { fallback: true, type: 'video', minSize: { w: 100, h: 60 } }
+  ];
+
+  const RESUME_WINDOW_MS = 1000; // resume-on-return grace period
+  const COMPLETE_FLASH_MS = 380; // green flash + ripple duration before click
+  const FADE_OUT_MS = 180;       // ring fade-out on cursor leave
+  const RING_BOX = 56;           // SVG viewBox edge & container size (px)
+  const RING_RADIUS = 26;        // arc radius inside that viewBox
+  const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS; // ≈ 163.36
+
+  // ───────── State ─────────
+
+  // Settings synced from chrome.storage.local.
+  let enabled = true;
+  let videoDwellTime = 5000;
+  let buttonDwellTime = 3000;
+
+  // Active dwell session. null when nothing being dwelled.
+  // { el, type, ring, startTime, elapsed, dwellTime, rafId }
+  let active = null;
+
+  // Last cancelled session, retained briefly for resume-on-return.
+  // { el, elapsed, leftAt }
+  let lastSession = null;
+
+  // ───────── Extension-context guard ─────────
+  // When the extension is reloaded / updated, content scripts already
+  // running on open tabs become "orphaned" — they can no longer talk
+  // to chrome.* and every call throws "Extension context invalidated."
+  // We check liveness before any chrome.* access and silently swallow
+  // residual errors via a window-level handler.
+
+  function isExtensionAlive() {
+    try {
+      return typeof chrome !== 'undefined' &&
+             !!chrome.runtime &&
+             !!chrome.runtime.id;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // Wrapper for any chrome.* call so an invalidated context doesn't
+  // throw into the rest of the script. Returns true on success.
+  function safeChrome(fn) {
+    if (!isExtensionAlive()) return false;
+    try { fn(); return true; } catch (_) { return false; }
+  }
+
+  // Last-line defense: catch the residual error if anything still slips
+  // through (e.g., a storage.onChanged callback firing exactly during
+  // invalidation). preventDefault() keeps it out of the page console.
+  window.addEventListener('error', (e) => {
+    if (e && e.message && /Extension context invalidated/i.test(e.message)) {
+      e.preventDefault();
+      e.stopImmediatePropagation && e.stopImmediatePropagation();
+      return true;
+    }
+  }, true);
+
+  // ───────── Settings sync ─────────
+
+  // Load initial settings, then begin listening for live updates.
+  // All chrome.* access is wrapped — if the extension is reloaded
+  // mid-session, the orphaned content script falls back to its in-memory
+  // defaults instead of crashing.
+  safeChrome(() => {
+    chrome.storage.local.get(
+      ['enabled', 'videoDwellTime', 'buttonDwellTime'],
+      (data) => {
+        // Guard the callback too: it can fire after context invalidation.
+        try {
+          if (chrome.runtime && chrome.runtime.lastError) return;
+          enabled = data.enabled !== false;
+          videoDwellTime = Number(data.videoDwellTime) || 5000;
+          buttonDwellTime = Number(data.buttonDwellTime) || 3000;
+          if (enabled) showStatus();
+        } catch (_) {}
+      }
+    );
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+      // Guard the listener body — Chrome can deliver one last event
+      // exactly during invalidation, which would otherwise throw into
+      // our code path.
+      try {
+        if (!isExtensionAlive()) return;
+        if (area !== 'local') return;
+        if (changes.enabled) {
+          enabled = changes.enabled.newValue !== false;
+          if (!enabled) {
+            cancelDwell();
+            hideStatus();
+          } else {
+            showStatus();
+          }
+        }
+        if (changes.videoDwellTime) {
+          videoDwellTime = Number(changes.videoDwellTime.newValue) || 5000;
+          // If we're mid-dwell on a video, adopt the new total instantly.
+          if (active && active.type === 'video') active.dwellTime = videoDwellTime;
+        }
+        if (changes.buttonDwellTime) {
+          buttonDwellTime = Number(changes.buttonDwellTime.newValue) || 3000;
+          if (active && active.type === 'button') active.dwellTime = buttonDwellTime;
+        }
+      } catch (_) {}
+    });
+  });
+
+  // ───────── Target detection ─────────
+
+  // Every YouTube card-level wrapper we know about. When a direct URL
+  // selector matches a video anchor, we climb up to one of these and
+  // use it for both the visual ring and the size check. The reason: in
+  // modern grid layouts the <a href="/watch?…"> is constrained to the
+  // title-text strip and is only ~24px tall, so a getBoundingClientRect
+  // on the anchor itself would fail any reasonable minSize threshold
+  // even though the card is clearly a big visible thumbnail.
+  const VIDEO_CARD_WRAPPERS = [
+    'yt-lockup-view-model',
+    'ytd-rich-item-renderer',
+    'ytd-rich-grid-media',
+    'ytd-rich-section-renderer',
+    'ytd-compact-video-renderer',
+    'ytd-playlist-panel-video-renderer',
+    'ytd-video-renderer',
+    'ytd-grid-video-renderer',
+    'ytd-channel-video-player-renderer'
+  ].join(', ');
+
+  // True when the cursor is on (or inside) a thumbnail image / media
+  // area. Used to gate the universal fallback inside findTarget(), so
+  // it must be defined BEFORE findTarget — both the helper and the
+  // const it reads. (Function declarations get hoisted, but the const
+  // they read does not, so calling isThumbnailArea before the const
+  // line had executed would throw a TDZ ReferenceError.)
+  const THUMBNAIL_CONTAINERS =
+    'ytd-thumbnail, ' +
+    'yt-thumbnail-view-model, ' +
+    'yt-collection-thumbnail-view-model, ' +
+    'yt-image, ' +
+    'ytd-moving-thumbnail-renderer, ' +
+    'ytd-thumbnail-overlay-time-status-renderer, ' +
+    '#thumbnail';
+
+  function isThumbnailArea(el) {
+    if (!el) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    // Direct media elements
+    if (tag === 'IMG' || tag === 'VIDEO' || tag === 'PICTURE' ||
+        tag === 'CANVAS' || tag === 'YT-IMAGE') return true;
+    // Inside a known thumbnail container
+    if (el.closest) {
+      try { return !!el.closest(THUMBNAIL_CONTAINERS); } catch (_) {}
+    }
+    return false;
+  }
+
+  // ───────── Comprehensive YouTube UI button list ─────────
+  // Hand-curated selectors covering every standard YouTube surface:
+  // sidebar, masthead, player chrome, watch-page actions, feed chips,
+  // and comments. These bypass the minSize geometry guard — even thin
+  // controls like the progress bar or a tiny sort dropdown are valid
+  // dwell targets here. Tried BEFORE the generic catch-alls so that
+  // YouTube-specific layouts always win.
+  const UI_BUTTON_SELECTORS = [
+    // ── Left sidebar nav ──
+    'ytd-guide-entry-renderer a',
+    'ytd-mini-guide-entry-renderer a',
+    'ytd-guide-collapsible-entry-renderer',
+    '#sections ytd-guide-section-renderer a',
+    // ── Top header / masthead ──
+    '#masthead-container button',
+    '#masthead-container ytd-topbar-menu-button-renderer',
+    '#avatar-btn.ytd-topbar-menu-button-renderer',
+    'button#search-icon-legacy',
+    // ── Video player chrome ──
+    '.ytp-chrome-controls button',
+    '.ytp-button',
+    '.ytp-progress-bar-container',
+    '.ytp-chapters-container',
+    '.ytp-cards-button',
+    '.ytp-autonav-toggle-button',
+    // ── Watch-page contextual actions ──
+    'ytd-subscribe-button-renderer button',
+    '#top-level-buttons-computed button',
+    'ytd-button-renderer.ytd-menu-renderer a',
+    '#flexible-item-buttons button',
+    // ── Feed filter chips & utility ──
+    'yt-chip-cloud-chip-renderer',
+    '#left-arrow button',
+    '#right-arrow button',
+    'button[aria-label="Action menu"]',
+    // ── Comments ──
+    'ytd-comment-action-buttons-renderer button',
+    '#expand-button button',
+    '#collapse-button button',
+    '#sort-menu yt-dropdown-menu'
+  ];
+
+  // Walk ancestry to find the closest supported target for an element.
+  // Returns { el, clickTarget, type } or null.
+  //
+  //   - el:          element used for visual highlight & contains() checks
+  //   - clickTarget: element to .click() when the dwell completes
+  //     (same as el for non-video direct matches; an inner <a> for video
+  //     matches where the card wrapper is the visual but the anchor is
+  //     what actually navigates).
+  function findTarget(el) {
+    if (!el || !el.closest) return null;
+
+    // ── Priority 0: comprehensive YouTube UI button list ──
+    // Hand-curated selectors that bypass the minSize geometry guard.
+    // A thin progress bar, a tiny sort dropdown, a sidebar entry, etc.
+    // are all valid dwell targets here. Tried before TARGET_SELECTORS
+    // so YouTube-specific layouts always win over the generic rules.
+    for (const sel of UI_BUTTON_SELECTORS) {
+      const hit = el.closest(sel);
+      if (hit) return { el: hit, clickTarget: hit, type: 'button' };
+    }
+
+    for (const entry of TARGET_SELECTORS) {
+      // ── DIRECT match ──
+      if (entry.sel) {
+        const hit = el.closest(entry.sel);
+        if (!hit) continue;
+
+        // For video URL matches, the anchor itself may be a thin
+        // title-area strip in modern grid layouts. Promote the visual
+        // element + size check to the surrounding card wrapper when
+        // one exists, but keep the anchor as the click target.
+        let visualEl = hit;
+        let sizeEl   = hit;
+        if (entry.type === 'video') {
+          const card = hit.closest(VIDEO_CARD_WRAPPERS);
+          if (card) {
+            visualEl = card;
+            sizeEl   = card;
+          }
+        }
+
+        if (entry.minSize) {
+          const r = sizeEl.getBoundingClientRect();
+          if (r.width < entry.minSize.w || r.height < entry.minSize.h) continue;
+        }
+        return { el: visualEl, clickTarget: hit, type: entry.type };
+      }
+
+      // ── WRAPPER match (split-link layouts with no anchor on cursor) ──
+      if (entry.wrap) {
+        const wrapper = el.closest(entry.wrap);
+        if (!wrapper) continue;
+        const inner = wrapper.querySelector(entry.inner);
+        if (!inner) continue;
+        if (entry.minSize) {
+          const r = wrapper.getBoundingClientRect();
+          if (r.width < entry.minSize.w || r.height < entry.minSize.h) continue;
+        }
+        return { el: wrapper, clickTarget: inner, type: entry.type };
+      }
+
+      // ── FALLBACK match (only when cursor is on a thumbnail image) ──
+      // Walking up to find ANY ancestor with a video anchor would match
+      // hovers over titles, channel names, badges, and even whitespace.
+      // Gate the fallback so it only fires when the cursor is actually
+      // on a media element or inside a thumbnail container.
+      if (entry.fallback) {
+        if (!isThumbnailArea(el)) continue;
+
+        let cur = el;
+        let depth = 0;
+        while (cur && cur !== document.body && cur !== document.documentElement && depth < 12) {
+          if (cur.querySelector) {
+            const anchor = cur.querySelector(
+              'a[href*="/watch?"], a[href*="/shorts/"], a[href*="/live/"]'
+            );
+            if (anchor) {
+              const r = cur.getBoundingClientRect();
+              if (r.width >= entry.minSize.w && r.height >= entry.minSize.h) {
+                // If a known card wrapper sits around this match, promote
+                // the visual element up to it so the ring centers on the
+                // whole card rather than just the thumbnail container.
+                const card = cur.closest(VIDEO_CARD_WRAPPERS);
+                return {
+                  el: card || cur,
+                  clickTarget: anchor,
+                  type: entry.type
+                };
+              }
+            }
+          }
+          cur = cur.parentElement;
+          depth++;
+        }
+      }
+    }
+    return null;
+  }
+
+  // ───────── Event handlers ─────────
+
+  // Spacebar toggles the extension on/off (when the cursor isn't in a
+  // text input). Captures the event so YouTube's space-to-pause doesn't
+  // also fire on the same press.
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    if (e.repeat) return;
+    if (isTypingTarget(e.target)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const next = !enabled;
+    // Apply locally first so the UI feedback (toast + ring behavior)
+    // works even if the extension context is dead. The storage write
+    // and onChanged listener still sync the popup when alive.
+    enabled = next;
+    if (!next) {
+      cancelDwell();
+      hideStatus();
+    } else {
+      showStatus();
+    }
+    safeChrome(() => chrome.storage.local.set({ enabled: next }));
+    showToast(next ? 'Dwell clicking on' : 'Dwell clicking off');
+  }, true);
+
+  // Mouseover: cursor entered a new element. Updates the status pill
+  // and, if it's a SwitchFlow target, starts (or resumes) a dwell.
+  document.addEventListener('mouseover', (e) => {
+    if (!enabled) return;
+    const raw = deepTarget(e);
+    const target = findTarget(raw);
+    if (target) {
+      // Already dwelling on this exact target? Just keep going.
+      if (active && active.el === target.el) return;
+      // Switched to a different target? Cancel and start fresh — the
+      // resume-on-return check inside startDwell handles same-element
+      // re-entry; a different element always restarts from full time.
+      if (active) cancelDwell();
+
+      // Seed the pill with the starting countdown so it never flashes blank.
+      const startMs = target.type === 'video' ? videoDwellTime : buttonDwellTime;
+      setStatus('engaged', formatCountdown(target.type, startMs));
+
+      startDwell(target);
+      return;
+    }
+    // Not a target — but is the cursor at least on something interactive?
+    if (findInteractive(raw)) {
+      setStatus('something');
+    } else {
+      setStatus('idle');
+    }
+  }, true);
+
+  // Mouseout: cursor left an element. Decide whether we're still inside
+  // our active target (mouse moved between two children of it) or really
+  // left.
+  document.addEventListener('mouseout', (e) => {
+    if (!active) return;
+    const next = e.relatedTarget;
+    // null = cursor left the document entirely
+    if (!next) { cancelDwell(); setStatus('idle'); return; }
+    // Still inside the target's subtree? Stay alive.
+    if (active.el.contains(next)) return;
+    // Genuine exit.
+    cancelDwell();
+    // Status will be repainted by the next mouseover, but set a sensible
+    // default in case mouseover doesn't fire (e.g., cursor left the
+    // document).
+    if (findInteractive(next)) setStatus('something');
+    else setStatus('idle');
+  }, true);
+
+  // If the user clicks anything themselves (or any other source clicks),
+  // tear down our ring so we don't double-fire.
+  document.addEventListener('click', () => {
+    if (active) cancelDwell();
+  }, true);
+
+  // Page hidden → user switched tabs / locked. Don't run timers.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && active) cancelDwell();
+  });
+
+  // YouTube is a single-page app. When navigation completes the relevant
+  // DOM is swapped in. Our mouseover delegation handles new elements
+  // automatically, but reset any in-flight dwell since the old target
+  // may have been removed from the DOM.
+  document.addEventListener('yt-navigate-finish', () => {
+    if (active) cancelDwell();
+  }, true);
+
+  // MutationObserver — keeps the orphaned-ring case clean if YouTube
+  // removes the target node out from under us mid-dwell.
+  const domObserver = new MutationObserver(() => {
+    if (active && active.el && !document.body.contains(active.el)) {
+      cancelDwell();
+    }
+  });
+  domObserver.observe(document.body, { childList: true, subtree: true });
+
+  // ───────── Dwell lifecycle ─────────
+
+  // Begin a dwell on the given target.
+  function startDwell(target) {
+    const dwellTime = target.type === 'video' ? videoDwellTime : buttonDwellTime;
+
+    // Resume-from-pause check: is this the same element we just left,
+    // and was that ≤ RESUME_WINDOW_MS ago?
+    let elapsedAtStart = 0;
+    if (
+      lastSession &&
+      lastSession.el === target.el &&
+      Date.now() - lastSession.leftAt < RESUME_WINDOW_MS
+    ) {
+      elapsedAtStart = lastSession.elapsed;
+    }
+    lastSession = null;
+
+    // Only draw the visual ring for VIDEO targets. For buttons (player
+    // controls, sidebar, comments, etc.) the countdown lives in the
+    // top status pill and a ring would just obscure tiny controls.
+    let ring = null;
+    if (target.type === 'video') {
+      ring = createRing();
+      document.documentElement.appendChild(ring);
+      const c = getElementCenter(target.el);
+      positionRing(ring, c.x, c.y);
+      // One paint later → fade in.
+      requestAnimationFrame(() => ring.classList.add('switchflow-visible'));
+    }
+
+    active = {
+      el: target.el,                 // visual element (whole card)
+      clickTarget: target.clickTarget, // element to actually click
+      type: target.type,
+      ring,                          // null for button-type targets
+      // startTime is back-shifted by elapsedAtStart so the math below
+      // produces the correct cumulative elapsed.
+      startTime: Date.now() - elapsedAtStart,
+      elapsed: elapsedAtStart,
+      dwellTime,
+      rafId: 0
+    };
+
+    tickDwell();
+  }
+
+  // One frame of the dwell animation. Recursively re-queues itself.
+  function tickDwell() {
+    if (!active) return;
+
+    // Re-anchor + repaint the ring only when there is one (video targets).
+    if (active.ring) {
+      const c = getElementCenter(active.el);
+      positionRing(active.ring, c.x, c.y);
+    }
+
+    const now = Date.now();
+    const elapsed = now - active.startTime;
+    active.elapsed = elapsed;
+
+    const msRemaining = active.dwellTime - elapsed;
+    const ratio = Math.min(1, elapsed / active.dwellTime);
+    if (active.ring) paintRing(active.ring, ratio, msRemaining);
+
+    // Live countdown in the status pill (rounded to whole seconds).
+    setStatus('engaged', formatCountdown(active.type, msRemaining));
+
+    if (ratio >= 1) {
+      completeDwell();
+    } else {
+      active.rafId = requestAnimationFrame(tickDwell);
+    }
+  }
+
+  // Dwell finished naturally → flash green (video only), click.
+  function completeDwell() {
+    if (!active) return;
+    const { ring, clickTarget, type } = active;
+
+    // Green flash + completion burst (CSS-driven). Video targets only;
+    // button targets have no ring to flash.
+    if (ring) {
+      const progress = ring.querySelector('.switchflow-ring-progress');
+      const count    = ring.querySelector('.switchflow-ring-count');
+      progress.classList.add('switchflow-complete');
+      count.classList.add('switchflow-complete');
+      count.textContent = '✓';
+      ring.classList.add('switchflow-completing');
+    }
+
+    // Pill: brief confirmation. The next mouseover (or page navigation)
+    // will reset to idle/something automatically.
+    setStatus('engaged', type === 'video' ? 'Opening!' : 'Clicked!');
+
+    // Cancel any further frames; we're done.
+    cancelAnimationFrame(active.rafId);
+    active = null;
+    lastSession = null;
+
+    // Video needs the full ripple window; buttons get a much shorter
+    // confirmation delay so the click feels snappy.
+    const delay = ring ? COMPLETE_FLASH_MS : 120;
+    setTimeout(() => {
+      if (ring) ring.remove();
+      try {
+        // clickTarget is the actual <a> / button to fire on. For wrapper
+        // matches it's the inner anchor; for direct matches it's the
+        // visual element itself.
+        triggerClick(clickTarget);
+      } catch (_) {}
+    }, delay);
+  }
+
+  // Cursor left target before completion → fade ring, remember progress.
+  function cancelDwell() {
+    if (!active) return;
+    const { ring, el, elapsed } = active;
+    cancelAnimationFrame(active.rafId);
+
+    // Remember progress for resume-on-return.
+    lastSession = { el, elapsed, leftAt: Date.now() };
+    active = null;
+
+    // Fade + remove only when a ring exists (video targets).
+    if (ring) {
+      ring.classList.remove('switchflow-visible');
+      setTimeout(() => { if (ring.parentNode) ring.remove(); }, FADE_OUT_MS);
+    }
+  }
+
+  // ───────── Click helper ─────────
+
+  // Fire the click in the most "real" way we can. Inputs get focus too.
+  function triggerClick(el) {
+    const tag = (el.tagName || '').toUpperCase();
+    if (tag === 'INPUT' || tag === 'TEXTAREA') {
+      el.focus();
+      // Also click in case some UI relies on it.
+      el.click();
+      return;
+    }
+    el.click();
+  }
+
+  // ───────── Ring rendering ─────────
+
+  // Build the ring overlay. Detached from DOM until we append it.
+  function createRing() {
+    const center = RING_BOX / 2; // 28
+    const wrap = document.createElement('div');
+    wrap.className = 'switchflow-ring-container';
+    wrap.innerHTML =
+      '<div class="switchflow-ring-halo"></div>' +
+      '<div class="switchflow-ring-ripple"></div>' +
+      '<svg class="switchflow-ring-svg" viewBox="0 0 ' + RING_BOX + ' ' + RING_BOX + '" aria-hidden="true">' +
+        '<circle class="switchflow-ring-track" cx="' + center + '" cy="' + center + '" r="' + RING_RADIUS + '"></circle>' +
+        '<circle class="switchflow-ring-progress" cx="' + center + '" cy="' + center + '" r="' + RING_RADIUS + '"' +
+        ' transform="rotate(-90 ' + center + ' ' + center + ')"' +
+        ' stroke-dasharray="' + RING_CIRCUMFERENCE.toFixed(2) + '"' +
+        ' stroke-dashoffset="' + RING_CIRCUMFERENCE.toFixed(2) + '"></circle>' +
+      '</svg>' +
+      '<div class="switchflow-ring-count"></div>';
+    return wrap;
+  }
+
+  // Place the ring at (x, y) viewport coordinates.
+  function positionRing(ring, x, y) {
+    ring.style.left = x + 'px';
+    ring.style.top  = y + 'px';
+  }
+
+  // Paint the ring's fill ratio and the countdown number.
+  function paintRing(ring, ratio, msRemaining) {
+    const progress = ring.querySelector('.switchflow-ring-progress');
+    const count    = ring.querySelector('.switchflow-ring-count');
+
+    const offset = RING_CIRCUMFERENCE * (1 - ratio);
+    progress.setAttribute('stroke-dashoffset', offset.toFixed(2));
+
+    // Count down whole seconds remaining (rounded up).
+    const secs = Math.max(0, Math.ceil(msRemaining / 1000));
+    count.textContent = secs > 0 ? String(secs) : '';
+  }
+
+  // ───────── Helpers ─────────
+
+  // Viewport-relative center of an element's bounding rect.
+  function getElementCenter(el) {
+    const r = el.getBoundingClientRect();
+    return {
+      x: r.left + r.width / 2,
+      y: r.top + r.height / 2
+    };
+  }
+
+  // True if the user is typing into an input / textarea / contenteditable.
+  // Used to keep the Space toggle from hijacking text entry.
+  function isTypingTarget(el) {
+    if (!el) return false;
+    if (el.isContentEditable) return true;
+    const tag = el.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  }
+
+  // Briefly show a centered toast confirming a state change.
+  function showToast(text) {
+    // Remove any existing toast first so successive presses replace cleanly.
+    document.querySelectorAll('.switchflow-toast').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'switchflow-toast';
+    toast.textContent = text;
+    document.documentElement.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('switchflow-toast-visible'));
+    setTimeout(() => {
+      toast.classList.remove('switchflow-toast-visible');
+      setTimeout(() => toast.remove(), 250);
+    }, 1400);
+  }
+
+  // Return the deepest element an event passed through, including ones
+  // hidden inside open shadow roots. composedPath() gives us the full
+  // chain target → ancestors; the first entry is the actual hit node.
+  // Falls back to event.target for environments without composedPath.
+  function deepTarget(e) {
+    if (typeof e.composedPath === 'function') {
+      const p = e.composedPath();
+      if (p && p.length > 0) return p[0];
+    }
+    return e.target;
+  }
+
+  // (THUMBNAIL_CONTAINERS + isThumbnailArea were moved above findTarget
+  // to avoid a TDZ ReferenceError when an early mouseover races the
+  // IIFE's later const initialization.)
+
+  // Walk up to find any interactive element (link, button, input, role).
+  // Returns the matching element or null. Used to decide between the
+  // "something hovering" vs "not hovering" status states.
+  function findInteractive(el) {
+    if (!el || !el.closest) return null;
+    return el.closest(
+      'a, button, input, select, textarea, summary, label, ' +
+      '[role="button"], [role="link"], [role="checkbox"], ' +
+      '[role="menuitem"], [role="tab"], ' +
+      '[tabindex]:not([tabindex="-1"])'
+    );
+  }
+
+  // ───────── Status pill ─────────
+
+  let statusEl = null;
+  let statusState = null; // 'idle' | 'something' | 'engaged'
+
+  // Phrases shown in each state. Centralized so they're easy to tweak.
+  // The "engaged" state text is set dynamically (live countdown) so it's
+  // intentionally absent here.
+  const STATUS_LABELS = {
+    idle:      'Hover any video to open it',
+    something: 'Hover a video or button',
+    engaged:   ''  // overridden each frame with the countdown
+  };
+
+  // Build the engaged-state countdown string. Used both on dwell start
+  // (so the pill never flashes blank) and each animation frame.
+  function formatCountdown(type, msRemaining) {
+    const secs = Math.max(0, Math.ceil(msRemaining / 1000));
+    if (type === 'video') {
+      return secs > 0 ? 'Opens in ' + secs + 's' : 'Opening…';
+    }
+    return secs > 0 ? 'Click in ' + secs + 's' : 'Clicking…';
+  }
+
+  // Lazily create the pill, then make it visible if the extension's on.
+  function ensureStatus() {
+    if (statusEl && document.documentElement.contains(statusEl)) return;
+    statusEl = document.createElement('div');
+    statusEl.className = 'switchflow-status switchflow-status-idle';
+    statusEl.innerHTML =
+      '<span class="switchflow-status-dot"></span>' +
+      '<span class="switchflow-status-text">' + STATUS_LABELS.idle + '</span>';
+    document.documentElement.appendChild(statusEl);
+    statusState = 'idle';
+  }
+
+  // Show the pill (creates it if needed). Idempotent.
+  function showStatus() {
+    ensureStatus();
+    requestAnimationFrame(() => statusEl.classList.add('switchflow-status-visible'));
+  }
+
+  // Hide the pill (kept in DOM so reshowing is instant).
+  function hideStatus() {
+    if (statusEl) statusEl.classList.remove('switchflow-status-visible');
+  }
+
+  // Set state ('idle' | 'something' | 'engaged') with optional dynamic
+  // text. For the 'engaged' state the caller passes a countdown string;
+  // for 'idle' / 'something' we use the static label.
+  function setStatus(next, customText) {
+    if (!enabled) return;
+    ensureStatus();
+    const stateChanged = statusState !== next;
+    if (stateChanged) {
+      statusState = next;
+      statusEl.classList.remove(
+        'switchflow-status-idle',
+        'switchflow-status-something',
+        'switchflow-status-engaged'
+      );
+      statusEl.classList.add('switchflow-status-' + next);
+    }
+    // Decide what to put in the pill.
+    const text = (customText !== undefined && customText !== null)
+      ? customText
+      : STATUS_LABELS[next];
+    // Avoid touching the DOM if nothing actually changed.
+    const textEl = statusEl.querySelector('.switchflow-status-text');
+    if (textEl.textContent !== text) textEl.textContent = text;
+  }
+
+  // Hide the pill while a YouTube video is in fullscreen so it doesn't
+  // overlap the video itself.
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+      hideStatus();
+    } else if (enabled) {
+      showStatus();
+    }
+  });
+})();

@@ -1,0 +1,314 @@
+/*
+ * SwitchFlow — content stylesheet (YouTube dwell clicking).
+ *
+ * The progress ring overlay only. No styles touch YouTube's DOM.
+ * Everything is fixed-positioned at the cursor with pointer-events
+ * disabled so it never interferes with hit-testing on the page.
+ *
+ * Sizing:
+ *   - container:  56px (viewport)
+ *   - SVG arc:    r=26 inside a 56-unit viewBox
+ *   - countdown:  18px bold
+ */
+
+/* ───────── Ring container ─────────
+ * Single floating overlay. JS sets left/top each mousemove; translate
+ * centers the ring on the cursor regardless of size.
+ */
+.switchflow-ring-container {
+  position: fixed !important;
+  pointer-events: none !important;
+  z-index: 2147483630 !important;
+
+  width: 56px !important;
+  height: 56px !important;
+
+  transform: translate(-50%, -50%) scale(0.88) !important;
+
+  opacity: 0 !important;
+  transition: opacity 0.1s ease, transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+
+  will-change: transform, opacity, left, top !important;
+}
+
+/* Visible state — applied one frame after creation so the fade-in plays. */
+.switchflow-ring-container.switchflow-visible {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* ───────── Soft halo backing ─────────
+ * Radial gradient: bright in the middle (so countdown is legible on
+ * any background), fades to transparent at the rim (so the user can
+ * still see the underlying element through the edges of the ring).
+ */
+.switchflow-ring-halo {
+  position: absolute !important;
+  inset: 4px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.78) 45%,
+    rgba(255, 255, 255, 0.0)  90%
+  ) !important;
+  box-shadow:
+    0 4px 14px rgba(0, 102, 255, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.10) !important;
+  pointer-events: none !important;
+}
+
+/* ───────── Ripple — fires only on completion ───────── */
+.switchflow-ring-ripple {
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 50% !important;
+  border: 3px solid #22C55E !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ───────── Progress SVG ───────── */
+.switchflow-ring-svg {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+  filter: drop-shadow(0 0 6px rgba(0, 102, 255, 0.35)) !important;
+}
+
+/* Gray dwell track, always visible while ring is up. */
+.switchflow-ring-track {
+  fill: none !important;
+  stroke: rgba(15, 20, 25, 0.20) !important;
+  stroke-width: 3 !important;
+}
+
+/* Blue progress arc — JS animates stroke-dashoffset.
+ * Pre-rotated -90° in the SVG so the start of the stroke sits at 12 o'clock. */
+.switchflow-ring-progress {
+  fill: none !important;
+  stroke: #0066FF !important;
+  stroke-width: 5 !important;
+  stroke-linecap: round !important;
+  transition: stroke-dashoffset 50ms linear,
+              stroke 0.1s ease !important;
+}
+
+/* Completion state — both arcs flip to green. */
+.switchflow-ring-progress.switchflow-complete {
+  stroke: #22C55E !important;
+}
+
+/* ───────── Countdown number ───────── */
+.switchflow-ring-count {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont,
+               "Helvetica Neue", sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  color: #0066FF !important;
+  text-align: center !important;
+
+  /* White halo so the number is legible on dark thumbnails too. */
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.85),
+    0 0 2px rgba(255, 255, 255, 0.9) !important;
+
+  pointer-events: none !important;
+  user-select: none !important;
+
+  transition: color 0.1s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.switchflow-ring-count.switchflow-complete {
+  color: #22C55E !important;
+  transform: translate(-50%, -50%) scale(1.15) !important;
+}
+
+/* ───────── Completion burst ─────────
+ * When dwell completes the container scales up briefly and the green
+ * ripple expands outward and fades. Removed via element.remove() after
+ * the burst window.
+ */
+.switchflow-ring-container.switchflow-completing {
+  transform: translate(-50%, -50%) scale(1.18) !important;
+}
+
+.switchflow-ring-container.switchflow-completing .switchflow-ring-ripple {
+  animation: switchflow-ripple 380ms ease-out forwards !important;
+}
+
+@keyframes switchflow-ripple {
+  0%   { transform: scale(1);    opacity: 0.9; border-width: 4px; }
+  60%  { opacity: 0.45;          border-width: 2px; }
+  100% { transform: scale(1.9);  opacity: 0;    border-width: 1px; }
+}
+
+/* ───────── Status pill (live hover state) ─────────
+ * Fixed at top-center of viewport, below YouTube's masthead. Three
+ * possible states, each with a colored leading dot:
+ *   idle      — gray   — cursor is over plain content
+ *   something — amber  — cursor is over an interactive element we don't
+ *                        dwell-click (so user knows we see it)
+ *   engaged   — blue   — cursor is over a SwitchFlow target, ring active
+ *
+ * Hidden entirely when the extension is disabled.
+ */
+.switchflow-status {
+  position: fixed !important;
+  top: 70px !important;            /* clear YouTube's masthead */
+  left: 50% !important;
+  transform: translateX(-50%) translateY(-8px) !important;
+  z-index: 2147483639 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+
+  padding: 8px 16px 8px 14px !important;
+  background: rgba(15, 20, 25, 0.92) !important;
+  color: #ffffff !important;
+
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont,
+               "Helvetica Neue", sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+
+  border-radius: 999px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25),
+              0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.22s ease, transform 0.22s ease,
+              background 0.22s ease !important;
+}
+
+.switchflow-status.switchflow-status-visible {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+.switchflow-status-dot {
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  background: #94a3b8 !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  transition: background 0.22s ease, transform 0.22s ease !important;
+}
+
+/* ── State: idle ── */
+.switchflow-status-idle .switchflow-status-dot {
+  background: #94a3b8 !important;
+}
+
+/* ── State: something hovering (not a SwitchFlow target) ── */
+.switchflow-status-something {
+  background: rgba(28, 21, 14, 0.94) !important;
+}
+.switchflow-status-something .switchflow-status-dot {
+  background: #F59E0B !important;
+}
+
+/* ── State: engaged (dwell active) ── */
+.switchflow-status-engaged {
+  background: rgba(0, 102, 255, 0.96) !important;
+}
+.switchflow-status-engaged .switchflow-status-dot {
+  background: #ffffff !important;
+  animation: switchflow-status-pulse 900ms ease-in-out infinite alternate !important;
+}
+
+@keyframes switchflow-status-pulse {
+  from { transform: scale(0.85); opacity: 0.65; }
+  to   { transform: scale(1.15); opacity: 1; }
+}
+
+/* ───────── Toast — confirms Space toggle ─────────
+ * Centered horizontally at the top of the viewport. Fades in, holds,
+ * fades out. Pointer-events disabled so it never blocks the page.
+ */
+.switchflow-toast {
+  position: fixed !important;
+  top: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(-12px) !important;
+  z-index: 2147483640 !important;
+
+  padding: 12px 22px !important;
+  background: rgba(15, 20, 25, 0.94) !important;
+  color: #ffffff !important;
+
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont,
+               "Helvetica Neue", sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+
+  border-radius: 999px !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28),
+              0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.switchflow-toast.switchflow-toast-visible {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+/* ───────── Reduced-motion ─────────
+ * Keep the ring functional but skip non-essential animations.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .switchflow-ring-container {
+    transition: opacity 0.1s ease !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+  .switchflow-ring-container.switchflow-visible {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+  .switchflow-ring-container.switchflow-completing {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+  .switchflow-ring-count,
+  .switchflow-ring-count.switchflow-complete {
+    transform: translate(-50%, -50%) !important;
+    transition: none !important;
+  }
+  .switchflow-ring-progress {
+    transition: stroke 0.1s ease !important;
+  }
+  .switchflow-ring-container.switchflow-completing .switchflow-ring-ripple {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+  .switchflow-toast {
+    transition: opacity 0.15s ease !important;
+    transform: translateX(-50%) !important;
+  }
+  .switchflow-toast.switchflow-toast-visible {
+    transform: translateX(-50%) !important;
+  }
+  .switchflow-status-engaged .switchflow-status-dot {
+    animation: none !important;
+    transform: scale(1) !important;
+  }
+}
