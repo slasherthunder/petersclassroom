@@ -15,31 +15,45 @@
 
 'use strict';
 
-const toggleEl   = document.getElementById('toggle');
-const statusEl   = document.getElementById('status');
-const videoEl    = document.getElementById('videoSpeed');
-const videoValEl = document.getElementById('videoVal');
-const buttonEl   = document.getElementById('buttonSpeed');
+// ── YouTube section ──
+const toggleEl    = document.getElementById('toggle');
+const statusEl    = document.getElementById('status');
+const videoEl     = document.getElementById('videoSpeed');
+const videoValEl  = document.getElementById('videoVal');
+const buttonEl    = document.getElementById('buttonSpeed');
 const buttonValEl = document.getElementById('buttonVal');
+
+// ── Universal (every other site) section ──
+const universalToggleEl = document.getElementById('universalToggle');
+const universalStatusEl = document.getElementById('universalStatus');
+const universalSpeedEl  = document.getElementById('universalSpeed');
+const universalValEl    = document.getElementById('universalVal');
 
 // ───────── Initial load ─────────
 
 // Pull saved state and paint the UI.
 chrome.storage.local.get(
-  ['enabled', 'videoDwellTime', 'buttonDwellTime'],
+  ['enabled', 'universalEnabled', 'videoDwellTime', 'buttonDwellTime', 'universalDwellTime'],
   (data) => {
-    const enabled         = data.enabled !== false;
-    const videoDwellTime  = Number(data.videoDwellTime)  || 5000;
-    const buttonDwellTime = Number(data.buttonDwellTime) || 3000;
+    const enabled           = data.enabled !== false;
+    const universalEnabled  = data.universalEnabled !== false;
+    const videoDwellTime    = Number(data.videoDwellTime)     || 5000;
+    const buttonDwellTime   = Number(data.buttonDwellTime)    || 3000;
+    const universalDwellTime = Number(data.universalDwellTime) || 3000;
 
+    // YouTube section
     paintToggle(enabled);
     paintStatus(enabled);
-
-    videoEl.value = videoDwellTime;
+    videoEl.value         = videoDwellTime;
     videoValEl.textContent = videoDwellTime;
-
-    buttonEl.value = buttonDwellTime;
+    buttonEl.value        = buttonDwellTime;
     buttonValEl.textContent = buttonDwellTime;
+
+    // Universal section
+    paintUniversalToggle(universalEnabled);
+    paintUniversalStatus(universalEnabled);
+    universalSpeedEl.value = universalDwellTime;
+    universalValEl.textContent = universalDwellTime;
   }
 );
 
@@ -74,6 +88,27 @@ buttonEl.addEventListener('input', () => {
   chrome.storage.local.set({ buttonDwellTime: v });
 });
 
+// ── Universal toggle ──
+universalToggleEl.addEventListener('click', () => {
+  const next = universalToggleEl.getAttribute('aria-checked') !== 'true';
+  paintUniversalToggle(next);
+  paintUniversalStatus(next);
+  chrome.storage.local.set({ universalEnabled: next });
+});
+universalToggleEl.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    universalToggleEl.click();
+  }
+});
+
+// ── Universal dwell-time slider ──
+universalSpeedEl.addEventListener('input', () => {
+  const v = parseInt(universalSpeedEl.value, 10);
+  universalValEl.textContent = v;
+  chrome.storage.local.set({ universalDwellTime: v });
+});
+
 // ───────── External changes ─────────
 
 // If another popup (or future settings page) writes to storage, mirror
@@ -81,9 +116,14 @@ buttonEl.addEventListener('input', () => {
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
   if (changes.enabled) {
-    const enabled = changes.enabled.newValue !== false;
-    paintToggle(enabled);
-    paintStatus(enabled);
+    const v = changes.enabled.newValue !== false;
+    paintToggle(v);
+    paintStatus(v);
+  }
+  if (changes.universalEnabled) {
+    const v = changes.universalEnabled.newValue !== false;
+    paintUniversalToggle(v);
+    paintUniversalStatus(v);
   }
   if (changes.videoDwellTime) {
     const v = Number(changes.videoDwellTime.newValue) || 5000;
@@ -94,6 +134,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
     const v = Number(changes.buttonDwellTime.newValue) || 3000;
     buttonEl.value = v;
     buttonValEl.textContent = v;
+  }
+  if (changes.universalDwellTime) {
+    const v = Number(changes.universalDwellTime.newValue) || 3000;
+    universalSpeedEl.value = v;
+    universalValEl.textContent = v;
   }
 });
 
@@ -226,4 +271,15 @@ function paintToggle(on) {
 function paintStatus(on) {
   statusEl.textContent = on ? 'Active on YouTube' : 'Disabled';
   statusEl.classList.toggle('on', on);
+}
+
+// Universal toggle visual.
+function paintUniversalToggle(on) {
+  universalToggleEl.setAttribute('aria-checked', on ? 'true' : 'false');
+}
+
+// Universal status line.
+function paintUniversalStatus(on) {
+  universalStatusEl.textContent = on ? 'Active everywhere' : 'Disabled';
+  universalStatusEl.classList.toggle('on', on);
 }

@@ -131,9 +131,26 @@
   // ───────── State ─────────
 
   // Settings synced from chrome.storage.local.
+  // `enabled` = YouTube dwell-click on/off (existing).
+  // `universalEnabled` = dwell-click on/off for every other site.
   let enabled = true;
+  let universalEnabled = true;
   let videoDwellTime = 5000;
   let buttonDwellTime = 3000;
+  let universalDwellTime = 3000;
+
+  // True when dwell-click is enabled in THIS page's context. On YouTube
+  // we look at `enabled`; on every other site we look at `universalEnabled`.
+  function isDwellEnabledHere() {
+    return IS_YOUTUBE ? enabled : universalEnabled;
+  }
+
+  // The dwell duration to use for a given target type.
+  function dwellTimeFor(type) {
+    if (type === 'video')  return videoDwellTime;
+    if (type === 'button') return buttonDwellTime;
+    return universalDwellTime; // 'universal' fallback for everything else
+  }
 
   // Active dwell session. null when nothing being dwelled.
   // { el, type, ring, startTime, elapsed, dwellTime, rafId }
@@ -186,15 +203,18 @@
   // defaults instead of crashing.
   safeChrome(() => {
     chrome.storage.local.get(
-      ['enabled', 'videoDwellTime', 'buttonDwellTime'],
+      ['enabled', 'universalEnabled', 'videoDwellTime', 'buttonDwellTime', 'universalDwellTime'],
       (data) => {
         // Guard the callback too: it can fire after context invalidation.
         try {
           if (chrome.runtime && chrome.runtime.lastError) return;
           enabled = data.enabled !== false;
-          videoDwellTime = Number(data.videoDwellTime) || 5000;
-          buttonDwellTime = Number(data.buttonDwellTime) || 3000;
+          universalEnabled = data.universalEnabled !== false;
+          videoDwellTime     = Number(data.videoDwellTime)     || 5000;
+          buttonDwellTime    = Number(data.buttonDwellTime)    || 3000;
+          universalDwellTime = Number(data.universalDwellTime) || 3000;
           if (enabled && IS_YOUTUBE) showStatus();
+          paintDwellToggle();
         } catch (_) {}
       }
     );
@@ -208,21 +228,28 @@
         if (area !== 'local') return;
         if (changes.enabled) {
           enabled = changes.enabled.newValue !== false;
-          if (!enabled) {
-            cancelDwell();
-            if (IS_YOUTUBE) hideStatus();
-          } else {
-            if (IS_YOUTUBE) showStatus();
+          if (IS_YOUTUBE) {
+            if (!enabled) { cancelDwell(); hideStatus(); }
+            else showStatus();
           }
+          paintDwellToggle();
+        }
+        if (changes.universalEnabled) {
+          universalEnabled = changes.universalEnabled.newValue !== false;
+          if (!IS_YOUTUBE && !universalEnabled) cancelDwell();
+          paintDwellToggle();
         }
         if (changes.videoDwellTime) {
           videoDwellTime = Number(changes.videoDwellTime.newValue) || 5000;
-          // If we're mid-dwell on a video, adopt the new total instantly.
           if (active && active.type === 'video') active.dwellTime = videoDwellTime;
         }
         if (changes.buttonDwellTime) {
           buttonDwellTime = Number(changes.buttonDwellTime.newValue) || 3000;
           if (active && active.type === 'button') active.dwellTime = buttonDwellTime;
+        }
+        if (changes.universalDwellTime) {
+          universalDwellTime = Number(changes.universalDwellTime.newValue) || 3000;
+          if (active && active.type === 'universal') active.dwellTime = universalDwellTime;
         }
       } catch (_) {}
     });
@@ -277,6 +304,49 @@
     return false;
   }
 
+  // ───────── Universal interactive selector (non-YouTube sites) ─────────
+  // A single composite selector — one closest() call resolves the
+  // nearest interactive ancestor regardless of which kind it is.
+  // Combined into one string for performance: on every mouseover we'd
+  // otherwise iterate ~14 individual selectors.
+  const UNIVERSAL_SELECTOR = [
+    'a[href]:not([href="#"]):not([href^="javascript:"])',
+    'button:not([disabled]):not([aria-hidden="true"])',
+    '[role="button"]:not([aria-disabled="true"]):not([aria-hidden="true"])',
+    'input:not([type="hidden"]):not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    'summary',
+    'label',
+    '[role="link"]',
+    '[role="menuitem"]',
+    '[role="menuitemcheckbox"]',
+    '[role="menuitemradio"]',
+    '[role="tab"]',
+    '[role="checkbox"]',
+    '[role="radio"]',
+    '[role="switch"]',
+    '[role="option"]',
+    '[contenteditable="true"]',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(', ');
+
+  // Minimum element size to count as a target on non-YouTube sites —
+  // skips tiny decorative buttons or hidden interactive elements.
+  const UNIVERSAL_MIN_W = 22;
+  const UNIVERSAL_MIN_H = 18;
+
+  // Universal-mode target lookup: any interactive element gets a
+  // 3-second dwell, no special selectors, no per-element customization.
+  function findUniversalTarget(el) {
+    if (!el || !el.closest) return null;
+    const hit = el.closest(UNIVERSAL_SELECTOR);
+    if (!hit) return null;
+    const r = hit.getBoundingClientRect();
+    if (r.width < UNIVERSAL_MIN_W || r.height < UNIVERSAL_MIN_H) return null;
+    return { el: hit, clickTarget: hit, type: 'universal' };
+  }
+
   // ───────── Comprehensive YouTube UI button list ─────────
   // Hand-curated selectors covering every standard YouTube surface:
   // sidebar, masthead, player chrome, watch-page actions, feed chips,
@@ -329,6 +399,11 @@
   //     what actually navigates).
   function findTarget(el) {
     if (!el || !el.closest) return null;
+
+    // Non-YouTube sites use the universal interactive-element matcher
+    // and skip every YouTube-specific selector below. Single closest()
+    // call keeps this fast on every mouseover.
+    if (!IS_YOUTUBE) return findUniversalTarget(el);
 
     // ── Priority 0: comprehensive YouTube UI button list ──
     // Hand-curated selectors that bypass the minSize geometry guard.
@@ -427,31 +502,32 @@
     if (e.code !== 'Space') return;
     if (e.repeat) return;
     if (isTypingTarget(e.target)) return;
-    if (!IS_YOUTUBE) return; // dwell-click toggle is YouTube-only
 
     e.preventDefault();
     e.stopPropagation();
 
-    const next = !enabled;
-    // Apply locally first so the UI feedback (toast + ring behavior)
-    // works even if the extension context is dead. The storage write
-    // and onChanged listener still sync the popup when alive.
-    enabled = next;
-    if (!next) {
-      cancelDwell();
-      hideStatus();
+    // Flip whichever toggle applies to the current site.
+    if (IS_YOUTUBE) {
+      const next = !enabled;
+      enabled = next;
+      if (!next) { cancelDwell(); hideStatus(); }
+      else showStatus();
+      safeChrome(() => chrome.storage.local.set({ enabled: next }));
+      showToast(next ? 'Dwell clicking on' : 'Dwell clicking off');
     } else {
-      showStatus();
+      const next = !universalEnabled;
+      universalEnabled = next;
+      if (!next) cancelDwell();
+      safeChrome(() => chrome.storage.local.set({ universalEnabled: next }));
+      showToast(next ? 'Dwell clicking on' : 'Dwell clicking off');
     }
-    safeChrome(() => chrome.storage.local.set({ enabled: next }));
-    showToast(next ? 'Dwell clicking on' : 'Dwell clicking off');
+    paintDwellToggle();
   }, true);
 
   // Mouseover: cursor entered a new element. Updates the status pill
   // and, if it's a EasePass target, starts (or resumes) a dwell.
   document.addEventListener('mouseover', (e) => {
-    if (!IS_YOUTUBE) return; // dwell-click runs only on YouTube
-    if (!enabled) return;
+    if (!isDwellEnabledHere()) return;
     const raw = deepTarget(e);
     const target = findTarget(raw);
     if (target) {
@@ -463,7 +539,7 @@
       if (active) cancelDwell();
 
       // Seed the pill with the starting countdown so it never flashes blank.
-      const startMs = target.type === 'video' ? videoDwellTime : buttonDwellTime;
+      const startMs = dwellTimeFor(target.type);
       setStatus('engaged', formatCountdown(target.type, startMs));
 
       startDwell(target);
@@ -481,7 +557,6 @@
   // our active target (mouse moved between two children of it) or really
   // left.
   document.addEventListener('mouseout', (e) => {
-    if (!IS_YOUTUBE) return;
     if (!active) return;
     const next = e.relatedTarget;
     // null = cursor left the document entirely
@@ -516,23 +591,20 @@
     if (active) cancelDwell();
   }, true);
 
-  // MutationObserver — keeps the orphaned-ring case clean if YouTube
-  // removes the target node out from under us mid-dwell. Only attach
-  // on YouTube to avoid the cost on every other site.
-  if (IS_YOUTUBE) {
-    const domObserver = new MutationObserver(() => {
-      if (active && active.el && !document.body.contains(active.el)) {
-        cancelDwell();
-      }
-    });
-    domObserver.observe(document.body, { childList: true, subtree: true });
-  }
+  // MutationObserver — clears any orphaned dwell if the active target
+  // node is removed mid-countdown. Works on every site, not just YouTube.
+  const domObserver = new MutationObserver(() => {
+    if (active && active.el && !document.body.contains(active.el)) {
+      cancelDwell();
+    }
+  });
+  domObserver.observe(document.body, { childList: true, subtree: true });
 
   // ───────── Dwell lifecycle ─────────
 
   // Begin a dwell on the given target.
   function startDwell(target) {
-    const dwellTime = target.type === 'video' ? videoDwellTime : buttonDwellTime;
+    const dwellTime = dwellTimeFor(target.type);
 
     // Resume-from-pause check: is this the same element we just left,
     // and was that ≤ RESUME_WINDOW_MS ago?
@@ -546,11 +618,13 @@
     }
     lastSession = null;
 
-    // Only draw the visual ring for VIDEO targets. For buttons (player
-    // controls, sidebar, comments, etc.) the countdown lives in the
-    // top status pill and a ring would just obscure tiny controls.
+    // Draw the visual ring for VIDEO (YouTube thumbnails) and UNIVERSAL
+    // (every interactive element on non-YouTube sites) targets. YouTube
+    // BUTTON targets keep their no-ring behavior — the countdown there
+    // lives in the top status pill so the ring doesn't obscure the
+    // tiny player controls.
     let ring = null;
-    if (target.type === 'video') {
+    if (target.type === 'video' || target.type === 'universal') {
       ring = createRing();
       document.documentElement.appendChild(ring);
       const c = getElementCenter(target.el);
@@ -828,6 +902,7 @@
   // text. For the 'engaged' state the caller passes a countdown string;
   // for 'idle' / 'something' we use the static label.
   function setStatus(next, customText) {
+    if (!IS_YOUTUBE) return; // status pill is YouTube-only
     if (!enabled) return;
     ensureStatus();
     const stateChanged = statusState !== next;
@@ -1035,4 +1110,67 @@
     loadTextSettings();
   }
   bootText();
+
+  // ══════════════════════════════════════════
+  // FLOATING DWELL TOGGLE — appears on every site
+  // Bottom-right circular button. Shows ✓ when dwell-click is active in
+  // this page's context, ✕ when off. Click (or dwell on YouTube) flips
+  // the appropriate storage flag.
+  // ══════════════════════════════════════════
+
+  let dwellToggleEl = null;
+
+  function createDwellToggle() {
+    if (dwellToggleEl && document.documentElement.contains(dwellToggleEl)) return;
+    dwellToggleEl = document.createElement('button');
+    dwellToggleEl.id = 'easepass-dwell-toggle';
+    dwellToggleEl.type = 'button';
+    dwellToggleEl.setAttribute('aria-label', 'Toggle EasePass dwell clicking');
+    dwellToggleEl.innerHTML =
+      '<span class="easepass-toggle-glyph" aria-hidden="true"></span>';
+    dwellToggleEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      flipDwell();
+    });
+    try { document.documentElement.appendChild(dwellToggleEl); } catch (_) {}
+    paintDwellToggle();
+  }
+
+  // Apply the on/off visual based on the toggle that governs THIS site.
+  function paintDwellToggle() {
+    if (!dwellToggleEl) return;
+    const on = isDwellEnabledHere();
+    dwellToggleEl.classList.toggle('easepass-toggle-on',  on);
+    dwellToggleEl.classList.toggle('easepass-toggle-off', !on);
+    dwellToggleEl.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const glyph = dwellToggleEl.querySelector('.easepass-toggle-glyph');
+    if (glyph) glyph.textContent = on ? '✓' : '✕'; // ✓ / ✕
+  }
+
+  // Flip the dwell-enabled flag relevant to the current page (YouTube
+  // vs universal). Mirrors the spacebar handler logic but with a
+  // mouse-friendly entry point.
+  function flipDwell() {
+    if (IS_YOUTUBE) {
+      const next = !enabled;
+      enabled = next;
+      if (!next) { cancelDwell(); hideStatus(); } else { showStatus(); }
+      safeChrome(() => chrome.storage.local.set({ enabled: next }));
+      showToast(next ? 'Dwell clicking on' : 'Dwell clicking off');
+    } else {
+      const next = !universalEnabled;
+      universalEnabled = next;
+      if (!next) cancelDwell();
+      safeChrome(() => chrome.storage.local.set({ universalEnabled: next }));
+      showToast(next ? 'Dwell clicking on' : 'Dwell clicking off');
+    }
+    paintDwellToggle();
+  }
+
+  function bootToggle() {
+    if (!document.body) { setTimeout(bootToggle, 50); return; }
+    createDwellToggle();
+  }
+  bootToggle();
 })();

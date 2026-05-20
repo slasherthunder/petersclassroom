@@ -649,3 +649,63 @@
   }
 }
 
+/* ══════════════════════════════════════════
+   FLOATING DWELL-CLICK TOGGLE — visible on every site
+   Bottom-right circular button. Green ✓ when active, gray ✕ when off.
+   Click (or dwell on YouTube) flips the appropriate storage flag.
+   ══════════════════════════════════════════ */
+#easepass-dwell-toggle {
+  position: fixed !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  z-index: 2147483629 !important; /* one below the dwell ring */
+
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  border: 3px solid #ffffff !important;
+  background: #22C55E !important;
+  color: #ffffff !important;
+
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont,
+               "Helvetica Neue", sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  cursor: pointer !important;
+  box-shadow: 0 6px 22px rgba(34, 197, 94, 0.45),
+              0 0 0 1px rgba(34, 197, 94, 0.3) !important;
+  transition: transform 0.18s ease, background 0.18s ease,
+              box-shadow 0.18s ease !important;
+  text-transform: none !important;
+}
+
+#easepass-dwell-toggle.easepass-toggle-off {
+  background: #6e6e73 !important;
+  box-shadow: 0 6px 22px rgba(110, 110, 115, 0.35),
+              0 0 0 1px rgba(110, 110, 115, 0.25) !important;
+}
+
+#easepass-dwell-toggle:hover  { transform: scale(1.06) !important; }
+#easepass-dwell-toggle:active { transform: scale(0.96) !important; }
+#easepass-dwell-toggle:focus-visible {
+  outline: 3px solid #ffd400 !important;
+  outline-offset: 3px !important;
+}
+
+#easepass-dwell-toggle .easepass-toggle-glyph {
+  display: inline-block !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #easepass-dwell-toggle { transition: none !important; }
+}

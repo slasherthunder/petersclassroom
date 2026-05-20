@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EasePass · A Chrome extension for switch-accessible web browsing</title>
+  <title>EasePass · Hover-to-click for every website</title>
+  <link rel="icon" type="image/png" href="easepasslogo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -33,6 +34,21 @@
     }
 
     .product-hero h1 .accent { color: var(--blue-d); }
+
+    /* EasePass brand logo — sits above the text wordmark in the hero. */
+    .product-hero-logo {
+      display: block;
+      width: min(360px, 70vw);
+      height: auto;
+      margin: 0 auto 1.2rem;
+      filter: drop-shadow(0 8px 28px rgba(0, 102, 255, 0.18));
+    }
+
+    /* Wordmark text sitting under the logo. */
+    .product-hero-wordmark {
+      display: block;
+      text-align: center;
+    }
 
     .feature-icon {
       width: 56px;
@@ -212,12 +228,15 @@
 
   <!-- HERO -->
   <section class="hero product-hero">
-    <span class="page-label">Chrome extension · In development</span>
-    <h1>Ease<span class="accent">Pass.</span></h1>
-    <p class="hero-tagline">Switch-accessible web browsing in a Chrome extension. Press space to scan, press again to select. One key, the whole internet.</p>
+    <span class="page-label">Free Chrome extension · v0.4.0</span>
+    <h1>
+      <img src="easepasslogo.png" alt="" class="product-hero-logo" aria-hidden="true" />
+      <span class="product-hero-wordmark">Ease<span class="accent">Pass.</span></span>
+    </h1>
+    <p class="hero-tagline">Hover to click. No button needed. EasePass adds dwell clicking to every website, with smart YouTube targeting on top.</p>
     <div class="hero-links">
       <a href="#how" class="hero-link">How it works</a>
-      <a href="#contact" class="hero-link">Request early access</a>
+      <a href="#contact" class="hero-link">Get EasePass</a>
     </div>
   </section>
 
@@ -226,29 +245,29 @@
     <div class="demo-box">
       <div class="demo-icon" aria-hidden="true">▶</div>
       <h3>Demo video coming soon</h3>
-      <p>We're recording EasePass in action — watch the highlight ring scan YouTube, drop into a region, and select a video with one key press.</p>
+      <p>We're recording EasePass in action — the blue ring filling on a YouTube thumbnail, the countdown pill ticking on a player button, and a universal hover-click opening a Wikipedia article. All without pressing a button.</p>
     </div>
   </section>
 
   <!-- MISSION -->
   <div class="mission">
-    <h2>The web, navigable by <span class="accent">a single key.</span></h2>
-    <p>EasePass groups every webpage into regions, then into elements, and lets students scan and select with one switch press. Built on <strong>Chrome's automation API</strong> so it works on real sites like YouTube and Wikipedia — not just demos.</p>
+    <h2>The web, navigable by <span class="accent">hover alone.</span></h2>
+    <p>EasePass watches your cursor and clicks for you. Hover any link, button, input, or video thumbnail and after a few seconds it clicks itself. Built for anyone who can move a cursor with a <strong>mouse, head tracker, or eye gaze device</strong> but can't easily press a button. Works on every website out of the box.</p>
   </div>
 
   <!-- AUDIENCES (who EasePass serves) -->
   <section class="audiences" id="for-whom">
-    <h2>Built for <span class="accent">switch users.</span></h2>
-    <p>Anyone who can press a single button — spacebar, AbleNet switch, big button, or sip-and-puff — can browse with EasePass.</p>
+    <h2>Built for <span class="accent">cursor-only users.</span></h2>
+    <p>If you can move a cursor but can't easily press a button, EasePass is for you. It works with any input that controls a pointer.</p>
 
     <div class="audience-grid">
       <div class="audience-card">
-        <h3>Single-switch users</h3>
-        <p>One press to scan, another to select. Works with spacebars, USB switches, and any input mapped to a key.</p>
+        <h3>People with motor differences</h3>
+        <p>Limited hand strength, tremors, RSI, fatigue, or anything else that makes the physical click difficult or painful.</p>
       </div>
       <div class="audience-card">
-        <h3>Students learning switch access</h3>
-        <p>A consistent, predictable scanning pattern on real websites — so practice transfers to real-world independence.</p>
+        <h3>Head tracker &amp; eye gaze users</h3>
+        <p>Assistive devices that move the cursor with a head, gaze, or other alternative input but don't always fire a real click on their own.</p>
       </div>
       <div class="audience-card">
         <h3>Classrooms &amp; families</h3>
@@ -264,23 +283,23 @@
     <div class="principles-grid">
       <div class="principle">
         <div class="principle-num">1</div>
-        <h3>Press space to scan regions</h3>
-        <p>EasePass highlights the page's regions in order: <strong>navigation, main content, sidebar, footer</strong>. One press moves to the next region.</p>
+        <h3>Hover any clickable element</h3>
+        <p>Links, buttons, inputs, video thumbnails, dropdowns. A blue ring appears centered on whatever your cursor is on.</p>
       </div>
       <div class="principle">
         <div class="principle-num">2</div>
-        <h3>Press again to enter</h3>
-        <p>A second press on a highlighted region drops scanning into the elements inside it — links, buttons, video controls, form fields.</p>
+        <h3>Watch the countdown</h3>
+        <p>The ring fills clockwise with a number in the center ticking down: <strong>3 → 2 → 1</strong>. Default 3 seconds. Adjustable in the popup.</p>
       </div>
       <div class="principle">
         <div class="principle-num">3</div>
-        <h3>Scan and select an element</h3>
-        <p>Each press moves a bright colored ring to the next interactive element. Press once more on the one you want to activate it.</p>
+        <h3>EasePass clicks for you</h3>
+        <p>At zero, the ring flashes green and a real click fires on the element. Links navigate, buttons activate, inputs focus.</p>
       </div>
       <div class="principle">
         <div class="principle-num">4</div>
-        <h3>Built on Chrome's automation API</h3>
-        <p>EasePass uses the accessibility tree the browser already builds — same source assistive tech relies on — so it finds real interactive targets, not just visual guesses.</p>
+        <h3>Toggle anywhere, instantly</h3>
+        <p>Tap <strong>Space</strong>, click the floating ✓/✕ button on any page, or open the toolbar popup. Off means off everywhere.</p>
       </div>
     </div>
   </section>
@@ -292,23 +311,23 @@
     <div class="principles-grid">
       <div class="principle">
         <div class="principle-num">✦</div>
-        <h3>Spotlight Mode</h3>
-        <p>The whole page dims except your target. Even busy sites become quiet, focused, and easy to scan.</p>
+        <h3>Universal coverage</h3>
+        <p>Works on every site automatically. Links, buttons, inputs, dropdowns, even custom <code>role="button"</code> elements. No per-site setup.</p>
       </div>
       <div class="principle">
-        <div class="principle-num">↶</div>
-        <h3>Intelligent Undo</h3>
-        <p>Made a wrong selection? One press jumps back to the previous region or element — no penalty for exploration.</p>
+        <div class="principle-num">▶</div>
+        <h3>Smart YouTube mode</h3>
+        <p>5-second dwell on thumbnails with the full ring, 3-second silent countdown on player and UI buttons in a status pill at the top.</p>
       </div>
       <div class="principle">
-        <div class="principle-num">◉</div>
-        <h3>Profiles</h3>
-        <p>Save scan speed, dwell time, and highlight color per learner. Switch between students without reconfiguring.</p>
+        <div class="principle-num">Aa</div>
+        <h3>Text accessibility built in</h3>
+        <p>Change the font (OpenDyslexic, Lexend, Atkinson Hyperlegible, Arial, Comic Sans), size, line height, and letter and word spacing on any page from the popup.</p>
       </div>
       <div class="principle">
-        <div class="principle-num">⤳</div>
-        <h3>Smart skip</h3>
-        <p>Empty regions and decorative elements skip automatically — scanning stays meaningful, never wasted.</p>
+        <div class="principle-num">↺</div>
+        <h3>Resume on return</h3>
+        <p>Move the cursor off and back on the same element within a second and the countdown picks up where it left off, so brief tremors or jitter don't reset progress.</p>
       </div>
     </div>
   </section>
@@ -316,35 +335,35 @@
   <!-- COMPARISON -->
   <section class="audiences" id="compare" style="background: var(--bg-alt);">
     <h2>How EasePass <span class="accent">compares.</span></h2>
-    <p>ChromeOS has built-in switch access, and it works for system-level navigation. EasePass is purpose-built for browsing the web.</p>
+    <p>OS-level dwell tools live in the system settings and treat the web as a generic surface. EasePass lives in the browser and is tuned for it.</p>
 
     <div class="compare-grid">
       <div class="compare-card old">
-        <h3>Built-in OS switch access</h3>
+        <h3>OS-level dwell tools</h3>
         <ul>
-          <li>Tab order only, slow on big sites</li>
-          <li>No region grouping</li>
-          <li>Generic visual highlighting</li>
-          <li>System-wide, not web-tuned</li>
+          <li>Buried in system accessibility settings</li>
+          <li>One dwell time for the whole computer</li>
+          <li>No awareness of video players, comments, or in-page UI</li>
+          <li>No font, size, or spacing controls for the page itself</li>
         </ul>
       </div>
       <div class="compare-card new">
         <h3>EasePass</h3>
         <ul>
-          <li>Region-first scanning</li>
-          <li>Spotlight Mode for visual clarity</li>
-          <li>Per-learner profiles &amp; intelligent undo</li>
-          <li>Tuned for YouTube and Wikipedia</li>
+          <li>Drop-in Chrome extension, on every site instantly</li>
+          <li>Separate dwell times for YouTube videos, YouTube buttons, and every other site</li>
+          <li>Smart YouTube mode with a top status pill and a per-thumbnail ring</li>
+          <li>Built-in text accessibility: font, size, line height, letter and word spacing</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- COMPATIBILITY / STATUS -->
+  <!-- WHERE IT WORKS -->
   <section class="products">
-    <h2>Starting <span class="accent">where it matters most.</span></h2>
+    <h2>Works <span class="accent">on every site.</span></h2>
     <p class="easepass-statement">
-      The first release focuses on <strong>YouTube and Wikipedia</strong> — two of the highest-impact sites for student learning, curiosity, and entertainment. EasePass is being co-developed with parents, students, and accessibility professionals so every region, every scan order, and every highlight is tuned to real classroom use.
+      Install once and EasePass goes everywhere your browser does. <strong>Universal mode</strong> handles the long tail of the web with a 3-second dwell on any interactive element. <strong>Smart YouTube mode</strong> layers extra targeting on top for video thumbnails and player UI.
     </p>
 
     <div class="product-grid" style="margin-top: 4rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 900px;">
@@ -356,34 +375,30 @@
             <polygon points="26,23 26,41 43,32" fill="#fff"/>
           </svg>
         </span>
-        <span class="card-badge">Launch target</span>
+        <span class="card-badge">Smart mode</span>
         <h3>YouTube</h3>
-        <p>Scan and select videos, player controls, search results, and playlist items — all with one key.</p>
+        <p>5-second dwell ring on video thumbnails. 3-second silent countdown on player and UI buttons in a top status pill. Click anything, no mouse button required.</p>
       </div>
 
       <div class="product-card hardware">
         <div class="card-glow"></div>
         <span class="card-icon" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56">
-            <rect x="14" y="8" width="36" height="48" rx="4" fill="#2E7D6B"/>
-            <rect x="18" y="16" width="28" height="3" rx="1" fill="#fff" opacity="0.9"/>
-            <rect x="18" y="23" width="28" height="3" rx="1" fill="#fff" opacity="0.6"/>
-            <rect x="18" y="30" width="22" height="3" rx="1" fill="#fff" opacity="0.9"/>
-            <rect x="18" y="37" width="28" height="3" rx="1" fill="#fff" opacity="0.6"/>
-            <rect x="18" y="44" width="18" height="3" rx="1" fill="#fff" opacity="0.9"/>
+            <circle cx="32" cy="32" r="24" fill="none" stroke="#2E7D6B" stroke-width="4"/>
+            <circle cx="32" cy="32" r="6" fill="#2E7D6B"/>
           </svg>
         </span>
-        <span class="card-badge">Launch target</span>
-        <h3>Wikipedia</h3>
-        <p>Read articles, follow citations, and explore the world's encyclopedia using only a switch.</p>
+        <span class="card-badge">Universal mode</span>
+        <h3>Every other site</h3>
+        <p>Wikipedia, news articles, web apps, social media, banking, anywhere. A single 3-second dwell (adjustable) on every link, button, input, and dropdown.</p>
       </div>
     </div>
   </section>
 
   <!-- CONTACT -->
   <section class="notify" id="contact">
-    <h2>Try the <span class="accent">EasePass</span> pilot.</h2>
-    <p>The Chrome extension is in active development. Sign up to test early builds, share feedback from real students, or just hear when it launches.</p>
+    <h2>Get <span class="accent">EasePass.</span></h2>
+    <p>EasePass is a free Chrome extension in active development. Get in touch to install the current build, share feedback, or hear when it lands on the Chrome Web Store.</p>
 
     <div class="contact-grid">
       <div class="contact-info">
@@ -393,12 +408,12 @@
         </p>
         <p class="contact-note">We typically respond within 2 business days.</p>
 
-        <h3 style="margin-top: 2rem;">Pilot participants</h3>
+        <h3 style="margin-top: 2rem;">Who we hear from</h3>
         <ul class="contact-list">
-          <li>Special education classrooms</li>
-          <li>Families exploring switch access</li>
-          <li>SLPs &amp; AT specialists</li>
-          <li>Schools and districts</li>
+          <li>People exploring dwell clicking</li>
+          <li>Head-tracker and eye-gaze users</li>
+          <li>Families, SLPs, and AT specialists</li>
+          <li>Schools, districts, and classrooms</li>
         </ul>
       </div>
 

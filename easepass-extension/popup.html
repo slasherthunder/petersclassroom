@@ -40,14 +40,41 @@
     }
     body { padding: 22px; }
 
+    .popup-logo {
+      display: block;
+      width: 92px;
+      height: auto;
+      margin: 0 auto 8px;
+    }
+
     h1 {
       font-size: 1.55rem;
       font-weight: 800;
       letter-spacing: -0.018em;
-      margin-bottom: 0.18rem;
+      margin: 0 0 0.18rem;
       line-height: 1.05;
+      text-align: center;
     }
     h1 .accent { color: var(--blue); }
+
+    .tagline { text-align: center; }
+
+    .section-heading {
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin: 1.1rem 0 0.5rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border);
+    }
+    h1 + .tagline + .section-heading,
+    .tagline + .section-heading {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 1.2rem;
+    }
 
     .tagline {
       color: var(--text-muted);
@@ -391,9 +418,12 @@
 </head>
 <body>
 
+  <img src="easepasslogo.png" alt="" class="popup-logo" aria-hidden="true" />
   <h1>Ease<span class="accent">Pass</span></h1>
   <p class="tagline">Hover to click. No button needed.</p>
 
+  <!-- ──── YouTube section ──── -->
+  <h2 class="section-heading">YouTube</h2>
   <div class="toggle-row">
     <div class="toggle-info">
       <span class="label">Dwell clicking</span>
@@ -403,7 +433,7 @@
             class="toggle"
             role="switch"
             aria-checked="true"
-            aria-label="Toggle dwell clicking"></button>
+            aria-label="Toggle YouTube dwell clicking"></button>
   </div>
 
   <div class="slider-row">
@@ -428,6 +458,32 @@
            min="500" max="5000" step="250"
            value="3000"
            aria-label="Button dwell time in milliseconds" />
+  </div>
+
+  <!-- ──── Universal (every other site) section ──── -->
+  <h2 class="section-heading">Every other site</h2>
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <span class="label">Dwell clicking</span>
+      <span id="universalStatus" class="status on">Active everywhere</span>
+    </div>
+    <button id="universalToggle"
+            class="toggle"
+            role="switch"
+            aria-checked="true"
+            aria-label="Toggle universal dwell clicking"></button>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-label">
+      <label for="universalSpeed">Dwell time</label>
+      <span class="value"><span id="universalVal">3000</span> ms</span>
+    </div>
+    <input type="range"
+           id="universalSpeed"
+           min="500" max="6000" step="250"
+           value="3000"
+           aria-label="Universal dwell time in milliseconds" />
   </div>
 
   <div class="how">
