@@ -34,6 +34,28 @@ html {
   scroll-padding-top: 72px; /* keep fixed nav from covering anchored sections */
 }
 
+/* Skip-to-main link — visually hidden until focused, lets keyboard and
+   screen-reader users jump past the nav straight to the page content. */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -100px;
+  z-index: 10001;
+  background: var(--blue-d);
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 0 0 10px 10px;
+  text-decoration: none;
+  transition: top 0.18s ease;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #fff;
+  outline-offset: -3px;
+}
+[id="main"]:focus { outline: none; }
+
 body {
   font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 400;
@@ -1145,7 +1167,11 @@ footer .dot {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.001ms !important;
+    /* Beat the inline transition-delay the reveal stagger sets via JS,
+       so reduced-motion users don't get a staggered fade. */
+    transition-delay: 0ms !important;
   }
 }
 
@@ -1421,6 +1447,23 @@ html[data-letter-spacing="wide"]  body { letter-spacing: 0.05em; }
 html[data-letter-spacing="wider"] body { letter-spacing: 0.1em; word-spacing: 0.15em; }
 
 /* Dyslexia-friendly font */
+/* Load OpenDyslexic so the dyslexia-friendly font below actually applies
+   instead of silently falling through to Comic Sans. */
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.cdnfonts.com/s/19808/OpenDyslexic-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://fonts.cdnfonts.com/s/19808/OpenDyslexic-Bold.woff') format('woff');
+}
+
 html[data-font="dyslexia"] body,
 html[data-font="dyslexia"] body * {
   font-family: 'OpenDyslexic', 'Lexie Readable', 'Comic Sans MS', 'Trebuchet MS', Verdana, sans-serif !important;
@@ -1452,6 +1495,12 @@ html[data-contrast="dark"] .compare-card { background: #1a1a1a; border-color: #2
 html[data-contrast="dark"] .compare-card h3 { color: #f0f0f0; }
 html[data-contrast="dark"] .compare-card li { color: #d0d0d0; }
 html[data-contrast="dark"] .compare-card.new { background: #10263b; border-color: #2d6b9f; }
+/* features-section forces a white bg via !important in easepass.html's
+   inline CSS — override it (also !important) so it goes dark too. */
+html[data-contrast="dark"] .features-section { background: #0a0a0a !important; }
+html[data-contrast="dark"] .feature-icon { background: rgba(79,195,247,0.18); color: #8ecbff; }
+html[data-contrast="dark"] .easepass-statement { color: #bbb; }
+html[data-contrast="dark"] .easepass-statement strong { color: #f0f0f0; }
 html[data-contrast="dark"] .a11y-panel { background: #1f1f1f; }
 html[data-contrast="dark"] .a11y-panel-header h2 { color: #f0f0f0; }
 html[data-contrast="dark"] .a11y-btn { background: #2a2a2a; color: #f0f0f0; }
@@ -1505,7 +1554,10 @@ html[data-reduce-motion="on"] *::before,
 html[data-reduce-motion="on"] *::after {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
+  animation-delay: 0ms !important;
   transition-duration: 0.001ms !important;
+  /* Override the inline transition-delay set by the JS reveal stagger. */
+  transition-delay: 0ms !important;
   scroll-behavior: auto !important;
 }
 
@@ -1539,3 +1591,223 @@ html[data-pause-animations="on"] *::after {
 
 /* Prevent body scroll when panel is open */
 html.a11y-locked, html.a11y-locked body { overflow: hidden; }
+
+/* ══════════════════════════════════════════
+   EASEPASS POPUP PREVIEW — top-right floating widget
+   A faithful, interactive replica of the extension's popup.html so site
+   visitors can see every control the extension offers. Injected by
+   script.js (injectPopupPreview). Scoped under #epd- ids so it can't
+   collide with the page's own styles. The dwell toggles/sliders are a
+   visual demo — they don't drive real dwell-clicking on this static page.
+   ══════════════════════════════════════════ */
+#epd-toggle {
+  position: fixed;
+  top: calc(0.9rem + env(safe-area-inset-top));
+  right: calc(1.1rem + env(safe-area-inset-right));
+  width: 56px; height: 56px;
+  padding: 0; border: none; border-radius: 50%;
+  background: transparent; cursor: pointer;
+  z-index: 9000;
+  box-shadow: 0 6px 22px rgba(48, 16, 112, 0.28);
+  transition: transform 0.18s ease;
+}
+#epd-toggle img { width: 100%; height: 100%; display: block; border-radius: 50%; }
+#epd-toggle:hover { transform: scale(1.06); }
+#epd-toggle:active { transform: scale(0.96); }
+#epd-toggle:focus-visible { outline: 3px solid #0066FF; outline-offset: 3px; }
+
+#epd-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.34);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+  z-index: 9001;
+}
+#epd-overlay.epd-open { opacity: 1; pointer-events: auto; }
+
+#epd-panel {
+  position: fixed; top: 0; right: 0;
+  width: 360px; max-width: 92vw;
+  height: 100vh; height: 100dvh;
+  background: #fff; color: #0f1419;
+  z-index: 9002;
+  box-shadow: -6px 0 28px rgba(0, 0, 0, 0.22);
+  transform: translateX(105%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+  overflow-y: auto;
+  padding: 20px 20px 28px;
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+#epd-panel.epd-open { transform: translateX(0); }
+#epd-panel *, #epd-panel *::before, #epd-panel *::after { box-sizing: border-box; }
+
+@media (prefers-reduced-motion: reduce) {
+  #epd-toggle, #epd-overlay, #epd-panel { transition: none !important; }
+}
+
+/* Header */
+.epd-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.epd-logo { width: 64px; height: auto; display: block; margin-bottom: 4px; }
+.epd-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.018em; line-height: 1.05; }
+.epd-title .accent { color: #0066FF; }
+.epd-tagline { color: #5a6470; font-size: 0.88rem; margin-top: 2px; }
+.epd-close {
+  flex-shrink: 0;
+  background: #f1f6ff; color: #0066FF; border: none;
+  width: 34px; height: 34px; border-radius: 50%;
+  font-size: 15px; font-weight: 800; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.epd-close:hover { background: #e0ecff; }
+.epd-close:focus-visible { outline: 3px solid #0066FF; outline-offset: 2px; }
+.epd-note {
+  margin: 10px 0 2px; padding: 7px 11px;
+  background: #f1f6ff; border-radius: 8px;
+  font-size: 0.74rem; color: #5a6470; line-height: 1.4;
+}
+
+/* Section headings */
+.epd-section-heading {
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #0066FF;
+  margin: 1.15rem 0 0.5rem; padding-top: 0.6rem;
+  border-top: 1px solid #e2e8ef;
+}
+
+/* Toggle rows */
+.epd-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 0.5rem 0 0.9rem;
+}
+.epd-toggle-info { display: flex; flex-direction: column; min-width: 0; }
+.epd-label { font-weight: 600; font-size: 0.96rem; }
+.epd-status { font-size: 0.78rem; color: #5a6470; margin-top: 2px; }
+.epd-status.on { color: #22C55E; font-weight: 600; }
+.epd-switch {
+  position: relative; width: 50px; height: 28px;
+  background: #cdd5df; border-radius: 999px; border: none;
+  cursor: pointer; flex-shrink: 0; transition: background 0.2s; padding: 0;
+}
+.epd-switch::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 22px; height: 22px; background: #fff; border-radius: 50%;
+  transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.epd-switch[aria-checked="true"] { background: #0066FF; }
+.epd-switch[aria-checked="true"]::after { transform: translateX(22px); }
+.epd-switch:focus-visible { outline: 3px solid #0066FF; outline-offset: 3px; }
+
+/* Sliders */
+.epd-slider-block { margin-bottom: 1rem; }
+.epd-slider-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem;
+}
+.epd-slider-label .epd-value { color: #0066FF; font-weight: 700; }
+#epd-panel input[type="range"] { width: 100%; accent-color: #0066FF; height: 24px; }
+#epd-panel input[type="range"]:focus-visible { outline: 3px solid #0066FF; outline-offset: 4px; border-radius: 4px; }
+
+/* How it works */
+.epd-how { background: #f1f6ff; border-radius: 12px; padding: 14px 16px; margin-top: 1rem; }
+.epd-how h3 {
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #0066FF; margin-bottom: 8px;
+}
+.epd-how ol { list-style: none; padding: 0; counter-reset: epd-step; }
+.epd-how li {
+  font-size: 0.88rem; line-height: 1.5; color: #0f1419;
+  padding-left: 1.9rem; position: relative; counter-increment: epd-step;
+  margin-bottom: 5px;
+}
+.epd-how li:last-child { margin-bottom: 0; }
+.epd-how li::before {
+  content: counter(epd-step); position: absolute; left: 0; top: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #0066FF; color: #fff; font-weight: 700; font-size: 0.76rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Text accessibility */
+.epd-ta-desc { font-size: 0.82rem; color: #5a6470; margin: 0.5rem 0 0.9rem; line-height: 1.45; }
+.epd-subhead {
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #0f1419; margin: 0.85rem 0 0.45rem;
+}
+.epd-section-header { display: flex; justify-content: space-between; align-items: baseline; margin: 0.85rem 0 0.45rem; }
+.epd-section-header .epd-subhead { margin: 0; }
+.epd-reset-link {
+  background: none; border: none; color: #5a6470;
+  font-family: inherit; font-size: 0.74rem; font-weight: 600;
+  cursor: pointer; padding: 0; text-decoration: underline;
+}
+.epd-reset-link:hover { color: #0066FF; }
+
+.epd-font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.epd-font-btn {
+  background: #f1f6ff; border: 2px solid transparent; border-radius: 10px;
+  padding: 8px; cursor: pointer; text-align: left;
+  display: flex; flex-direction: column; gap: 3px; color: #0f1419;
+  font-family: inherit; transition: background 0.15s, border-color 0.15s;
+}
+.epd-font-btn:hover { background: #e0ecff; }
+.epd-font-btn[aria-pressed="true"] { background: #fff; border-color: #0066FF; color: #0066FF; }
+.epd-font-btn:focus-visible { outline: 3px solid #0066FF; outline-offset: 2px; }
+.epd-font-name { font-size: 0.78rem; font-weight: 700; line-height: 1.1; }
+.epd-font-preview { font-size: 0.74rem; color: #5a6470; line-height: 1.15; }
+.epd-font-btn[data-font="opendyslexic"] .epd-font-preview { font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif; }
+.epd-font-btn[data-font="lexend"] .epd-font-preview { font-family: 'Lexend', sans-serif; }
+.epd-font-btn[data-font="arial"] .epd-font-preview { font-family: Arial, Helvetica, sans-serif; }
+.epd-font-btn[data-font="comic"] .epd-font-preview { font-family: 'Comic Sans MS', 'Comic Sans', cursive; }
+.epd-font-btn[data-font="atkinson"] .epd-font-preview { font-family: 'Atkinson Hyperlegible', sans-serif; }
+
+.epd-slider-row { display: flex; align-items: center; gap: 10px; }
+.epd-slider-row input[type="range"] { flex: 1; }
+.epd-slider-value { color: #0066FF; font-weight: 700; font-size: 0.85rem; min-width: 42px; text-align: right; }
+
+.epd-pill-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.epd-pill-row:last-child { margin-bottom: 0; }
+.epd-pill-row-label { font-size: 0.78rem; font-weight: 600; color: #0f1419; min-width: 46px; }
+.epd-pill-group { display: flex; gap: 4px; flex: 1; }
+.epd-pill-btn {
+  flex: 1; background: #f1f6ff; color: #0f1419;
+  border: 1px solid transparent; border-radius: 999px; padding: 5px 6px;
+  font-family: inherit; font-size: 0.74rem; font-weight: 600;
+  cursor: pointer; transition: background 0.12s, color 0.12s, border-color 0.12s;
+  text-align: center; white-space: nowrap;
+}
+.epd-pill-btn:hover { background: #e0ecff; }
+.epd-pill-btn[aria-pressed="true"] { background: #0066FF; color: #fff; border-color: #0066FF; }
+.epd-pill-btn:focus-visible { outline: 3px solid #0066FF; outline-offset: 2px; }
+
+.epd-reset-all {
+  width: 100%; padding: 0.7rem 1rem; background: #0f1419; color: #fff;
+  border: none; border-radius: 10px; font-family: inherit;
+  font-size: 0.86rem; font-weight: 700; cursor: pointer; margin-top: 1rem;
+  transition: background 0.15s;
+}
+.epd-reset-all:hover { background: #2a2f36; }
+.epd-reset-all:focus-visible { outline: 3px solid #0066FF; outline-offset: 3px; }
+
+.epd-footer {
+  margin-top: 1.2rem; padding-top: 0.9rem; border-top: 1px solid #e2e8ef;
+  text-align: center; font-size: 0.76rem; color: #5a6470;
+}
+.epd-footer a { color: #0066FF; text-decoration: none; font-weight: 600; }
+.epd-footer a:hover { text-decoration: underline; }
+
+/* Dark mode parity with the site's contrast toggle */
+html[data-contrast="dark"] #epd-panel { background: #1f1f1f; color: #f0f0f0; }
+html[data-contrast="dark"] .epd-tagline,
+html[data-contrast="dark"] .epd-ta-desc,
+html[data-contrast="dark"] .epd-status,
+html[data-contrast="dark"] .epd-footer { color: #bbb; }
+html[data-contrast="dark"] .epd-label,
+html[data-contrast="dark"] .epd-subhead,
+html[data-contrast="dark"] .epd-how li,
+html[data-contrast="dark"] .epd-font-name { color: #f0f0f0; }
+html[data-contrast="dark"] .epd-how,
+html[data-contrast="dark"] .epd-note,
+html[data-contrast="dark"] .epd-font-btn,
+html[data-contrast="dark"] .epd-pill-btn { background: #2a2a2a; }
+html[data-contrast="dark"] .epd-font-btn[aria-pressed="true"] { background: #10263b; }
+html[data-contrast="dark"] .epd-close { background: #2a2a2a; }

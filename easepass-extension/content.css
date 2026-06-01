@@ -1,9 +1,10 @@
 /*
- * EasePass — content stylesheet (YouTube dwell clicking).
+ * EasePass — content stylesheet (dwell-click overlays, every site).
  *
- * The progress ring overlay only. No styles touch YouTube's DOM.
- * Everything is fixed-positioned at the cursor with pointer-events
- * disabled so it never interferes with hit-testing on the page.
+ * The progress ring, status pill, toast, floating toggle, and "Aa"
+ * button. No styles touch the host page's own DOM. Everything is
+ * fixed-positioned at the cursor with pointer-events disabled so it
+ * never interferes with hit-testing on the page.
  *
  * Sizing:
  *   - container:  56px (viewport)

@@ -1156,6 +1156,7 @@
           ? { ...DEFAULT_TEXT_SETTINGS, ...next }
           : { ...DEFAULT_TEXT_SETTINGS };
         applyTextSettings();
+        paintTextPanel(); // keep the in-page panel in sync with popup edits
       } catch (_) {}
     });
   }
@@ -1175,31 +1176,171 @@
   }
   bootText();
 
-  // Lightweight on-page entrypoint for text accessibility controls.
-  // Opens the extension popup page in a new tab, scrolled to the text
-  // accessibility section.
+  // The floating "Aa" button opens an in-page slide-in panel (styled in
+  // content.css) with the same font / size / spacing controls as the
+  // toolbar popup. It stays in the page — closeable via the ✕ button, a
+  // backdrop click, or Escape — rather than navigating to a new tab.
+  // Changes write to chrome.storage.local so the popup and other tabs
+  // stay in sync via the storage.onChanged listener above.
   let aaButtonEl = null;
+  let textPanelEl = null;
+  let textBackdropEl = null;
+
   function createAaButton() {
     if (aaButtonEl && document.documentElement.contains(aaButtonEl)) return;
     aaButtonEl = document.createElement('button');
     aaButtonEl.id = 'easepass-aa-btn';
     aaButtonEl.type = 'button';
     aaButtonEl.setAttribute('aria-label', 'Open EasePass text accessibility controls');
+    aaButtonEl.setAttribute('aria-expanded', 'false');
     aaButtonEl.textContent = 'Aa';
     aaButtonEl.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      safeChrome(() => {
-        const url = chrome.runtime.getURL('popup.html#text-accessibility');
-        chrome.runtime.sendMessage({ type: 'OPEN_EXTENSION_PAGE', url }, () => {
-          if (chrome.runtime && chrome.runtime.lastError) {
-            try { window.open(url, '_blank', 'noopener'); } catch (_) {}
-          }
-        });
-      });
+      toggleTextPanel();
     });
     try { document.documentElement.appendChild(aaButtonEl); } catch (_) {}
   }
+
+  // Build the backdrop + panel once and wire every control.
+  function buildTextPanel() {
+    if (textPanelEl) return;
+
+    textBackdropEl = document.createElement('div');
+    textBackdropEl.id = 'easepass-text-backdrop';
+    textBackdropEl.addEventListener('click', closeTextPanel);
+
+    textPanelEl = document.createElement('aside');
+    textPanelEl.id = 'easepass-text-panel';
+    textPanelEl.setAttribute('role', 'dialog');
+    textPanelEl.setAttribute('aria-label', 'Text accessibility');
+
+    const fontBtns = FONT_OPTIONS.map(f =>
+      `<button class="sw-font-btn" type="button" data-font="${f.id}" aria-pressed="false" aria-label="Use the ${f.name} font">` +
+        `<span class="sw-font-name">${f.name}</span>` +
+        `<span class="sw-font-preview">${f.preview}</span>` +
+      `</button>`).join('');
+
+    const pillRow = (label, attr, opts) =>
+      `<div class="sw-pill-row">` +
+        `<span class="sw-pill-row-label">${label}</span>` +
+        `<div class="sw-pill-group" role="group" aria-label="${label} spacing">` +
+          opts.map(([v, t]) =>
+            `<button class="sw-pill-btn" type="button" data-${attr}="${v}" aria-pressed="false">${t}</button>`).join('') +
+        `</div>` +
+      `</div>`;
+
+    textPanelEl.innerHTML =
+      `<div class="sw-text-panel-header">` +
+        `<h2>Text Accessibility</h2>` +
+        `<button class="sw-text-panel-close" type="button" aria-label="Close text accessibility panel">✕</button>` +
+      `</div>` +
+      `<div class="sw-text-section">` +
+        `<h3>Font</h3>` +
+        `<div class="sw-font-grid">${fontBtns}</div>` +
+      `</div>` +
+      `<div class="sw-text-section">` +
+        `<div class="sw-text-section-header">` +
+          `<h3>Text Size</h3>` +
+          `<button class="sw-reset-link" type="button" data-reset="textSize">Reset</button>` +
+        `</div>` +
+        `<div class="sw-slider-row">` +
+          `<input type="range" min="80" max="200" step="10" id="easepass-size-slider" aria-label="Text size percentage" />` +
+          `<span class="sw-slider-value"><span id="easepass-size-value">100</span>%</span>` +
+        `</div>` +
+      `</div>` +
+      `<div class="sw-text-section">` +
+        `<h3>Spacing</h3>` +
+        pillRow('Letter', 'letter', [['normal','Normal'],['wide','Wide'],['wider','Wider']]) +
+        pillRow('Word', 'word', [['normal','Normal'],['wide','Wide'],['wider','Wider']]) +
+        pillRow('Line', 'line', [['normal','Normal'],['relaxed','Relaxed'],['loose','Loose']]) +
+      `</div>` +
+      `<button class="sw-reset-all" type="button">Reset all text settings</button>`;
+
+    textPanelEl.querySelector('.sw-text-panel-close')
+      .addEventListener('click', closeTextPanel);
+    textPanelEl.querySelectorAll('.sw-font-btn').forEach(b =>
+      b.addEventListener('click', () => updateText({ fontFamily: b.dataset.font })));
+    const slider = textPanelEl.querySelector('#easepass-size-slider');
+    slider.addEventListener('input', () => updateText({ textSize: Number(slider.value) }));
+    textPanelEl.querySelector('[data-reset="textSize"]')
+      .addEventListener('click', () => updateText({ textSize: DEFAULT_TEXT_SETTINGS.textSize }));
+    textPanelEl.querySelectorAll('[data-letter]').forEach(b =>
+      b.addEventListener('click', () => updateText({ letterSpacing: b.dataset.letter })));
+    textPanelEl.querySelectorAll('[data-word]').forEach(b =>
+      b.addEventListener('click', () => updateText({ wordSpacing: b.dataset.word })));
+    textPanelEl.querySelectorAll('[data-line]').forEach(b =>
+      b.addEventListener('click', () => updateText({ lineHeight: b.dataset.line })));
+    textPanelEl.querySelector('.sw-reset-all')
+      .addEventListener('click', () => updateText({ ...DEFAULT_TEXT_SETTINGS }));
+
+    try {
+      document.documentElement.appendChild(textBackdropEl);
+      document.documentElement.appendChild(textPanelEl);
+    } catch (_) {}
+  }
+
+  // Apply a partial settings change: update in memory, re-apply the page
+  // CSS, repaint the panel, and persist (which syncs the popup + other tabs).
+  function updateText(patch) {
+    textSettings = { ...textSettings, ...patch };
+    applyTextSettings();
+    paintTextPanel();
+    safeChrome(() => chrome.storage.local.set({ [TEXT_SETTINGS_KEY]: textSettings }));
+  }
+
+  // Reflect current textSettings into the panel's controls.
+  function paintTextPanel() {
+    if (!textPanelEl) return;
+    const press = (els, key) => els.forEach(b =>
+      b.setAttribute('aria-pressed', b.dataset[key] === textSettings[
+        key === 'font' ? 'fontFamily' :
+        key === 'letter' ? 'letterSpacing' :
+        key === 'word' ? 'wordSpacing' : 'lineHeight'
+      ] ? 'true' : 'false'));
+    press(textPanelEl.querySelectorAll('.sw-font-btn'), 'font');
+    press(textPanelEl.querySelectorAll('[data-letter]'), 'letter');
+    press(textPanelEl.querySelectorAll('[data-word]'), 'word');
+    press(textPanelEl.querySelectorAll('[data-line]'), 'line');
+    const slider = textPanelEl.querySelector('#easepass-size-slider');
+    const sizeVal = textPanelEl.querySelector('#easepass-size-value');
+    if (slider) slider.value = String(textSettings.textSize);
+    if (sizeVal) sizeVal.textContent = String(textSettings.textSize);
+  }
+
+  function isTextPanelOpen() {
+    return !!(textPanelEl && textPanelEl.classList.contains('easepass-open'));
+  }
+
+  function openTextPanel() {
+    buildTextPanel();
+    ensureFontFaces();   // so the font previews render in their own typeface
+    paintTextPanel();
+    requestAnimationFrame(() => {
+      textPanelEl.classList.add('easepass-open');
+      textBackdropEl.classList.add('easepass-open');
+    });
+    if (aaButtonEl) aaButtonEl.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeTextPanel() {
+    if (textPanelEl) textPanelEl.classList.remove('easepass-open');
+    if (textBackdropEl) textBackdropEl.classList.remove('easepass-open');
+    if (aaButtonEl) aaButtonEl.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleTextPanel() {
+    if (isTextPanelOpen()) closeTextPanel();
+    else openTextPanel();
+  }
+
+  // Escape closes the panel.
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isTextPanelOpen()) {
+      e.preventDefault();
+      closeTextPanel();
+    }
+  }, true);
 
   function bootAaButton() {
     if (!document.body) { setTimeout(bootAaButton, 50); return; }
