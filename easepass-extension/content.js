@@ -1,18 +1,24 @@
 /*
- * EasePass — content script (YouTube dwell clicking).
+ * EasePass — content script (dwell clicking + text accessibility).
  *
- * Runs only on youtube.com (per manifest match). When the cursor hovers
- * one of a curated list of YouTube targets (video thumbnails, player
- * buttons, search bar, subscribe/like) a circular progress ring appears
+ * Runs on <all_urls> (per manifest match). Behavior is split by host:
+ *   - On youtube.com: a curated list of YouTube targets (video
+ *     thumbnails, player buttons, search bar, subscribe/like) plus a
+ *     status pill.
+ *   - On every other site: any interactive element (links, buttons,
+ *     inputs, role="button", …) is a dwell target — see IS_YOUTUBE.
+ * The text-accessibility feature (font/size/spacing) runs everywhere.
+ *
+ * When the cursor hovers a target a circular progress ring appears
  * around the cursor and fills over the configured dwell time. When the
- * ring completes, EasePass fires a real .click() on the target.
+ * ring completes, EasePass fires a click on the target.
  *
  * Cursor leaves the target  → timer pauses, ring fades out.
  * Cursor returns within 1s → timer RESUMES from where it left off.
  * Cursor returns after 1s   → timer restarts from zero.
  *
  * No accidental clicks: even 1px outside the element ends the dwell.
- * No YouTube DOM is modified — we only inject an overlay div.
+ * No page DOM is modified — we only inject overlay elements.
  */
 
 (function () {
@@ -493,6 +499,34 @@
     return null;
   }
 
+  // Resolve a dwell target for a mouse event, transparently crossing
+  // shadow-DOM boundaries. findTarget()'s closest() calls stop at the
+  // shadow root they start in, so a hit inside a shadow tree would be
+  // detected but never resolve a selector. composedPath() includes the
+  // host elements from every outer tree, so when the deepest node lives
+  // in a shadow root and a direct lookup fails, we retry findTarget on
+  // each ancestor in the path. The cheap common case (no shadow DOM) only
+  // ever does the single direct lookup.
+  function findTargetForEvent(e) {
+    const path = (typeof e.composedPath === 'function') ? e.composedPath() : null;
+    const top = (path && path.length) ? path[0] : e.target;
+
+    const direct = findTarget(top);
+    if (direct || !path) return direct;
+
+    if (top && top.getRootNode && top.getRootNode() instanceof ShadowRoot) {
+      for (let i = 1; i < path.length; i++) {
+        const node = path[i];
+        if (!node || node === document || node === window) break;
+        if (node.closest) {
+          const t = findTarget(node);
+          if (t) return t;
+        }
+      }
+    }
+    return null;
+  }
+
   // ───────── Event handlers ─────────
 
   // Spacebar toggles the extension on/off (when the cursor isn't in a
@@ -529,7 +563,7 @@
   document.addEventListener('mouseover', (e) => {
     if (!isDwellEnabledHere()) return;
     const raw = deepTarget(e);
-    const target = findTarget(raw);
+    const target = findTargetForEvent(e);
     if (target) {
       // Already dwelling on this exact target? Just keep going.
       if (active && active.el === target.el) return;
@@ -593,12 +627,18 @@
 
   // MutationObserver — clears any orphaned dwell if the active target
   // node is removed mid-countdown. Works on every site, not just YouTube.
+  //
+  // It only ever matters while a dwell is in flight, so we connect it in
+  // startDwell and disconnect it in cancelDwell/completeDwell rather than
+  // observing the whole page subtree at all times. On heavy sites
+  // (infinite scroll, live feeds, SPAs) an always-on subtree observer
+  // fires hundreds of times a second for nothing; this scopes the cost
+  // to the few seconds a dwell is actually running.
   const domObserver = new MutationObserver(() => {
     if (active && active.el && !document.body.contains(active.el)) {
       cancelDwell();
     }
   });
-  domObserver.observe(document.body, { childList: true, subtree: true });
 
   // ───────── Dwell lifecycle ─────────
 
@@ -645,6 +685,10 @@
       dwellTime,
       rafId: 0
     };
+
+    // Watch for the target node being removed mid-countdown — only while
+    // this dwell is live (see domObserver definition above).
+    domObserver.observe(document.body, { childList: true, subtree: true });
 
     tickDwell();
   }
@@ -699,6 +743,7 @@
 
     // Cancel any further frames; we're done.
     cancelAnimationFrame(active.rafId);
+    domObserver.disconnect();
     active = null;
     lastSession = null;
 
@@ -721,6 +766,7 @@
     if (!active) return;
     const { ring, el, elapsed } = active;
     cancelAnimationFrame(active.rafId);
+    domObserver.disconnect();
 
     // Remember progress for resume-on-return.
     lastSession = { el, elapsed, leftAt: Date.now() };
@@ -736,6 +782,12 @@
   // ───────── Click helper ─────────
 
   // Fire the click in the most "real" way we can. Inputs get focus too.
+  //
+  // Some frameworks (React, web components) only react to a full pointer/
+  // mouse sequence, not a bare element.click(). We dispatch the press
+  // events first — these don't trigger navigation or default activation —
+  // then let the native click() perform the authoritative activation. That
+  // way custom handlers fire AND we never double-navigate.
   function triggerClick(el) {
     const tag = (el.tagName || '').toUpperCase();
     if (tag === 'INPUT' || tag === 'TEXTAREA') {
@@ -744,6 +796,11 @@
       el.click();
       return;
     }
+    const opts = { bubbles: true, cancelable: true, view: window };
+    try {
+      el.dispatchEvent(new MouseEvent('mousedown', opts));
+      el.dispatchEvent(new MouseEvent('mouseup', opts));
+    } catch (_) {}
     el.click();
   }
 
@@ -814,7 +871,7 @@
     const toast = document.createElement('div');
     toast.className = 'easepass-toast';
     toast.textContent = text;
-    document.documentElement.appendChild(toast);
+    try { document.documentElement.appendChild(toast); } catch (_) { return; }
     requestAnimationFrame(() => toast.classList.add('easepass-toast-visible'));
     setTimeout(() => {
       toast.classList.remove('easepass-toast-visible');
@@ -858,7 +915,9 @@
 
   // Phrases shown in each state. Centralized so they're easy to tweak.
   // The "engaged" state text is set dynamically (live countdown) so it's
-  // intentionally absent here.
+  // intentionally absent here. NOTE: these are intentionally YouTube-
+  // worded — the status pill is YouTube-only (setStatus() returns early
+  // on every other host), so this text never renders off YouTube.
   const STATUS_LABELS = {
     idle:      'Hover any video to open it',
     something: 'Hover a video or button',
@@ -991,7 +1050,10 @@
 
   // ─── Font CDN loading ───
   // Inject <link> tags for the three webfonts we offer. Idempotent.
-  function injectFontCDNs() {
+  // Only ever called when a non-default font is actually selected, so a
+  // user on defaults never pays for 3 CDN requests on every page load.
+  function ensureFontCDNs() {
+    if (!document.head) return;
     if (document.getElementById(FONT_CDN_FLAG)) return;
     const marker = document.createElement('meta');
     marker.id = FONT_CDN_FLAG;
@@ -1045,6 +1107,10 @@
 
   // ─── Apply current settings to the page ───
   function applyTextSettings() {
+    // Load webfont CDNs lazily — only when a custom font is in effect.
+    const font = FONT_OPTIONS.find(f => f.id === textSettings.fontFamily);
+    if (font && font.stack) ensureFontCDNs();
+
     const css = generateTextCSS(textSettings);
     const existing = document.getElementById(TEXT_STYLE_TAG_ID);
     if (!css) {
@@ -1097,16 +1163,16 @@
   }
 
   // ─── Boot the text feature ───
-  // Inject font CDNs once so the chosen font has glyphs available, then
-  // load current settings and apply them. No on-page UI — all controls
-  // live in the toolbar popup.
+  // Load current settings and apply them. Webfont CDNs are injected
+  // lazily by applyTextSettings() only when a custom font is selected,
+  // so users on defaults never trigger any font network requests. No
+  // on-page UI — all controls live in the toolbar popup.
   function bootText() {
     if (!document.head || !document.body) {
       // Defer if DOM isn't ready (rare with run_at: document_idle).
       setTimeout(bootText, 50);
       return;
     }
-    injectFontCDNs();
     loadTextSettings();
   }
   bootText();
