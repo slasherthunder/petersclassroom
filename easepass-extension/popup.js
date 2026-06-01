@@ -1,19 +1,44 @@
 /*
- * EasePass — popup controller (dwell clicking).
+ * EasePass — popup controller (dwell clicking + text accessibility).
  *
- * Persists three settings to chrome.storage.local:
- *   - enabled         (boolean, master switch)
- *   - videoDwellTime  (ms, dwell time for video thumbnails)
- *   - buttonDwellTime (ms, dwell time for buttons/controls)
+ * Persists to chrome.storage.local:
+ *   - enabled            (boolean, YouTube dwell master switch)
+ *   - universalEnabled   (boolean, every-other-site dwell switch)
+ *   - videoDwellTime     (ms, dwell time for video thumbnails)
+ *   - buttonDwellTime    (ms, dwell time for buttons/controls)
+ *   - universalDwellTime (ms, dwell time on non-YouTube sites)
+ *   - easepass-text-settings (object: font / size / spacing / line-height)
+ *
+ * Dwell times are floored at DWELL_FLOOR_MS so a momentary cursor pause
+ * can never trigger a click — important for the motor-impaired users who
+ * are the primary audience.
  *
  * content.js listens to storage changes and applies them immediately,
- * so the active YouTube tab updates without a reload.
+ * so every open tab updates without a reload. Each save flashes a brief
+ * "Saved ✓" confirmation (also announced to screen readers).
  *
  * The popup itself is fully keyboard navigable: tab cycles controls,
- * space/enter operate the toggle, arrows move the sliders.
+ * space/enter operate the toggles, arrows move the sliders.
  */
 
 'use strict';
+
+// Hard floor for every dwell slider. Mirrors the min= on the range inputs
+// in popup.html; also enforced here so any older stored value below it is
+// clamped up on load.
+const DWELL_FLOOR_MS = 1000;
+
+// Write to local storage and flash the "Saved ✓" confirmation. Centralizes
+// every persistence path so feedback is consistent and a dead/invalidated
+// extension context can't throw.
+function saveLocal(obj) {
+  try {
+    chrome.storage.local.set(obj, () => {
+      if (chrome.runtime && chrome.runtime.lastError) return;
+      showSaved();
+    });
+  } catch (_) {}
+}
 
 // ── YouTube section ──
 const toggleEl    = document.getElementById('toggle');
@@ -37,9 +62,26 @@ chrome.storage.local.get(
   (data) => {
     const enabled           = data.enabled !== false;
     const universalEnabled  = data.universalEnabled !== false;
-    const videoDwellTime    = Number(data.videoDwellTime)     || 5000;
-    const buttonDwellTime   = Number(data.buttonDwellTime)    || 3000;
-    const universalDwellTime = Number(data.universalDwellTime) || 3000;
+    const clampDwell = (v, dflt) => Math.max(DWELL_FLOOR_MS, Number(v) || dflt);
+    const videoDwellTime     = clampDwell(data.videoDwellTime,     5000);
+    const buttonDwellTime    = clampDwell(data.buttonDwellTime,    3000);
+    const universalDwellTime = clampDwell(data.universalDwellTime, 3000);
+
+    // Persist any value we had to clamp up from a pre-floor stored setting
+    // so content.js never reads an unsafe sub-floor dwell time. Only rewrite
+    // keys that were actually stored below the floor — never write defaults
+    // on a fresh install where nothing is stored yet.
+    const clamped = {};
+    const belowFloor = (raw) => {
+      const n = Number(raw);
+      return Number.isFinite(n) && n < DWELL_FLOOR_MS;
+    };
+    if (belowFloor(data.videoDwellTime))     clamped.videoDwellTime     = videoDwellTime;
+    if (belowFloor(data.buttonDwellTime))    clamped.buttonDwellTime    = buttonDwellTime;
+    if (belowFloor(data.universalDwellTime)) clamped.universalDwellTime = universalDwellTime;
+    if (Object.keys(clamped).length) {
+      try { chrome.storage.local.set(clamped); } catch (_) {}
+    }
 
     // YouTube section
     paintToggle(enabled);
@@ -63,7 +105,7 @@ toggleEl.addEventListener('click', () => {
   const next = toggleEl.getAttribute('aria-checked') !== 'true';
   paintToggle(next);
   paintStatus(next);
-  chrome.storage.local.set({ enabled: next });
+  saveLocal({ enabled: next });
 });
 
 // Space / Enter activates the role="switch" button.
@@ -79,13 +121,13 @@ toggleEl.addEventListener('keydown', (e) => {
 videoEl.addEventListener('input', () => {
   const v = parseInt(videoEl.value, 10);
   videoValEl.textContent = v;
-  chrome.storage.local.set({ videoDwellTime: v });
+  saveLocal({ videoDwellTime: v });
 });
 
 buttonEl.addEventListener('input', () => {
   const v = parseInt(buttonEl.value, 10);
   buttonValEl.textContent = v;
-  chrome.storage.local.set({ buttonDwellTime: v });
+  saveLocal({ buttonDwellTime: v });
 });
 
 // ── Universal toggle ──
@@ -93,7 +135,7 @@ universalToggleEl.addEventListener('click', () => {
   const next = universalToggleEl.getAttribute('aria-checked') !== 'true';
   paintUniversalToggle(next);
   paintUniversalStatus(next);
-  chrome.storage.local.set({ universalEnabled: next });
+  saveLocal({ universalEnabled: next });
 });
 universalToggleEl.addEventListener('keydown', (e) => {
   if (e.key === ' ' || e.key === 'Enter') {
@@ -106,40 +148,48 @@ universalToggleEl.addEventListener('keydown', (e) => {
 universalSpeedEl.addEventListener('input', () => {
   const v = parseInt(universalSpeedEl.value, 10);
   universalValEl.textContent = v;
-  chrome.storage.local.set({ universalDwellTime: v });
+  saveLocal({ universalDwellTime: v });
 });
 
 // ───────── External changes ─────────
 
-// If another popup (or future settings page) writes to storage, mirror
-// the change in this popup's UI so they don't drift.
+// If another popup (or another tab) writes to storage, mirror the change
+// in this popup's UI so they don't drift. One listener covers every key —
+// dwell settings and the text-settings object both flow through here.
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== 'local') return;
-  if (changes.enabled) {
-    const v = changes.enabled.newValue !== false;
-    paintToggle(v);
-    paintStatus(v);
-  }
-  if (changes.universalEnabled) {
-    const v = changes.universalEnabled.newValue !== false;
-    paintUniversalToggle(v);
-    paintUniversalStatus(v);
-  }
-  if (changes.videoDwellTime) {
-    const v = Number(changes.videoDwellTime.newValue) || 5000;
-    videoEl.value = v;
-    videoValEl.textContent = v;
-  }
-  if (changes.buttonDwellTime) {
-    const v = Number(changes.buttonDwellTime.newValue) || 3000;
-    buttonEl.value = v;
-    buttonValEl.textContent = v;
-  }
-  if (changes.universalDwellTime) {
-    const v = Number(changes.universalDwellTime.newValue) || 3000;
-    universalSpeedEl.value = v;
-    universalValEl.textContent = v;
-  }
+  try {
+    if (area !== 'local') return;
+    if (changes.enabled) {
+      const v = changes.enabled.newValue !== false;
+      paintToggle(v);
+      paintStatus(v);
+    }
+    if (changes.universalEnabled) {
+      const v = changes.universalEnabled.newValue !== false;
+      paintUniversalToggle(v);
+      paintUniversalStatus(v);
+    }
+    if (changes.videoDwellTime) {
+      const v = Number(changes.videoDwellTime.newValue) || 5000;
+      videoEl.value = v;
+      videoValEl.textContent = v;
+    }
+    if (changes.buttonDwellTime) {
+      const v = Number(changes.buttonDwellTime.newValue) || 3000;
+      buttonEl.value = v;
+      buttonValEl.textContent = v;
+    }
+    if (changes.universalDwellTime) {
+      const v = Number(changes.universalDwellTime.newValue) || 3000;
+      universalSpeedEl.value = v;
+      universalValEl.textContent = v;
+    }
+    if (changes[TA_STORAGE_KEY]) {
+      const next = changes[TA_STORAGE_KEY].newValue;
+      taSettings = next ? { ...TA_DEFAULTS, ...next } : { ...TA_DEFAULTS };
+      paintTextSettings();
+    }
+  } catch (_) {}
 });
 
 // ───────── Text accessibility (all inline in this popup) ─────────
@@ -179,9 +229,7 @@ chrome.storage.local.get([TA_STORAGE_KEY], (data) => {
 
 // Persist + repaint after any change.
 function commitTextSettings() {
-  try {
-    chrome.storage.local.set({ [TA_STORAGE_KEY]: taSettings });
-  } catch (_) {}
+  saveLocal({ [TA_STORAGE_KEY]: taSettings });
   paintTextSettings();
 }
 
@@ -251,14 +299,26 @@ if (taResetAllBtn) {
   });
 }
 
-// React to external changes (another popup window, another tab).
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== 'local') return;
-  if (!changes[TA_STORAGE_KEY]) return;
-  const next = changes[TA_STORAGE_KEY].newValue;
-  taSettings = next ? { ...TA_DEFAULTS, ...next } : { ...TA_DEFAULTS };
-  paintTextSettings();
-});
+// (External text-setting changes are handled by the single
+// storage.onChanged listener above, alongside the dwell settings.)
+
+// ───────── Save confirmation ─────────
+
+// Flash the "Saved ✓" pill. Debounced so dragging a slider (which fires
+// many input events) shows one steady confirmation that clears ~1s after
+// the last change rather than strobing.
+const saveToastEl = document.getElementById('saveToast');
+let saveToastTimer = null;
+function showSaved() {
+  if (!saveToastEl) return;
+  saveToastEl.classList.add('visible');
+  saveToastEl.setAttribute('aria-hidden', 'false');
+  clearTimeout(saveToastTimer);
+  saveToastTimer = setTimeout(() => {
+    saveToastEl.classList.remove('visible');
+    saveToastEl.setAttribute('aria-hidden', 'true');
+  }, 1100);
+}
 
 // ───────── Paint helpers ─────────
 

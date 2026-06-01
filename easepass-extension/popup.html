@@ -1,22 +1,22 @@
 <!--
-  EasePass — popup UI (dwell clicking for YouTube).
+  EasePass — popup UI (dwell clicking + text accessibility).
 
-  320px wide. Wordmark + tagline, master enable/disable toggle, two
-  dwell-time sliders (video and button), a short "How it works" block,
-  and a footer link back to the Axolo Assist site. Lexend font, blue and
-  white. Fully keyboard navigable.
+  320px wide. Wordmark + tagline; a YouTube section and an "every other
+  site" section, each with an enable/disable toggle; three dwell-time
+  sliders (video, button, universal); a "How it works" block; the full
+  text-accessibility controls (font / size / spacing); and a footer with
+  links to the Axolo Assist site, privacy policy, and help. Lexend font,
+  blue and white. Fully keyboard navigable.
+
+  All webfonts (Lexend UI font + OpenDyslexic/Atkinson previews) are
+  bundled locally via fonts.css — no CDN requests, renders fully offline.
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>EasePass</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Webfonts used in the text-accessibility previews -->
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+  <link href="fonts.css" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -399,6 +399,32 @@
       outline-offset: 3px;
     }
 
+    /* ─── Save confirmation toast ─── */
+    .save-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translate(-50%, 12px);
+      background: var(--green);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 7px 16px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 1000;
+    }
+    .save-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .save-toast { transition: opacity 0.18s ease; }
+    }
+
     /* ─── Footer ─── */
     .footer {
       margin-top: 1.3rem;
@@ -455,7 +481,7 @@
     </div>
     <input type="range"
            id="buttonSpeed"
-           min="500" max="5000" step="250"
+           min="1000" max="5000" step="250"
            value="3000"
            aria-label="Button dwell time in milliseconds" />
   </div>
@@ -481,7 +507,7 @@
     </div>
     <input type="range"
            id="universalSpeed"
-           min="500" max="6000" step="250"
+           min="1000" max="6000" step="250"
            value="3000"
            aria-label="Universal dwell time in milliseconds" />
   </div>
@@ -573,8 +599,13 @@
 
   <div class="footer">
     From <a href="https://axol-assist.vercel.app" target="_blank" rel="noopener noreferrer">Axolo Assist</a> ·
-    <a href="https://axol-assist.vercel.app/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+    <a href="https://axol-assist.vercel.app/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a> ·
+    <a href="mailto:axolassist.business@gmail.com?subject=EasePass%20help%20%26%20feedback" rel="noopener noreferrer">Help &amp; feedback</a>
   </div>
+
+  <!-- Brief, screen-reader-announced confirmation shown after any setting
+       is saved. Hidden until showSaved() adds the visible class. -->
+  <div id="saveToast" class="save-toast" role="status" aria-live="polite" aria-hidden="true">Saved&nbsp;✓</div>
 
   <script src="popup.js"></script>
 </body>

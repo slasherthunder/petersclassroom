@@ -1004,7 +1004,8 @@
 
   const TEXT_SETTINGS_KEY = 'easepass-text-settings';
   const TEXT_STYLE_TAG_ID = 'easepass-text-styles';
-  const FONT_CDN_FLAG     = 'easepass-font-cdns-loaded';
+  // id of the injected <link> to the bundled fonts.css (idempotency marker).
+  const FONT_FACES_LINK_ID = 'easepass-font-faces';
 
   const TEXT_TAGS =
     'body, p, h1, h2, h3, h4, h5, h6, li, td, th, span, div, a, ' +
@@ -1048,29 +1049,25 @@
 
   let textSettings = { ...DEFAULT_TEXT_SETTINGS };
 
-  // ─── Font CDN loading ───
-  // Inject <link> tags for the three webfonts we offer. Idempotent.
-  // Only ever called when a non-default font is actually selected, so a
-  // user on defaults never pays for 3 CDN requests on every page load.
-  function ensureFontCDNs() {
+  // ─── Font loading ───
+  // The webfonts (OpenDyslexic, Lexend, Atkinson Hyperlegible) are bundled
+  // with the extension and declared in fonts.css. We inject that one local
+  // stylesheet — no CDN requests, works fully offline. The relative
+  // url(fonts/…) refs inside fonts.css resolve against its own
+  // chrome-extension:// URL, so they point at the bundled files. Idempotent,
+  // and only ever called when a non-default font is actually selected, so a
+  // user on defaults never injects anything.
+  function ensureFontFaces() {
     if (!document.head) return;
-    if (document.getElementById(FONT_CDN_FLAG)) return;
-    const marker = document.createElement('meta');
-    marker.id = FONT_CDN_FLAG;
-    document.head.appendChild(marker);
-
-    const links = [
-      'https://fonts.cdnfonts.com/css/opendyslexic',
-      'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap',
-      'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap'
-    ];
-    for (const href of links) {
-      const link = document.createElement('link');
-      link.rel  = 'stylesheet';
-      link.href = href;
-      link.dataset.easepassFont = 'true';
-      try { document.head.appendChild(link); } catch (_) {}
-    }
+    if (document.getElementById(FONT_FACES_LINK_ID)) return;
+    if (!isExtensionAlive()) return;
+    const link = document.createElement('link');
+    link.id   = FONT_FACES_LINK_ID;
+    link.rel  = 'stylesheet';
+    try {
+      link.href = chrome.runtime.getURL('fonts.css');
+      document.head.appendChild(link);
+    } catch (_) {}
   }
 
   // ─── Generate the CSS to inject ───
@@ -1107,9 +1104,10 @@
 
   // ─── Apply current settings to the page ───
   function applyTextSettings() {
-    // Load webfont CDNs lazily — only when a custom font is in effect.
+    // Inject the bundled webfont stylesheet lazily — only when a custom
+    // font is in effect.
     const font = FONT_OPTIONS.find(f => f.id === textSettings.fontFamily);
-    if (font && font.stack) ensureFontCDNs();
+    if (font && font.stack) ensureFontFaces();
 
     const css = generateTextCSS(textSettings);
     const existing = document.getElementById(TEXT_STYLE_TAG_ID);
