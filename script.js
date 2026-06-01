@@ -12,17 +12,17 @@ function handleContactSubmit(e) {
   }
 
   const data = Object.fromEntries(new FormData(form));
-  const subject = encodeURIComponent("Inquiry from Peter's Classroom site: " + data.name);
+  const subject = encodeURIComponent("Inquiry from Axolo Assist site: " + data.name);
   const body = encodeURIComponent(
     "Name: "  + data.name  + "\n" +
     "Email: " + data.email + "\n" +
     "Role: "  + data.role  + "\n\n" +
     "Message:\n" + data.message + "\n\n" +
-    "-- Sent via petersclassroom.com contact form"
+    "-- Sent via axol-assist.vercel.app contact form"
   );
 
   const mailtoUrl =
-    "mailto:petersclassroom.business@gmail.com" +
+    "mailto:axolassist.business@gmail.com" +
     "?subject=" + subject +
     "&body="    + body;
 
@@ -64,7 +64,7 @@ revealTargets.forEach(el => {
 
 /* ───────── ACCESSIBILITY TOOLBAR ───────── */
 (function () {
-  const STORAGE_KEY = 'pc-a11y-settings-v1';
+  const STORAGE_KEY = 'axoloassist-a11y-settings-v1';
   const root = document.documentElement;
 
   const defaults = {

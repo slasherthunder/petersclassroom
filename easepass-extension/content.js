@@ -1111,6 +1111,38 @@
   }
   bootText();
 
+  // Lightweight on-page entrypoint for text accessibility controls.
+  // Opens the extension popup page in a new tab, scrolled to the text
+  // accessibility section.
+  let aaButtonEl = null;
+  function createAaButton() {
+    if (aaButtonEl && document.documentElement.contains(aaButtonEl)) return;
+    aaButtonEl = document.createElement('button');
+    aaButtonEl.id = 'easepass-aa-btn';
+    aaButtonEl.type = 'button';
+    aaButtonEl.setAttribute('aria-label', 'Open EasePass text accessibility controls');
+    aaButtonEl.textContent = 'Aa';
+    aaButtonEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      safeChrome(() => {
+        const url = chrome.runtime.getURL('popup.html#text-accessibility');
+        chrome.runtime.sendMessage({ type: 'OPEN_EXTENSION_PAGE', url }, () => {
+          if (chrome.runtime && chrome.runtime.lastError) {
+            try { window.open(url, '_blank', 'noopener'); } catch (_) {}
+          }
+        });
+      });
+    });
+    try { document.documentElement.appendChild(aaButtonEl); } catch (_) {}
+  }
+
+  function bootAaButton() {
+    if (!document.body) { setTimeout(bootAaButton, 50); return; }
+    createAaButton();
+  }
+  bootAaButton();
+
   // ══════════════════════════════════════════
   // FLOATING DWELL TOGGLE — appears on every site
   // Bottom-right circular button. Shows ✓ when dwell-click is active in

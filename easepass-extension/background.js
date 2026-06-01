@@ -114,4 +114,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: true, ts: Date.now() });
     return false;
   }
+  if (message.type === 'OPEN_EXTENSION_PAGE' && typeof message.url === 'string') {
+    chrome.tabs.create({ url: message.url }, () => {
+      if (chrome.runtime.lastError) {
+        sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        return;
+      }
+      sendResponse({ ok: true });
+    });
+    return true;
+  }
 });
