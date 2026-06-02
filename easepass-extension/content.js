@@ -1381,7 +1381,15 @@
       dwellSlider('sw-button', 'Button dwell time', 1000, 5000, 250, 'ms') +
       `<h3 class="sw-section-heading">Every other site</h3>` +
       dwellToggleRow('sw-univ-toggle', 'Active everywhere', 'Disabled') +
-      dwellSlider('sw-univ', 'Dwell time', 1000, 6000, 250, 'ms');
+      dwellSlider('sw-univ', 'Dwell time', 1000, 6000, 250, 'ms') +
+      `<h3 class="sw-section-heading">Reading Mode</h3>` +
+      `<div class="sw-toggle-row">` +
+        `<div class="sw-toggle-info"><span class="sw-toggle-label">Remember sites</span>` +
+        `<span class="sw-toggle-status">Offer reading mode where you've used it</span></div>` +
+        `<button class="sw-switch" type="button" id="sw-rm-memory" role="switch" aria-checked="true" aria-label="Remember sites where I use reading mode"></button>` +
+      `</div>` +
+      `<button class="sw-reset-all" type="button" id="sw-rm-open">Open in reading mode</button>` +
+      `<button class="sw-reset-link" type="button" id="sw-rm-clear" style="display:block !important;margin-top:10px !important;">Clear site memory · Alt+R anytime</button>`;
 
     dwellPanelEl.querySelector('.sw-text-panel-close')
       .addEventListener('click', closeDwellPanel);
@@ -1398,6 +1406,36 @@
     bindDwell('sw-video', 'videoDwellTime');
     bindDwell('sw-button', 'buttonDwellTime');
     bindDwell('sw-univ', 'universalDwellTime');
+
+    // ── Reading Mode controls (functional) ──
+    const rmMemBtn = dwellPanelEl.querySelector('#sw-rm-memory');
+    if (rmMemBtn) {
+      safeChrome(() => chrome.storage.local.get(['easepass-reading-mode-memory'], (data) => {
+        try {
+          if (chrome.runtime && chrome.runtime.lastError) return;
+          rmMemBtn.setAttribute('aria-checked', data['easepass-reading-mode-memory'] !== false ? 'true' : 'false');
+        } catch (_) {}
+      }));
+      rmMemBtn.addEventListener('click', () => {
+        const next = rmMemBtn.getAttribute('aria-checked') !== 'true';
+        rmMemBtn.setAttribute('aria-checked', next ? 'true' : 'false');
+        safeChrome(() => chrome.storage.local.set({ 'easepass-reading-mode-memory': next }));
+      });
+    }
+    const rmOpenBtn = dwellPanelEl.querySelector('#sw-rm-open');
+    if (rmOpenBtn) {
+      rmOpenBtn.addEventListener('click', () => {
+        closeDwellPanel(); // reading mode sits below this panel, so close it first
+        if (window.EasePassReadingMode) window.EasePassReadingMode.enable(rmSettings || {});
+      });
+    }
+    const rmClearBtn = dwellPanelEl.querySelector('#sw-rm-clear');
+    if (rmClearBtn) {
+      rmClearBtn.addEventListener('click', () => {
+        safeChrome(() => chrome.storage.local.remove('easepass-reading-mode-domains'));
+        showToast('Reading mode site memory cleared');
+      });
+    }
 
     try {
       document.documentElement.appendChild(dwellBackdropEl);
