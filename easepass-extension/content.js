@@ -1,5 +1,5 @@
 /*
- * EasePass — content script (dwell clicking + text accessibility).
+ * Accessibility Surfer — content script (dwell clicking + text accessibility).
  *
  * Runs on <all_urls> (per manifest match). Behavior is split by host:
  *   - On youtube.com: a curated list of YouTube targets (video
@@ -11,7 +11,7 @@
  *
  * When the cursor hovers a target a circular progress ring appears
  * around the cursor and fills over the configured dwell time. When the
- * ring completes, EasePass fires a click on the target.
+ * ring completes, Accessibility Surfer fires a click on the target.
  *
  * Cursor leaves the target  → timer pauses, ring fades out.
  * Cursor returns within 1s → timer RESUMES from where it left off.
@@ -256,6 +256,11 @@
         if (changes.universalDwellTime) {
           universalDwellTime = Number(changes.universalDwellTime.newValue) || 3000;
           if (active && active.type === 'universal') active.dwellTime = universalDwellTime;
+        }
+        // Keep the in-page dwell panel in sync with popup/other-tab edits.
+        if (changes.enabled || changes.universalEnabled || changes.videoDwellTime ||
+            changes.buttonDwellTime || changes.universalDwellTime) {
+          paintDwellPanel();
         }
       } catch (_) {}
     });
@@ -559,7 +564,7 @@
   }, true);
 
   // Mouseover: cursor entered a new element. Updates the status pill
-  // and, if it's a EasePass target, starts (or resumes) a dwell.
+  // and, if it's a Accessibility Surfer target, starts (or resumes) a dwell.
   document.addEventListener('mouseover', (e) => {
     if (!isDwellEnabledHere()) return;
     const raw = deepTarget(e);
@@ -1183,15 +1188,18 @@
   // Changes write to chrome.storage.local so the popup and other tabs
   // stay in sync via the storage.onChanged listener above.
   let aaButtonEl = null;
+  let popupButtonEl = null;
   let textPanelEl = null;
   let textBackdropEl = null;
+  let dwellPanelEl = null;
+  let dwellBackdropEl = null;
 
   function createAaButton() {
     if (aaButtonEl && document.documentElement.contains(aaButtonEl)) return;
     aaButtonEl = document.createElement('button');
     aaButtonEl.id = 'easepass-aa-btn';
     aaButtonEl.type = 'button';
-    aaButtonEl.setAttribute('aria-label', 'Open EasePass text accessibility controls');
+    aaButtonEl.setAttribute('aria-label', 'Open Accessibility Surfer text accessibility controls');
     aaButtonEl.setAttribute('aria-expanded', 'false');
     aaButtonEl.textContent = 'Aa';
     aaButtonEl.addEventListener('click', (e) => {
@@ -1202,7 +1210,33 @@
     try { document.documentElement.appendChild(aaButtonEl); } catch (_) {}
   }
 
-  // Build the backdrop + panel once and wire every control.
+  // Top-right floating button showing the Accessibility Surfer logo. Opens the same
+  // panel as the Aa button, which now holds every popup control (dwell
+  // toggles + dwell-time sliders + text accessibility).
+  function createPopupButton() {
+    if (popupButtonEl && document.documentElement.contains(popupButtonEl)) return;
+    popupButtonEl = document.createElement('button');
+    popupButtonEl.id = 'easepass-popup-btn';
+    popupButtonEl.type = 'button';
+    popupButtonEl.setAttribute('aria-label', 'Open Accessibility Surfer settings');
+    popupButtonEl.setAttribute('aria-expanded', 'false');
+    const img = document.createElement('img');
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    if (isExtensionAlive()) {
+      try { img.src = chrome.runtime.getURL('icons/icon-128.png'); } catch (_) {}
+    }
+    popupButtonEl.appendChild(img);
+    popupButtonEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleDwellPanel();
+    });
+    try { document.documentElement.appendChild(popupButtonEl); } catch (_) {}
+  }
+
+  // ── Text-accessibility panel (slides in from the LEFT, Aa button) ──
+  // Font / size / spacing controls only.
   function buildTextPanel() {
     if (textPanelEl) return;
 
@@ -1280,8 +1314,8 @@
     } catch (_) {}
   }
 
-  // Apply a partial settings change: update in memory, re-apply the page
-  // CSS, repaint the panel, and persist (which syncs the popup + other tabs).
+  // Apply a partial text-settings change: update in memory, re-apply the
+  // page CSS, repaint, and persist (which syncs the popup + other tabs).
   function updateText(patch) {
     textSettings = { ...textSettings, ...patch };
     applyTextSettings();
@@ -1289,7 +1323,7 @@
     safeChrome(() => chrome.storage.local.set({ [TEXT_SETTINGS_KEY]: textSettings }));
   }
 
-  // Reflect current textSettings into the panel's controls.
+  // Reflect current textSettings into the text panel's controls.
   function paintTextPanel() {
     if (!textPanelEl) return;
     const press = (els, key) => els.forEach(b =>
@@ -1308,10 +1342,110 @@
     if (sizeVal) sizeVal.textContent = String(textSettings.textSize);
   }
 
+  // ── Dwell-settings panel (slides in from the RIGHT, top-right button) ──
+  // YouTube + universal dwell on/off and dwell-time sliders.
+  function buildDwellPanel() {
+    if (dwellPanelEl) return;
+
+    dwellBackdropEl = document.createElement('div');
+    dwellBackdropEl.id = 'easepass-dwell-backdrop';
+    dwellBackdropEl.addEventListener('click', closeDwellPanel);
+
+    dwellPanelEl = document.createElement('aside');
+    dwellPanelEl.id = 'easepass-dwell-panel';
+    dwellPanelEl.setAttribute('role', 'dialog');
+    dwellPanelEl.setAttribute('aria-label', 'Accessibility Surfer dwell settings');
+
+    const dwellToggleRow = (id, statusOn, statusOff) =>
+      `<div class="sw-toggle-row">` +
+        `<div class="sw-toggle-info"><span class="sw-toggle-label">Dwell clicking</span>` +
+        `<span class="sw-toggle-status" id="${id}-status" data-on="${statusOn}" data-off="${statusOff}"></span></div>` +
+        `<button class="sw-switch" type="button" id="${id}" role="switch" aria-checked="false" aria-label="Toggle ${statusOn === 'Active on YouTube' ? 'YouTube' : 'universal'} dwell clicking"></button>` +
+      `</div>`;
+
+    const dwellSlider = (id, label, min, max, step, unit) =>
+      `<div class="sw-dwell-block">` +
+        `<div class="sw-dwell-label"><label for="${id}">${label}</label>` +
+        `<span><span class="sw-dwell-value" id="${id}-val">0</span> ${unit}</span></div>` +
+        `<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" aria-label="${label} in milliseconds" />` +
+      `</div>`;
+
+    dwellPanelEl.innerHTML =
+      `<div class="sw-text-panel-header">` +
+        `<h2>Accessibility Surfer</h2>` +
+        `<button class="sw-text-panel-close" type="button" aria-label="Close Accessibility Surfer settings">✕</button>` +
+      `</div>` +
+      `<h3 class="sw-section-heading">YouTube</h3>` +
+      dwellToggleRow('sw-yt-toggle', 'Active on YouTube', 'Disabled') +
+      dwellSlider('sw-video', 'Video dwell time', 1000, 8000, 500, 'ms') +
+      dwellSlider('sw-button', 'Button dwell time', 1000, 5000, 250, 'ms') +
+      `<h3 class="sw-section-heading">Every other site</h3>` +
+      dwellToggleRow('sw-univ-toggle', 'Active everywhere', 'Disabled') +
+      dwellSlider('sw-univ', 'Dwell time', 1000, 6000, 250, 'ms');
+
+    dwellPanelEl.querySelector('.sw-text-panel-close')
+      .addEventListener('click', closeDwellPanel);
+    const ytToggle = dwellPanelEl.querySelector('#sw-yt-toggle');
+    ytToggle.addEventListener('click', () =>
+      updateDwell({ enabled: ytToggle.getAttribute('aria-checked') !== 'true' }));
+    const univToggle = dwellPanelEl.querySelector('#sw-univ-toggle');
+    univToggle.addEventListener('click', () =>
+      updateDwell({ universalEnabled: univToggle.getAttribute('aria-checked') !== 'true' }));
+    const bindDwell = (id, key) => {
+      const el = dwellPanelEl.querySelector('#' + id);
+      el.addEventListener('input', () => updateDwell({ [key]: Number(el.value) }));
+    };
+    bindDwell('sw-video', 'videoDwellTime');
+    bindDwell('sw-button', 'buttonDwellTime');
+    bindDwell('sw-univ', 'universalDwellTime');
+
+    try {
+      document.documentElement.appendChild(dwellBackdropEl);
+      document.documentElement.appendChild(dwellPanelEl);
+    } catch (_) {}
+  }
+
+  // Apply a dwell-setting change: update in memory (panel paints
+  // immediately) and persist. The storage.onChanged listener applies the
+  // real side effects (cancel in-flight dwell, status pill, badge) and
+  // keeps the popup + other tabs in sync.
+  function updateDwell(patch) {
+    if ('enabled' in patch) enabled = patch.enabled;
+    if ('universalEnabled' in patch) universalEnabled = patch.universalEnabled;
+    if ('videoDwellTime' in patch) videoDwellTime = patch.videoDwellTime;
+    if ('buttonDwellTime' in patch) buttonDwellTime = patch.buttonDwellTime;
+    if ('universalDwellTime' in patch) universalDwellTime = patch.universalDwellTime;
+    safeChrome(() => chrome.storage.local.set(patch));
+    paintDwellPanel();
+    paintDwellToggle();
+  }
+
+  // Reflect current dwell settings into the dwell panel's controls.
+  function paintDwellPanel() {
+    if (!dwellPanelEl) return;
+    const paintToggle = (id, on) => {
+      const sw = dwellPanelEl.querySelector('#' + id);
+      const st = dwellPanelEl.querySelector('#' + id + '-status');
+      if (sw) sw.setAttribute('aria-checked', on ? 'true' : 'false');
+      if (st) { st.textContent = on ? st.dataset.on : st.dataset.off; st.classList.toggle('on', on); }
+    };
+    paintToggle('sw-yt-toggle', enabled);
+    paintToggle('sw-univ-toggle', universalEnabled);
+    const paintSlider = (id, val) => {
+      const el = dwellPanelEl.querySelector('#' + id);
+      const out = dwellPanelEl.querySelector('#' + id + '-val');
+      if (el) el.value = String(val);
+      if (out) out.textContent = String(val);
+    };
+    paintSlider('sw-video', videoDwellTime);
+    paintSlider('sw-button', buttonDwellTime);
+    paintSlider('sw-univ', universalDwellTime);
+  }
+
+  // ── Open / close (text panel = left/Aa, dwell panel = right/top-right) ──
   function isTextPanelOpen() {
     return !!(textPanelEl && textPanelEl.classList.contains('easepass-open'));
   }
-
   function openTextPanel() {
     buildTextPanel();
     ensureFontFaces();   // so the font previews render in their own typeface
@@ -1322,29 +1456,49 @@
     });
     if (aaButtonEl) aaButtonEl.setAttribute('aria-expanded', 'true');
   }
-
   function closeTextPanel() {
     if (textPanelEl) textPanelEl.classList.remove('easepass-open');
     if (textBackdropEl) textBackdropEl.classList.remove('easepass-open');
     if (aaButtonEl) aaButtonEl.setAttribute('aria-expanded', 'false');
   }
-
   function toggleTextPanel() {
     if (isTextPanelOpen()) closeTextPanel();
     else openTextPanel();
   }
 
-  // Escape closes the panel.
+  function isDwellPanelOpen() {
+    return !!(dwellPanelEl && dwellPanelEl.classList.contains('easepass-open'));
+  }
+  function openDwellPanel() {
+    buildDwellPanel();
+    paintDwellPanel();
+    requestAnimationFrame(() => {
+      dwellPanelEl.classList.add('easepass-open');
+      dwellBackdropEl.classList.add('easepass-open');
+    });
+    if (popupButtonEl) popupButtonEl.setAttribute('aria-expanded', 'true');
+  }
+  function closeDwellPanel() {
+    if (dwellPanelEl) dwellPanelEl.classList.remove('easepass-open');
+    if (dwellBackdropEl) dwellBackdropEl.classList.remove('easepass-open');
+    if (popupButtonEl) popupButtonEl.setAttribute('aria-expanded', 'false');
+  }
+  function toggleDwellPanel() {
+    if (isDwellPanelOpen()) closeDwellPanel();
+    else openDwellPanel();
+  }
+
+  // Escape closes whichever panel is open.
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isTextPanelOpen()) {
-      e.preventDefault();
-      closeTextPanel();
-    }
+    if (e.key !== 'Escape') return;
+    if (isTextPanelOpen()) { e.preventDefault(); closeTextPanel(); }
+    if (isDwellPanelOpen()) { e.preventDefault(); closeDwellPanel(); }
   }, true);
 
   function bootAaButton() {
     if (!document.body) { setTimeout(bootAaButton, 50); return; }
     createAaButton();
+    createPopupButton();
   }
   bootAaButton();
 
@@ -1362,7 +1516,7 @@
     dwellToggleEl = document.createElement('button');
     dwellToggleEl.id = 'easepass-dwell-toggle';
     dwellToggleEl.type = 'button';
-    dwellToggleEl.setAttribute('aria-label', 'Toggle EasePass dwell clicking');
+    dwellToggleEl.setAttribute('aria-label', 'Toggle Accessibility Surfer dwell clicking');
     dwellToggleEl.innerHTML =
       '<span class="easepass-toggle-glyph" aria-hidden="true"></span>';
     dwellToggleEl.addEventListener('click', (e) => {
@@ -1410,4 +1564,57 @@
     createDwellToggle();
   }
   bootToggle();
+
+  // ══════════════════════════════════════════
+  // READING MODE integration — coordinates window.EasePassReadingMode
+  // (reading-mode.js). Independent of dwell clicking: the dwell-click logic
+  // above is untouched. Reading-mode elements become dwell targets simply by
+  // being focusable, so the existing universal dwell-click rings + clicks
+  // them with no special handling here.
+  // ══════════════════════════════════════════
+
+  // Read-only handle the reading-mode module reads for dwell timing/state.
+  window.EasePassDwell = {
+    isEnabled: function () { return isDwellEnabledHere(); },
+    get universalDwellTime() { return universalDwellTime; }
+  };
+
+  let rmSettings = null;
+
+  function toggleReadingMode() {
+    if (window.EasePassReadingMode) window.EasePassReadingMode.toggle(rmSettings || {});
+  }
+
+  // Trigger script (same frame) asks us to toggle via a CustomEvent.
+  window.addEventListener('easepass-rm-toggle', toggleReadingMode);
+
+  safeChrome(() => {
+    chrome.storage.local.get(['easepass-reading-mode-settings'], (data) => {
+      try {
+        if (chrome.runtime && chrome.runtime.lastError) return;
+        rmSettings = data['easepass-reading-mode-settings'] || null;
+      } catch (_) {}
+    });
+
+    // Live-apply reading-mode typography changes from the popup / other tabs.
+    chrome.storage.onChanged.addListener((changes, area) => {
+      try {
+        if (!isExtensionAlive()) return;
+        if (area !== 'local') return;
+        if (changes['easepass-reading-mode-settings']) {
+          rmSettings = changes['easepass-reading-mode-settings'].newValue || null;
+          if (window.EasePassReadingMode && window.EasePassReadingMode.isActive()) {
+            window.EasePassReadingMode.updateSettings(rmSettings || {});
+          }
+        }
+      } catch (_) {}
+    });
+
+    // "Open in reading mode" from the popup → chrome.tabs.sendMessage.
+    chrome.runtime.onMessage.addListener((msg) => {
+      try {
+        if (msg && msg.type === 'TOGGLE_READING_MODE') toggleReadingMode();
+      } catch (_) {}
+    });
+  });
 })();

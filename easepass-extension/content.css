@@ -1,5 +1,5 @@
 /*
- * EasePass — content stylesheet (dwell-click overlays, every site).
+ * Accessibility Surfer — content stylesheet (dwell-click overlays, every site).
  *
  * The progress ring, status pill, toast, floating toggle, and "Aa"
  * button. No styles touch the host page's own DOM. Everything is
@@ -159,7 +159,7 @@
  *   idle      — gray   — cursor is over plain content
  *   something — amber  — cursor is over an interactive element we don't
  *                        dwell-click (so user knows we see it)
- *   engaged   — blue   — cursor is over a EasePass target, ring active
+ *   engaged   — blue   — cursor is over a Accessibility Surfer target, ring active
  *
  * Hidden entirely when the extension is disabled.
  */
@@ -216,7 +216,7 @@
   background: #94a3b8 !important;
 }
 
-/* ── State: something hovering (not a EasePass target) ── */
+/* ── State: something hovering (not a Accessibility Surfer target) ── */
 .easepass-status-something {
   background: rgba(28, 21, 14, 0.94) !important;
 }
@@ -361,8 +361,9 @@
   outline-offset: 3px !important;
 }
 
-/* ───────── Backdrop overlay behind panel ───────── */
-#easepass-text-backdrop {
+/* ───────── Backdrop overlay behind either panel ───────── */
+#easepass-text-backdrop,
+#easepass-dwell-backdrop {
   position: fixed !important;
   inset: 0 !important;
   z-index: 2147483627 !important;
@@ -371,17 +372,20 @@
   pointer-events: none !important;
   transition: opacity 0.22s ease !important;
 }
-#easepass-text-backdrop.easepass-open {
+#easepass-text-backdrop.easepass-open,
+#easepass-dwell-backdrop.easepass-open {
   opacity: 1 !important;
   pointer-events: auto !important;
 }
 
-/* ───────── Slide-in panel from the left ───────── */
-#easepass-text-panel {
+/* ───────── Slide-in panels — shared frame ─────────
+   Text panel (Aa button) slides in from the LEFT; dwell panel
+   (top-right button) slides in from the RIGHT. */
+#easepass-text-panel,
+#easepass-dwell-panel {
   position: fixed !important;
   top: 0 !important;
-  left: 0 !important;
-  width: 320px !important;
+  width: 340px !important;
   max-width: 92vw !important;
   height: 100vh !important;
   height: 100dvh !important;
@@ -389,9 +393,7 @@
 
   background: #ffffff !important;
   color: #0f1419 !important;
-  box-shadow: 6px 0 28px rgba(0, 0, 0, 0.22) !important;
 
-  transform: translateX(-105%) !important;
   transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) !important;
 
   display: flex !important;
@@ -402,12 +404,25 @@
 
   font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
 }
-#easepass-text-panel.easepass-open { transform: translateX(0) !important; }
+#easepass-text-panel {
+  left: 0 !important;
+  box-shadow: 6px 0 28px rgba(0, 0, 0, 0.22) !important;
+  transform: translateX(-105%) !important;
+}
+#easepass-dwell-panel {
+  right: 0 !important;
+  box-shadow: -6px 0 28px rgba(0, 0, 0, 0.22) !important;
+  transform: translateX(105%) !important;
+}
+#easepass-text-panel.easepass-open,
+#easepass-dwell-panel.easepass-open { transform: translateX(0) !important; }
 
 /* Always neutralize ALL font/spacing inheritance inside our own UI
- * so the user's chosen page font doesn't disfigure the panel. */
+ * so the user's chosen page font doesn't disfigure the panels. */
 #easepass-text-panel,
-#easepass-text-panel * {
+#easepass-text-panel *,
+#easepass-dwell-panel,
+#easepass-dwell-panel * {
   font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
   letter-spacing: normal !important;
   word-spacing: normal !important;
@@ -642,10 +657,105 @@
 }
 .sw-text-panel-footer a:hover { text-decoration: underline !important; }
 
+/* ───────── Floating "all settings" button (top-right) ───────── */
+/* Mirrors the Aa button's circular floating style but shows the Accessibility Surfer
+   logo and opens the full settings panel (dwell + text). */
+#easepass-popup-btn {
+  position: fixed !important;
+  top: 1.5rem !important;
+  right: 1.5rem !important;
+  z-index: 2147483629 !important;
+  width: 54px !important;
+  height: 54px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  border: 3px solid #ffffff !important;
+  background: #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 6px 22px rgba(0, 102, 255, 0.40),
+              0 0 0 1px rgba(0, 102, 255, 0.25) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+#easepass-popup-btn img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  border-radius: 50% !important;
+}
+#easepass-popup-btn:hover  { transform: scale(1.06) !important; }
+#easepass-popup-btn:active { transform: scale(0.96) !important; }
+#easepass-popup-btn:focus-visible {
+  outline: 3px solid #0066FF !important;
+  outline-offset: 3px !important;
+}
+
+/* ───────── Panel: dwell-setting controls ───────── */
+.sw-section-heading {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #0066FF !important;
+  margin: 16px 0 8px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid #e2e8ef !important;
+}
+.sw-toggle-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  margin-bottom: 12px !important;
+}
+.sw-toggle-info { display: flex !important; flex-direction: column !important; min-width: 0 !important; }
+.sw-toggle-label { font-weight: 600 !important; font-size: 0.92rem !important; color: #0f1419 !important; }
+.sw-toggle-status { font-size: 0.76rem !important; color: #5a6470 !important; margin-top: 2px !important; }
+.sw-toggle-status.on { color: #22C55E !important; font-weight: 600 !important; }
+.sw-switch {
+  position: relative !important;
+  width: 48px !important; height: 27px !important;
+  background: #cdd5df !important;
+  border-radius: 999px !important; border: none !important;
+  cursor: pointer !important; flex-shrink: 0 !important;
+  transition: background 0.2s !important; padding: 0 !important;
+}
+.sw-switch::after {
+  content: '' !important; position: absolute !important;
+  top: 3px !important; left: 3px !important;
+  width: 21px !important; height: 21px !important;
+  background: #fff !important; border-radius: 50% !important;
+  transition: transform 0.2s !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25) !important;
+}
+.sw-switch[aria-checked="true"] { background: #0066FF !important; }
+.sw-switch[aria-checked="true"]::after { transform: translateX(21px) !important; }
+.sw-switch:focus-visible { outline: 3px solid #0066FF !important; outline-offset: 3px !important; }
+.sw-dwell-block { margin-bottom: 12px !important; }
+.sw-dwell-label {
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  font-weight: 600 !important; font-size: 0.86rem !important; color: #0f1419 !important;
+  margin-bottom: 5px !important;
+}
+.sw-dwell-label .sw-dwell-value { color: #0066FF !important; font-weight: 700 !important; }
+.sw-dwell-block input[type="range"] {
+  width: 100% !important; accent-color: #0066FF !important; height: 24px !important;
+}
+.sw-dwell-block input[type="range"]:focus-visible {
+  outline: 3px solid #0066FF !important; outline-offset: 4px !important; border-radius: 4px !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #easepass-aa-btn,
+  #easepass-popup-btn,
   #easepass-text-panel,
-  #easepass-text-backdrop {
+  #easepass-text-backdrop,
+  #easepass-dwell-panel,
+  #easepass-dwell-backdrop {
     transition: none !important;
   }
 }

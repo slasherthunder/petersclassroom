@@ -1,5 +1,5 @@
 /*
- * EasePass — popup controller (dwell clicking + text accessibility).
+ * Accessibility Surfer — popup controller (dwell clicking + text accessibility).
  *
  * Persists to chrome.storage.local:
  *   - enabled            (boolean, YouTube dwell master switch)
@@ -342,4 +342,92 @@ function paintUniversalToggle(on) {
 function paintUniversalStatus(on) {
   universalStatusEl.textContent = on ? 'Active everywhere' : 'Disabled';
   universalStatusEl.classList.toggle('on', on);
+}
+
+// ───────── Reading Mode ─────────
+// Persists easepass-reading-mode-enabled and easepass-reading-mode-memory.
+// The actual overlay lives in the content script (reading-mode.js); here we
+// just store preferences and provide an immediate "open" action + a memory
+// reset. Reading mode never sends page content anywhere.
+
+const RM_ENABLED_KEY = 'easepass-reading-mode-enabled';
+const RM_MEMORY_KEY  = 'easepass-reading-mode-memory';
+const RM_DOMAINS_KEY = 'easepass-reading-mode-domains';
+
+const rmToggleEl   = document.getElementById('rmToggle');
+const rmStatusEl   = document.getElementById('rmStatus');
+const rmMemoryEl   = document.getElementById('rmMemoryToggle');
+const rmOpenEl     = document.getElementById('rmOpen');
+const rmClearEl    = document.getElementById('rmClearMemory');
+
+function paintRm(enabled, memory) {
+  if (rmToggleEl) rmToggleEl.setAttribute('aria-checked', enabled ? 'true' : 'false');
+  if (rmStatusEl) {
+    rmStatusEl.textContent = enabled ? 'Active' : 'Off';
+    rmStatusEl.classList.toggle('on', enabled);
+  }
+  if (rmMemoryEl) rmMemoryEl.setAttribute('aria-checked', memory ? 'true' : 'false');
+}
+
+// Load saved reading-mode prefs (memory defaults on).
+chrome.storage.local.get([RM_ENABLED_KEY, RM_MEMORY_KEY], (data) => {
+  try {
+    if (chrome.runtime.lastError) return;
+    paintRm(data[RM_ENABLED_KEY] === true, data[RM_MEMORY_KEY] !== false);
+  } catch (_) {}
+});
+
+if (rmToggleEl) {
+  rmToggleEl.addEventListener('click', () => {
+    const next = rmToggleEl.getAttribute('aria-checked') !== 'true';
+    rmToggleEl.setAttribute('aria-checked', next ? 'true' : 'false');
+    if (rmStatusEl) {
+      rmStatusEl.textContent = next ? 'Active' : 'Off';
+      rmStatusEl.classList.toggle('on', next);
+    }
+    saveLocal({ [RM_ENABLED_KEY]: next });
+  });
+  rmToggleEl.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); rmToggleEl.click(); }
+  });
+}
+
+if (rmMemoryEl) {
+  rmMemoryEl.addEventListener('click', () => {
+    const next = rmMemoryEl.getAttribute('aria-checked') !== 'true';
+    rmMemoryEl.setAttribute('aria-checked', next ? 'true' : 'false');
+    saveLocal({ [RM_MEMORY_KEY]: next });
+  });
+  rmMemoryEl.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); rmMemoryEl.click(); }
+  });
+}
+
+// Open reading mode on the active tab immediately.
+if (rmOpenEl) {
+  rmOpenEl.addEventListener('click', () => {
+    try {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (chrome.runtime.lastError || !tabs || !tabs[0]) return;
+        try {
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'TOGGLE_READING_MODE' }, () => {
+            void chrome.runtime.lastError; // ignore "no receiver" on non-content pages
+          });
+        } catch (_) {}
+        window.close();
+      });
+    } catch (_) {}
+  });
+}
+
+// Clear all remembered reading-mode domains.
+if (rmClearEl) {
+  rmClearEl.addEventListener('click', () => {
+    try {
+      chrome.storage.local.remove(RM_DOMAINS_KEY, () => {
+        void chrome.runtime.lastError;
+        showSaved();
+      });
+    } catch (_) {}
+  });
 }

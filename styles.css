@@ -1070,7 +1070,7 @@ footer .dot {
   box-shadow: 0 14px 36px rgba(0,0,0,0.06);
 }
 
-/* Card icons — PNGs stay static; SVGs (e.g. EasePass page) keep reveal + hover */
+/* Card icons — PNGs stay static; SVGs (e.g. Accessibility Surfer page) keep reveal + hover */
 .card-icon img {
   display: block;
   width: 96px;

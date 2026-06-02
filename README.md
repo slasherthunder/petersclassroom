@@ -5,7 +5,7 @@ Axolo Assist is a static website plus a Chrome extension (`easepass-extension`) 
 ## Website
 
 - `index.html` is the main landing page.
-- `easepass.html` is the EasePass product page.
+- `easepass.html` is the Accessibility Surfer product page.
 - `styles.css` and `script.js` are shared by both pages.
 
 ## Local Development
@@ -18,7 +18,7 @@ python3 -m http.server 8000
 
 Then open [http://localhost:8000](http://localhost:8000).
 
-## Chrome Extension (EasePass)
+## Chrome Extension (Accessibility Surfer)
 
 The extension source is in `easepass-extension/`.
 

@@ -262,38 +262,14 @@ revealTargets.forEach(el => {
 })();
 
 /* ───────── EASEPASS POPUP PREVIEW ─────────
-   A top-right floating button (accessibility logo) that opens a faithful,
-   interactive replica of the extension's popup.html, so visitors can see
-   every control the extension offers. Injected here (one source, appears
-   on every page that loads script.js). The dwell toggles and sliders are
-   a visual demo — they update their own UI but don't drive dwell-clicking
-   on this static page. The text controls likewise just demonstrate the UI. */
+   A top-right floating button (accessibility logo) that opens a preview of
+   the extension's dwell-clicking controls, so visitors can see what the
+   extension offers. Injected here (one source, appears on every page that
+   loads script.js). The toggles and sliders are a visual demo — they update
+   their own UI but don't drive dwell-clicking on this static page. (Text-
+   accessibility controls live only in the extension itself, not here.) */
 (function () {
   if (document.getElementById('epd-panel')) return;
-
-  const FONTS = [
-    ['default', 'Default', 'Original page font'],
-    ['opendyslexic', 'OpenDyslexic', 'The quick brown fox'],
-    ['lexend', 'Lexend', 'The quick brown fox'],
-    ['arial', 'Arial', 'The quick brown fox'],
-    ['comic', 'Comic Sans MS', 'The quick brown fox'],
-    ['atkinson', 'Atkinson', 'The quick brown fox']
-  ];
-
-  const fontBtns = FONTS.map(([id, name, prev], i) =>
-    `<button class="epd-font-btn" type="button" data-font="${id}" aria-pressed="${i === 0 ? 'true' : 'false'}" aria-label="Use the ${name} font">` +
-      `<span class="epd-font-name">${name}</span>` +
-      `<span class="epd-font-preview">${prev}</span>` +
-    `</button>`).join('');
-
-  const pillRow = (label, attr, opts) =>
-    `<div class="epd-pill-row">` +
-      `<span class="epd-pill-row-label">${label}</span>` +
-      `<div class="epd-pill-group" role="group" aria-label="${label} spacing">` +
-        opts.map(([v, t], i) =>
-          `<button class="epd-pill-btn" type="button" data-${attr}="${v}" aria-pressed="${i === 0 ? 'true' : 'false'}">${t}</button>`).join('') +
-      `</div>` +
-    `</div>`;
 
   const slider = (id, label, min, max, step, value, unit) =>
     `<div class="epd-slider-block">` +
@@ -305,7 +281,7 @@ revealTargets.forEach(el => {
   const toggle = document.createElement('button');
   toggle.id = 'epd-toggle';
   toggle.type = 'button';
-  toggle.setAttribute('aria-label', 'Preview the EasePass extension popup');
+  toggle.setAttribute('aria-label', 'Preview the Accessibility Surfer extension popup');
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-controls', 'epd-panel');
   toggle.innerHTML = '<img src="accessibility.png" alt="" aria-hidden="true" width="56" height="56" />';
@@ -318,18 +294,18 @@ revealTargets.forEach(el => {
   panel.id = 'epd-panel';
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'true');
-  panel.setAttribute('aria-label', 'EasePass extension popup preview');
+  panel.setAttribute('aria-label', 'Accessibility Surfer extension popup preview');
   panel.tabIndex = -1;
   panel.innerHTML =
     `<div class="epd-head">` +
       `<div>` +
         `<img src="easepasslogo.png" alt="" class="epd-logo" aria-hidden="true" />` +
-        `<div class="epd-title">Ease<span class="accent">Pass</span></div>` +
+        `<div class="epd-title">Accessibility <span class="accent">Surfer</span></div>` +
         `<div class="epd-tagline">Hover to click. No button needed.</div>` +
       `</div>` +
       `<button class="epd-close" type="button" aria-label="Close popup preview">✕</button>` +
     `</div>` +
-    `<p class="epd-note">Preview of the extension's toolbar popup. Install EasePass to use these controls for real.</p>` +
+    `<p class="epd-note">Preview of the extension's toolbar popup. Install Accessibility Surfer to use these controls for real.</p>` +
 
     `<h3 class="epd-section-heading">YouTube</h3>` +
     `<div class="epd-toggle-row">` +
@@ -354,21 +330,6 @@ revealTargets.forEach(el => {
       `<li>It clicks automatically.</li>` +
       `<li>Tap <strong>Space</strong> any time to toggle on or off.</li>` +
     `</ol></div>` +
-
-    `<h3 class="epd-section-heading">Text Accessibility</h3>` +
-    `<p class="epd-ta-desc">Change fonts, size, and spacing on any website.</p>` +
-    `<h4 class="epd-subhead">Font</h4>` +
-    `<div class="epd-font-grid">${fontBtns}</div>` +
-    `<div class="epd-section-header"><h4 class="epd-subhead">Text Size</h4>` +
-      `<button class="epd-reset-link" type="button" data-reset="size">Reset</button></div>` +
-    `<div class="epd-slider-row">` +
-      `<input type="range" id="epd-size" min="80" max="200" step="10" value="100" aria-label="Text size percentage" />` +
-      `<span class="epd-slider-value"><span id="epd-size-val">100</span>%</span></div>` +
-    `<h4 class="epd-subhead">Spacing</h4>` +
-    pillRow('Letter', 'letter', [['normal', 'Normal'], ['wide', 'Wide'], ['wider', 'Wider']]) +
-    pillRow('Word', 'word', [['normal', 'Normal'], ['wide', 'Wide'], ['wider', 'Wider']]) +
-    pillRow('Line', 'line', [['normal', 'Normal'], ['relaxed', 'Relaxed'], ['loose', 'Loose']]) +
-    `<button class="epd-reset-all" type="button">Reset all text settings</button>` +
 
     `<div class="epd-footer">From <a href="https://axol-assist.vercel.app" target="_blank" rel="noopener noreferrer">Axolo Assist</a> · ` +
       `<a href="privacy.html">Privacy Policy</a></div>`;
@@ -417,34 +378,6 @@ revealTargets.forEach(el => {
   bindSlider('epd-video', 'epd-video-val');
   bindSlider('epd-button', 'epd-button-val');
   bindSlider('epd-universal', 'epd-universal-val');
-  bindSlider('epd-size', 'epd-size-val');
-
-  // Single-select groups (font buttons + spacing pills).
-  const singleSelect = (selector) => {
-    const btns = panel.querySelectorAll(selector);
-    btns.forEach(b => b.addEventListener('click', () => {
-      btns.forEach(o => o.setAttribute('aria-pressed', 'false'));
-      b.setAttribute('aria-pressed', 'true');
-    }));
-  };
-  singleSelect('.epd-font-btn');
-  ['letter', 'word', 'line'].forEach(attr => singleSelect(`[data-${attr}]`));
-
-  // Reset links.
-  panel.querySelector('[data-reset="size"]').addEventListener('click', () => {
-    const el = panel.querySelector('#epd-size');
-    el.value = 100;
-    panel.querySelector('#epd-size-val').textContent = '100';
-  });
-  panel.querySelector('.epd-reset-all').addEventListener('click', () => {
-    panel.querySelectorAll('.epd-font-btn, .epd-pill-btn').forEach(b =>
-      b.setAttribute('aria-pressed', b.dataset.font === 'default' ||
-        b.dataset.letter === 'normal' || b.dataset.word === 'normal' || b.dataset.line === 'normal'
-        ? 'true' : 'false'));
-    const size = panel.querySelector('#epd-size');
-    size.value = 100;
-    panel.querySelector('#epd-size-val').textContent = '100';
-  });
 
   document.body.appendChild(toggle);
   document.body.appendChild(overlay);

@@ -1,5 +1,5 @@
 <!--
-  EasePass — popup UI (dwell clicking + text accessibility).
+  Accessibility Surfer — popup UI (dwell clicking + text accessibility).
 
   320px wide. Wordmark + tagline; a YouTube section and an "every other
   site" section, each with an enable/disable toggle; three dwell-time
@@ -16,7 +16,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EasePass</title>
+  <title>Accessibility Surfer</title>
   <link href="fonts.css" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -446,7 +446,7 @@
 <body>
 
   <img src="easepasslogo.png" alt="" class="popup-logo" aria-hidden="true" />
-  <h1>Ease<span class="accent">Pass</span></h1>
+  <h1>Accessibility <span class="accent">Surfer</span></h1>
   <p class="tagline">Hover to click. No button needed.</p>
 
   <!-- ──── YouTube section ──── -->
@@ -598,10 +598,45 @@
     <button id="ta-reset-all" class="ta-reset-all" type="button">Reset all text settings</button>
   </div>
 
+  <!-- ──── Reading Mode section ──── -->
+  <div class="text-accessibility-section">
+    <h2>Reading Mode</h2>
+    <p class="ta-description">A clean, distraction-free reading view with its own typography, focus mode, and progress tracking. Page content stays on your device.</p>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="label">Reading mode</span>
+        <span id="rmStatus" class="status">Off</span>
+      </div>
+      <button id="rmToggle"
+              class="toggle"
+              role="switch"
+              aria-checked="false"
+              aria-label="Toggle reading mode feature"></button>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="label">Remember sites</span>
+        <span class="status">Offer reading mode on sites where you've used it</span>
+      </div>
+      <button id="rmMemoryToggle"
+              class="toggle"
+              role="switch"
+              aria-checked="true"
+              aria-label="Remember sites where I use reading mode"></button>
+    </div>
+
+    <p class="ta-description" style="margin-top:0.6rem;">Shortcut: <strong>Alt&nbsp;+&nbsp;R</strong> on any article.</p>
+
+    <button id="rmOpen" class="ta-reset-all" type="button">Open in reading mode</button>
+    <button id="rmClearMemory" class="ta-reset-link" type="button" style="display:block;margin-top:0.7rem;">Clear site memory</button>
+  </div>
+
   <div class="footer">
     From <a href="https://axol-assist.vercel.app" target="_blank" rel="noopener noreferrer">Axolo Assist</a> ·
     <a href="https://axol-assist.vercel.app/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a> ·
-    <a href="mailto:axolassist.business@gmail.com?subject=EasePass%20help%20%26%20feedback" rel="noopener noreferrer">Help &amp; feedback</a>
+    <a href="mailto:axolassist.business@gmail.com?subject=Accessibility%20Surfer%20help%20%26%20feedback" rel="noopener noreferrer">Help &amp; feedback</a>
   </div>
 
   <!-- Brief, screen-reader-announced confirmation shown after any setting

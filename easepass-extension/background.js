@@ -1,5 +1,5 @@
 /*
- * EasePass — background service worker (Manifest V3).
+ * Accessibility Surfer — background service worker (Manifest V3).
  *
  * Responsibilities:
  *   - Seed default settings on install.
