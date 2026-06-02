@@ -331,6 +331,21 @@ revealTargets.forEach(el => {
       `<li>Tap <strong>Space</strong> any time to toggle on or off.</li>` +
     `</ol></div>` +
 
+    `<h3 class="epd-section-heading">Reading Mode</h3>` +
+    `<p class="epd-ta-desc">A clean, distraction-free reading view with its own typography, focus mode, fatigue compensation, word simplification, and progress tracking. Page content stays on your device.</p>` +
+    `<div class="epd-toggle-row">` +
+      `<div class="epd-toggle-info"><span class="epd-label">Reading mode</span>` +
+      `<span class="epd-status" id="epd-rm-status" data-on="Active" data-off="Off">Off</span></div>` +
+      `<button class="epd-switch" type="button" role="switch" aria-checked="false" aria-label="Toggle reading mode"></button>` +
+    `</div>` +
+    `<div class="epd-toggle-row">` +
+      `<div class="epd-toggle-info"><span class="epd-label">Remember sites</span></div>` +
+      `<button class="epd-switch" type="button" role="switch" aria-checked="true" aria-label="Remember sites where I use reading mode"></button>` +
+    `</div>` +
+    `<p class="epd-ta-desc">Shortcut: <strong>Alt&nbsp;+&nbsp;R</strong> on any article.</p>` +
+    `<button class="epd-reset-all" type="button" id="epd-rm-open">Open in reading mode</button>` +
+    `<button class="epd-reset-link" type="button" id="epd-rm-clear" style="display:block;margin-top:0.6rem;">Clear site memory</button>` +
+
     `<div class="epd-footer">From <a href="https://axol-assist.vercel.app" target="_blank" rel="noopener noreferrer">Axolo Assist</a> · ` +
       `<a href="privacy.html">Privacy Policy</a></div>`;
 
