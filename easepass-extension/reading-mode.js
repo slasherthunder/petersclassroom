@@ -131,7 +131,7 @@
     concur: 'agree', consequently: 'so', constitute: 'make up',
     construct: 'build', consult: 'ask', contribute: 'give', convene: 'meet',
     correspond: 'match', currently: 'now', deduct: 'subtract', deficiency: 'lack',
-    delineate: 'describe', demonstrate2: 'show', depict: 'show', designate: 'name',
+    delineate: 'describe', clarify: 'make clear', depict: 'show', designate: 'name',
     desire: 'want', detrimental: 'harmful', deviate: 'differ', disclose: 'reveal',
     discontinue: 'stop', disseminate: 'spread', distribute: 'give out',
     domicile: 'home', dual: 'double', eliminate: 'remove', elucidate: 'explain',
@@ -139,32 +139,32 @@
     endeavor: 'try', enumerate: 'list', equitable: 'fair', equivalent: 'equal',
     erroneous: 'wrong', exclusively: 'only', exemplify: 'show', exhibit: 'show',
     expedite: 'speed up', expenditure: 'cost', expertise: 'skill',
-    facilitate2: 'ease', feasible: 'possible', finalize: 'finish', forfeit: 'lose',
+    negligible: 'tiny', feasible: 'possible', finalize: 'finish', forfeit: 'lose',
     formulate: 'plan', fluctuate: 'change', frequently: 'often', furnish: 'give',
     generate: 'make', hierarchy: 'ranking', hypothesis: 'guess',
     identical: 'same', illustrate: 'show', immediately: 'now', impact: 'effect',
-    impede: 'block', implement2: 'carry out', incentive: 'reward',
-    incorporate: 'include', indicate2: 'point to', initiate: 'begin',
-    innovative2: 'new', inquire: 'ask', insufficient: 'too little',
+    impede: 'block', paramount: 'main', incentive: 'reward',
+    incorporate: 'include', reiterate: 'repeat', initiate: 'begin',
+    cognizant: 'aware', inquire: 'ask', insufficient: 'too little',
     interrogate: 'question', irrespective: 'regardless', justify: 'explain',
     locality: 'place', locate: 'find', magnitude: 'size', mandatory: 'required',
     materialize: 'happen', maximize: 'increase', minimize: 'reduce',
     modify: 'change', momentous: 'important', monitor: 'watch', necessitate: 'need',
     nevertheless: 'still', notify: 'tell', notwithstanding: 'despite',
-    objective2: 'aim', observe: 'see', occupation: 'job', operate: 'run',
+    aggregate: 'total', observe: 'see', occupation: 'job', operate: 'run',
     optimum: 'best', originate: 'start', overall: 'total', participate: 'take part',
     perceive: 'see', permit: 'let', perspective: 'view', pertaining: 'about',
     portion: 'part', possess: 'have', preliminary: 'early', presently: 'soon',
     preserve: 'keep', principal: 'main', procure: 'get', proficient: 'skilled',
-    prohibit: 'ban', proportion: 'part', proximity: 'nearness', purchase2: 'buy',
+    prohibit: 'ban', proportion: 'part', proximity: 'nearness', expend: 'spend',
     rationale: 'reason', recommend: 'suggest', rectify: 'fix', reduction: 'cut',
     relinquish: 'give up', remainder: 'rest', remuneration: 'pay', render: 'make',
     represent: 'stand for', request: 'ask', reside: 'live', residence: 'home',
     resolve: 'solve', retain: 'keep', reveal: 'show', satisfactory: 'good enough',
     scrutinize: 'examine', solicit: 'ask for', strategy: 'plan', submit: 'send in',
     subsequent: 'later', substantial: 'large', substantiate: 'prove',
-    sufficient2: 'enough', supplementary: 'extra', surpass: 'beat',
-    terminate2: 'stop', transmit: 'send', transpire: 'happen', ultimate: 'final',
+    utilise: 'use', supplementary: 'extra', surpass: 'beat',
+    endeavour: 'try', transmit: 'send', transpire: 'happen', ultimate: 'final',
     underutilized: 'unused', undertake: 'do', utilization: 'use', validate: 'confirm',
     variation: 'change', verify: 'check', viable: 'workable', vicinity: 'area',
     voluminous: 'large', whereas: 'while', widespread: 'common', withdraw: 'remove'
@@ -1122,6 +1122,11 @@
 
   function enable(newSettings) {
     if (active) { if (newSettings) updateSettings(newSettings); return; }
+    // Clear any leftover "no article" overlay so retrying on another page works.
+    if (overlayEl && overlayEl.parentNode) {
+      try { overlayEl.parentNode.removeChild(overlayEl); } catch (_) {}
+    }
+    overlayEl = null;
     mergeSettings(newSettings);
 
     article = extractArticle();
@@ -1204,7 +1209,9 @@
     box.appendChild(closeBtn);
     overlayEl.appendChild(box);
     try { document.documentElement.appendChild(overlayEl); } catch (_) {}
-    active = true;
+    // Intentionally NOT setting active = true: there's no live reading session,
+    // so enable() can retry on another page and updateSettings() stays a no-op.
+    // disable() still tears down this overlay (its guard also checks overlayEl).
   }
 
   function updateSettings(newSettings) {

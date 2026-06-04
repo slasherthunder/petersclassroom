@@ -441,6 +441,26 @@
       font-weight: 600;
     }
     .footer a:hover { text-decoration: underline; }
+
+    /* Secondary full-width button (44px touch target) — e.g. Clear site memory */
+    .rm-secondary-btn {
+      display: block;
+      width: 100%;
+      min-height: 44px;
+      margin-top: 0.7rem;
+      padding: 0.6rem 1rem;
+      background: var(--bg-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .rm-secondary-btn:hover { background: #e0ecff; }
+    .rm-secondary-btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
   </style>
 </head>
 <body>
@@ -630,7 +650,7 @@
     <p class="ta-description" style="margin-top:0.6rem;">Shortcut: <strong>Alt&nbsp;+&nbsp;R</strong> on any article.</p>
 
     <button id="rmOpen" class="ta-reset-all" type="button">Open in reading mode</button>
-    <button id="rmClearMemory" class="ta-reset-link" type="button" style="display:block;margin-top:0.7rem;">Clear site memory</button>
+    <button id="rmClearMemory" class="rm-secondary-btn" type="button">Clear site memory</button>
   </div>
 
   <div class="footer">

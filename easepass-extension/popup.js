@@ -8,6 +8,10 @@
  *   - buttonDwellTime    (ms, dwell time for buttons/controls)
  *   - universalDwellTime (ms, dwell time on non-YouTube sites)
  *   - easepass-text-settings (object: font / size / spacing / line-height)
+ *   - easepass-reading-mode-enabled (boolean, reading-mode feature on/off)
+ *   - easepass-reading-mode-memory  (boolean, offer pill on remembered sites)
+ * It also clears easepass-reading-mode-domains on request. (The reading-mode
+ * typography object, easepass-reading-mode-settings, is owned by the overlay.)
  *
  * Dwell times are floored at DWELL_FLOOR_MS so a momentary cursor pause
  * can never trigger a click — important for the motor-impaired users who
@@ -363,7 +367,7 @@ const rmClearEl    = document.getElementById('rmClearMemory');
 function paintRm(enabled, memory) {
   if (rmToggleEl) rmToggleEl.setAttribute('aria-checked', enabled ? 'true' : 'false');
   if (rmStatusEl) {
-    rmStatusEl.textContent = enabled ? 'Active' : 'Off';
+    rmStatusEl.textContent = enabled ? 'Enabled' : 'Disabled';
     rmStatusEl.classList.toggle('on', enabled);
   }
   if (rmMemoryEl) rmMemoryEl.setAttribute('aria-checked', memory ? 'true' : 'false');
@@ -382,7 +386,7 @@ if (rmToggleEl) {
     const next = rmToggleEl.getAttribute('aria-checked') !== 'true';
     rmToggleEl.setAttribute('aria-checked', next ? 'true' : 'false');
     if (rmStatusEl) {
-      rmStatusEl.textContent = next ? 'Active' : 'Off';
+      rmStatusEl.textContent = next ? 'Enabled' : 'Disabled';
       rmStatusEl.classList.toggle('on', next);
     }
     saveLocal({ [RM_ENABLED_KEY]: next });
