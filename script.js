@@ -284,8 +284,8 @@ revealTargets.forEach(el => {
 })();
 
 /* ───────── EASEPASS POPUP PREVIEW ─────────
-   A top-right floating button (Accessibility Surfer logo) that opens a preview of
-   the extension's dwell-clicking controls, so visitors can see what the
+   A bottom-left floating button (Accessibility Surfer logo) that opens a left-side
+   preview of the extension's dwell-clicking controls, so visitors can see what the
    extension offers. Injected here (one source, appears on every page that
    loads script.js). The toggles and sliders are a visual demo — they update
    their own UI but don't drive dwell-clicking on this static page. (Text-
