@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Accessibility Surfer",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Universal dwell clicking on every site, with smart YouTube targeting on top. Plus text-accessibility controls.",
   "permissions": [
     "activeTab",

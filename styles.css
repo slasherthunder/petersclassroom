@@ -1565,8 +1565,8 @@ html[data-contrast="dark"] .compare-card.new { background: #10263b; border-color
    inline CSS — override it (also !important) so it goes dark too. */
 html[data-contrast="dark"] .features-section { background: #0a0a0a !important; }
 html[data-contrast="dark"] .feature-icon { background: rgba(79,195,247,0.18); color: #8ecbff; }
-html[data-contrast="dark"] .easepass-statement { color: #bbb; }
-html[data-contrast="dark"] .easepass-statement strong { color: #f0f0f0; }
+html[data-contrast="dark"] .product-statement { color: #bbb; }
+html[data-contrast="dark"] .product-statement strong { color: #f0f0f0; }
 html[data-contrast="dark"] .a11y-panel { background: #1f1f1f; }
 html[data-contrast="dark"] .a11y-panel-header h2 { color: #f0f0f0; }
 html[data-contrast="dark"] .a11y-btn { background: #2a2a2a; color: #f0f0f0; }

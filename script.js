@@ -283,7 +283,7 @@ revealTargets.forEach(el => {
   syncUI();
 })();
 
-/* ───────── EASEPASS POPUP PREVIEW ─────────
+/* ───────── ACCESSIBILITY SURFER POPUP PREVIEW ─────────
    A bottom-left floating button (Accessibility Surfer logo) that opens a left-side
    preview of the extension's dwell-clicking controls, so visitors can see what the
    extension offers. Injected here (one source, appears on every page that
