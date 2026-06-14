@@ -42,7 +42,7 @@
     0 32px 80px -24px rgba(8, 12, 24, 0.6),
     0 12px 32px -12px rgba(8, 12, 24, 0.4) !important;
   padding: 3rem !important;
-  padding-bottom: 5.5rem !important;
+  padding-bottom: 8.5rem !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   box-sizing: border-box !important;
@@ -205,7 +205,7 @@
 }
 .easepass-rm-progress-indicator {
   position: fixed !important;
-  bottom: 5.6rem !important;
+  bottom: 9rem !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   background: rgba(15, 20, 28, 0.9) !important;
@@ -257,22 +257,29 @@
   position: sticky !important;
   bottom: 0 !important;
   margin: 1.5rem -3rem -3rem !important;
-  padding: 0.7rem 1.1rem !important;
+  padding: 0.85rem 1.5rem 1rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   gap: 0.5rem !important;
-  background: rgba(250, 249, 246, 0.82) !important;
-  border-top: 1px solid rgba(0, 0, 0, 0.07) !important;
-  border-radius: 18px 18px 0 0 !important;
-  box-shadow: 0 -10px 30px -12px rgba(0, 0, 0, 0.18) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(1.1) !important;
-  backdrop-filter: blur(12px) saturate(1.1) !important;
+  row-gap: 0.7rem !important;
+  background: #ffffff !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
   flex-wrap: wrap !important;
 }
 .easepass-rm-toolbar-left,
 .easepass-rm-toolbar-center,
-.easepass-rm-toolbar-right { display: flex !important; align-items: center !important; gap: 0.4rem !important; }
+.easepass-rm-toolbar-right { display: flex !important; align-items: center !important; gap: 0.5rem !important; }
+/* Reading features get their own centered top row; Exit + utilities share
+   the bottom row (Exit left, utilities right). Reads as an intentional
+   two-row bar instead of awkwardly wrapped single row. */
+.easepass-rm-toolbar-center {
+  order: -1 !important;
+  flex-basis: 100% !important;
+  justify-content: center !important;
+  padding-bottom: 0.7rem !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07) !important;
+}
 .easepass-rm-tool {
   min-height: 44px !important;
   min-width: 44px !important;
@@ -319,12 +326,12 @@
 /* ───────── Settings panel ───────── */
 .easepass-rm-settings-panel {
   position: sticky !important;
-  bottom: 4.2rem !important;
+  bottom: 7.5rem !important;
   margin: 0 -3rem !important;
   padding: 1.3rem 1.5rem !important;
   background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
-  border-radius: 16px 16px 0 0 !important;
+  border-radius: 0 !important;
   box-shadow: 0 -16px 40px -16px rgba(0, 0, 0, 0.18) !important;
   max-height: 50vh !important;
   overflow-y: auto !important;
