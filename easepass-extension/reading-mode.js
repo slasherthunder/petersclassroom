@@ -601,13 +601,10 @@
     const center = el('div', 'easepass-rm-toolbar-center');
     const focusBtn = toolbarToggle('focus', STRINGS.focus, settings.focusMode);
     const fatigueBtn = toolbarToggle('fatigue', STRINGS.fatigue, settings.fatigueMode);
-    const simplifyBtn = toolbarToggle('simplify', STRINGS.simplify, settings.simplifyWords);
     focusBtn.addEventListener('click', function () { toggleFeature('focusMode', focusBtn); });
     fatigueBtn.addEventListener('click', function () { toggleFeature('fatigueMode', fatigueBtn); });
-    simplifyBtn.addEventListener('click', function () { toggleFeature('simplifyWords', simplifyBtn); });
     center.appendChild(focusBtn);
     center.appendChild(fatigueBtn);
-    center.appendChild(simplifyBtn);
 
     const right = el('div', 'easepass-rm-toolbar-right');
     const resetFatigue = el('button', 'easepass-rm-fatigue-reset', STRINGS.resetFatigue);
