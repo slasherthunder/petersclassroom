@@ -1230,7 +1230,7 @@
     img.alt = '';
     img.setAttribute('aria-hidden', 'true');
     if (isExtensionAlive()) {
-      try { img.src = chrome.runtime.getURL('icons/icon-128.png'); } catch (_) {}
+      try { img.src = chrome.runtime.getURL('assistsurfer.png'); } catch (_) {}
     }
     popupButtonEl.appendChild(img);
     popupButtonEl.addEventListener('click', (e) => {

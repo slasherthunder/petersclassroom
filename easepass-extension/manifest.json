@@ -40,7 +40,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["fonts.css", "fonts/*", "icons/icon-128.png"],
+      "resources": ["fonts.css", "fonts/*", "icons/icon-128.png", "assistsurfer.png"],
       "matches": ["<all_urls>"]
     }
   ]
