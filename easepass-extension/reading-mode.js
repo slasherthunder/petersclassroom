@@ -281,10 +281,22 @@
   // ───────── Content extraction ─────────
 
   const ROOT_SELECTORS = [
-    'article', '[role="main"]', 'main',
+    'main', 'article', '[role="main"]',
     '.post-content', '.article-body', '.entry-content', '.story-body'
   ];
   const BLOCK_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, blockquote, ul, ol, figure, img, pre';
+  const EXCLUDE_SELECTORS = [
+    'nav', 'footer', 'script', 'style', 'noscript',
+    '#epd-panel', '#epd-overlay', '#epd-toggle',
+    '#a11yPanel', '#a11yToggle', '.a11y-overlay',
+    '#easepass-rm-overlay', '.easepass-ring-container',
+    '.easepass-status', '.easepass-toast', '.easepass-rm-pill'
+  ].join(', ');
+
+  function isExcludedNode(node) {
+    if (!node || !node.closest) return false;
+    try { return !!node.closest(EXCLUDE_SELECTORS); } catch (_) { return false; }
+  }
 
   function wordCount(node) {
     return (node.textContent || '').trim().split(/\s+/).filter(Boolean).length;
@@ -394,6 +406,7 @@
     const blocks = [];
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
+      if (isExcludedNode(node)) continue;
       if (hasAncestorBlock(node, root)) continue;
       const tag = node.tagName.toLowerCase();
       if (tag === 'p') {
@@ -427,6 +440,7 @@
             caption: cap ? (cap.textContent || '').trim() : '' });
         }
       } else if (tag === 'img') {
+        if (node.closest('.hero-logo, .product-hero-logo, .card-icon, .card-icon-img')) continue;
         // Keep the image unless it's a confirmed tiny tracking pixel.
         // naturalWidth is 0 for not-yet-loaded images, so those are kept.
         const w = node.naturalWidth;
@@ -1169,6 +1183,7 @@
 
     active = true;
     rememberDomain();
+    try { window.dispatchEvent(new CustomEvent('easepass-rm-opened')); } catch (_) {}
 
     if (!reducedMotion()) requestAnimationFrame(function () { overlayEl.classList.add('easepass-rm-open'); });
     else overlayEl.classList.add('easepass-rm-open');
@@ -1192,6 +1207,7 @@
       focusIndex = 0;
       article = null;
       active = false;
+      try { window.dispatchEvent(new CustomEvent('easepass-rm-closed')); } catch (_) {}
     };
 
     if (overlayEl && !reducedMotion()) {

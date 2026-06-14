@@ -369,7 +369,7 @@ revealTargets.forEach(el => {
       `<div class="epd-toggle-info"><span class="epd-label">Remember sites</span></div>` +
       `<button class="epd-switch" type="button" role="switch" aria-checked="true" aria-label="Remember sites where I use reading mode"></button>` +
     `</div>` +
-    `<p class="epd-ta-desc">Shortcut: <strong>Alt&nbsp;+&nbsp;R</strong> on any article.</p>` +
+    `<p class="epd-ta-desc">Shortcut: <strong>Alt&nbsp;+&nbsp;R</strong> on this page.</p>` +
     `<button class="epd-reset-all" type="button" id="epd-rm-open">Open in reading mode</button>` +
     `<button class="epd-reset-link" type="button" id="epd-rm-clear" style="display:block;margin-top:0.6rem;">Clear site memory</button>` +
 
@@ -439,6 +439,19 @@ revealTargets.forEach(el => {
       status.classList.toggle('on', on);
     }
   });
+
+  function syncReadingModeToggle(on) {
+    const rmSwitch = panel.querySelector('#epd-rm-toggle');
+    const rmStatus = panel.querySelector('#epd-rm-status');
+    if (rmSwitch) rmSwitch.setAttribute('aria-checked', on ? 'true' : 'false');
+    if (rmStatus) {
+      rmStatus.textContent = on ? rmStatus.dataset.on : rmStatus.dataset.off;
+      rmStatus.classList.toggle('on', on);
+    }
+  }
+
+  window.addEventListener('easepass-rm-opened', () => syncReadingModeToggle(true));
+  window.addEventListener('easepass-rm-closed', () => syncReadingModeToggle(false));
 
   // Dwell-time + size sliders: live-update their value label.
   const bindSlider = (id, labelId) => {

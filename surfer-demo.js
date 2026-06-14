@@ -444,6 +444,20 @@
     } catch (_) { return false; }
   }
 
+  function toggleReadingMode() {
+    if (readingModeActive()) closeReadingMode();
+    else launchReadingMode();
+  }
+
+  // Alt+R toggles reading mode on the marketing-site demo (mirrors the extension).
+  document.addEventListener('keydown', function (e) {
+    if (!e.altKey || (e.key !== 'r' && e.key !== 'R') || e.repeat) return;
+    if (isTypingTarget(e.target)) return;
+    if (extensionActive()) return;
+    e.preventDefault();
+    toggleReadingMode();
+  }, true);
+
   // ───────── Public control surface ─────────
   function setDwellEnabled(on) {
     enabled = !!on;
@@ -489,6 +503,7 @@
     isDwellEnabled: function () { return enabled; },
     launchReadingMode: launchReadingMode,
     closeReadingMode: closeReadingMode,
+    toggleReadingMode: toggleReadingMode,
     readingModeActive: readingModeActive,
     extensionActive: extensionActive
   };
