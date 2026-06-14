@@ -32,6 +32,12 @@
 // clamped up on load.
 const DWELL_FLOOR_MS = 1000;
 
+function formatDwellSeconds(ms) {
+  const sec = Math.round((Number(ms) / 1000) * 100) / 100;
+  const text = Number.isInteger(sec) ? String(sec) : String(sec);
+  return text + (sec === 1 ? ' second' : ' seconds');
+}
+
 // Write to local storage and flash the "Saved ✓" confirmation. Centralizes
 // every persistence path so feedback is consistent and a dead/invalidated
 // extension context can't throw.
@@ -91,15 +97,15 @@ chrome.storage.local.get(
     paintToggle(enabled);
     paintStatus(enabled);
     videoEl.value         = videoDwellTime;
-    videoValEl.textContent = videoDwellTime;
+    videoValEl.textContent = formatDwellSeconds(videoDwellTime);
     buttonEl.value        = buttonDwellTime;
-    buttonValEl.textContent = buttonDwellTime;
+    buttonValEl.textContent = formatDwellSeconds(buttonDwellTime);
 
     // Universal section
     paintUniversalToggle(universalEnabled);
     paintUniversalStatus(universalEnabled);
     universalSpeedEl.value = universalDwellTime;
-    universalValEl.textContent = universalDwellTime;
+    universalValEl.textContent = formatDwellSeconds(universalDwellTime);
   }
 );
 
@@ -124,13 +130,13 @@ toggleEl.addEventListener('keydown', (e) => {
 
 videoEl.addEventListener('input', () => {
   const v = parseInt(videoEl.value, 10);
-  videoValEl.textContent = v;
+  videoValEl.textContent = formatDwellSeconds(v);
   saveLocal({ videoDwellTime: v });
 });
 
 buttonEl.addEventListener('input', () => {
   const v = parseInt(buttonEl.value, 10);
-  buttonValEl.textContent = v;
+  buttonValEl.textContent = formatDwellSeconds(v);
   saveLocal({ buttonDwellTime: v });
 });
 
@@ -151,7 +157,7 @@ universalToggleEl.addEventListener('keydown', (e) => {
 // ── Universal dwell-time slider ──
 universalSpeedEl.addEventListener('input', () => {
   const v = parseInt(universalSpeedEl.value, 10);
-  universalValEl.textContent = v;
+  universalValEl.textContent = formatDwellSeconds(v);
   saveLocal({ universalDwellTime: v });
 });
 
@@ -176,17 +182,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if (changes.videoDwellTime) {
       const v = Number(changes.videoDwellTime.newValue) || 5000;
       videoEl.value = v;
-      videoValEl.textContent = v;
+      videoValEl.textContent = formatDwellSeconds(v);
     }
     if (changes.buttonDwellTime) {
       const v = Number(changes.buttonDwellTime.newValue) || 3000;
       buttonEl.value = v;
-      buttonValEl.textContent = v;
+      buttonValEl.textContent = formatDwellSeconds(v);
     }
     if (changes.universalDwellTime) {
       const v = Number(changes.universalDwellTime.newValue) || 3000;
       universalSpeedEl.value = v;
-      universalValEl.textContent = v;
+      universalValEl.textContent = formatDwellSeconds(v);
     }
     if (changes[TA_STORAGE_KEY]) {
       const next = changes[TA_STORAGE_KEY].newValue;

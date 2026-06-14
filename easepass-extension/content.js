@@ -158,6 +158,12 @@
     return universalDwellTime; // 'universal' fallback for everything else
   }
 
+  function formatDwellSeconds(ms) {
+    const sec = Math.round((Number(ms) / 1000) * 100) / 100;
+    const text = Number.isInteger(sec) ? String(sec) : String(sec);
+    return text + (sec === 1 ? ' second' : ' seconds');
+  }
+
   // Active dwell session. null when nothing being dwelled.
   // { el, type, ring, startTime, elapsed, dwellTime, rafId }
   let active = null;
@@ -933,10 +939,11 @@
   // (so the pill never flashes blank) and each animation frame.
   function formatCountdown(type, msRemaining) {
     const secs = Math.max(0, Math.ceil(msRemaining / 1000));
+    const label = secs === 1 ? ' second' : ' seconds';
     if (type === 'video') {
-      return secs > 0 ? 'Opens in ' + secs + 's' : 'Opening…';
+      return secs > 0 ? 'Opens in ' + secs + label : 'Opening…';
     }
-    return secs > 0 ? 'Click in ' + secs + 's' : 'Clicking…';
+    return secs > 0 ? 'Click in ' + secs + label : 'Clicking…';
   }
 
   // Lazily create the pill, then make it visible if the extension's on.
@@ -1363,11 +1370,11 @@
         `<button class="sw-switch" type="button" id="${id}" role="switch" aria-checked="false" aria-label="Toggle ${statusOn === 'Active on YouTube' ? 'YouTube' : 'universal'} dwell clicking"></button>` +
       `</div>`;
 
-    const dwellSlider = (id, label, min, max, step, unit) =>
+    const dwellSlider = (id, label, min, max, step) =>
       `<div class="sw-dwell-block">` +
         `<div class="sw-dwell-label"><label for="${id}">${label}</label>` +
-        `<span><span class="sw-dwell-value" id="${id}-val">0</span> ${unit}</span></div>` +
-        `<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" aria-label="${label} in milliseconds" />` +
+        `<span class="sw-dwell-value" id="${id}-val">0 seconds</span></div>` +
+        `<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" aria-label="${label} in seconds" />` +
       `</div>`;
 
     dwellPanelEl.innerHTML =
@@ -1377,11 +1384,11 @@
       `</div>` +
       `<h3 class="sw-section-heading">YouTube</h3>` +
       dwellToggleRow('sw-yt-toggle', 'Active on YouTube', 'Disabled') +
-      dwellSlider('sw-video', 'Video dwell time', 1000, 8000, 500, 'ms') +
-      dwellSlider('sw-button', 'Button dwell time', 1000, 5000, 250, 'ms') +
+      dwellSlider('sw-video', 'Video dwell time', 1000, 8000, 500) +
+      dwellSlider('sw-button', 'Button dwell time', 1000, 5000, 250) +
       `<h3 class="sw-section-heading">Every other site</h3>` +
       dwellToggleRow('sw-univ-toggle', 'Active everywhere', 'Disabled') +
-      dwellSlider('sw-univ', 'Dwell time', 1000, 6000, 250, 'ms') +
+      dwellSlider('sw-univ', 'Dwell time', 1000, 6000, 250) +
       `<h3 class="sw-section-heading">Reading Mode</h3>` +
       `<div class="sw-toggle-row">` +
         `<div class="sw-toggle-info"><span class="sw-toggle-label">Remember sites</span>` +
@@ -1473,7 +1480,7 @@
       const el = dwellPanelEl.querySelector('#' + id);
       const out = dwellPanelEl.querySelector('#' + id + '-val');
       if (el) el.value = String(val);
-      if (out) out.textContent = String(val);
+      if (out) out.textContent = formatDwellSeconds(val);
     };
     paintSlider('sw-video', videoDwellTime);
     paintSlider('sw-button', buttonDwellTime);

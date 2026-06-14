@@ -223,9 +223,13 @@
     return { el: hit, clickTarget: hit, type: 'universal' };
   }
 
+  function formatSecondsLabel(secs) {
+    return secs + (secs === 1 ? ' second' : ' seconds');
+  }
+
   function formatCountdown(msRemaining) {
     var secs = Math.max(0, Math.ceil(msRemaining / 1000));
-    return secs > 0 ? 'Click in ' + secs + 's' : 'Clicking…';
+    return secs > 0 ? 'Click in ' + formatSecondsLabel(secs) : 'Clicking…';
   }
 
   // ───────── Click helper ─────────

@@ -293,11 +293,17 @@ revealTargets.forEach(el => {
 (function () {
   if (document.getElementById('epd-panel')) return;
 
-  const slider = (id, label, min, max, step, value, unit) =>
+  function formatDwellSeconds(ms) {
+    const sec = Math.round((Number(ms) / 1000) * 100) / 100;
+    const text = Number.isInteger(sec) ? String(sec) : String(sec);
+    return text + (sec === 1 ? ' second' : ' seconds');
+  }
+
+  const slider = (id, label, min, max, step, value) =>
     `<div class="epd-slider-block">` +
       `<div class="epd-slider-label"><label for="${id}">${label}</label>` +
-      `<span class="epd-value"><span id="${id}-val">${value}</span> ${unit}</span></div>` +
-      `<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" aria-label="${label}" />` +
+      `<span class="epd-value"><span id="${id}-val">${formatDwellSeconds(value)}</span></span></div>` +
+      `<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" aria-label="${label} in seconds" />` +
     `</div>`;
 
   const toggle = document.createElement('button');
@@ -335,8 +341,8 @@ revealTargets.forEach(el => {
       `<span class="epd-status on" data-on="Active on YouTube" data-off="Disabled">Active on YouTube</span></div>` +
       `<button class="epd-switch" type="button" role="switch" aria-checked="true" aria-label="Toggle YouTube dwell clicking"></button>` +
     `</div>` +
-    slider('epd-video', 'Video dwell time', 1000, 8000, 500, 5000, 'ms') +
-    slider('epd-button', 'Button dwell time', 1000, 5000, 250, 3000, 'ms') +
+    slider('epd-video', 'Video dwell time', 1000, 8000, 500, 5000) +
+    slider('epd-button', 'Button dwell time', 1000, 5000, 250, 3000) +
 
     `<h3 class="epd-section-heading">Every other site</h3>` +
     `<div class="epd-toggle-row">` +
@@ -344,7 +350,7 @@ revealTargets.forEach(el => {
       `<span class="epd-status on" data-on="Active everywhere" data-off="Disabled">Active everywhere</span></div>` +
       `<button class="epd-switch" id="epd-universal-toggle" type="button" role="switch" aria-checked="true" aria-label="Toggle universal dwell clicking"></button>` +
     `</div>` +
-    slider('epd-universal', 'Dwell time', 1000, 6000, 250, 3000, 'ms') +
+    slider('epd-universal', 'Dwell time', 1000, 6000, 250, 3000) +
 
     `<div class="epd-how"><h3>How it works</h3><ol>` +
       `<li>Hover over a video or button.</li>` +
@@ -439,7 +445,7 @@ revealTargets.forEach(el => {
   const bindSlider = (id, labelId) => {
     const el = panel.querySelector('#' + id);
     const out = panel.querySelector('#' + labelId);
-    if (el && out) el.addEventListener('input', () => { out.textContent = el.value; });
+    if (el && out) el.addEventListener('input', () => { out.textContent = formatDwellSeconds(el.value); });
   };
   bindSlider('epd-video', 'epd-video-val');
   bindSlider('epd-button', 'epd-button-val');
