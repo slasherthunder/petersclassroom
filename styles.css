@@ -18,17 +18,19 @@
   --muted:      #6B645B;
   --muted-2:    #938B80;
 
-  /* Accent — axolotl coral */
-  --coral:      #F0573D;
-  --coral-deep: #C8381F;   /* hover / text needing AA on light */
-  --coral-press:#A82E18;
-  --coral-tint: #FCE9E4;
-  --coral-tint2:#F8D8CF;
+  /* Accent — axolotl palette (deep purple ring + magenta from the mascot) */
+  --coral:      #B03060;   /* magenta — the "Assist" wordmark color */
+  --coral-deep: #8C2550;   /* deeper magenta — hover / text AA on light */
+  --coral-press:#6E1C40;
+  --coral-tint: #F6E1EA;
+  --coral-tint2:#ECC4D6;
   --on-coral:   #FFFFFF;
 
-  /* Brand wordmark (kept for the mascot lockup) */
+  /* Brand wordmark / deep-purple from the mascot ring */
   --brand-axolo:  #301070;
   --brand-assist: #B03060;
+  --purple:       #301070;
+  --purple-deep:  #25095a;
 
   /* Functional aliases used by the accessibility toolbar + modes.
      Repointed to the coral system so the whole product is cohesive. */
@@ -184,9 +186,9 @@ nav.is-scrolled { border-bottom-color: var(--line); }
   letter-spacing: -0.02em; color: var(--ink);
 }
 .nav-logo .axol-mark { width: 34px; height: 34px; flex-shrink: 0; }
-.nav-axolo  { color: var(--ink); }
-.nav-assist { color: var(--coral-deep); }
-.nav-logo:hover .nav-assist { color: var(--coral); }
+.nav-axolo  { color: var(--purple); }
+.nav-assist { color: var(--brand-assist); }
+.nav-logo:hover .nav-assist { color: var(--coral-deep); }
 
 .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
 .nav-links a:not(.nav-cta) {
