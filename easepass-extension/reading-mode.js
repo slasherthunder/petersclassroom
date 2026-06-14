@@ -1080,6 +1080,12 @@
       const f = pills[i].dataset.rmPill;
       pills[i].setAttribute('aria-pressed', String(settings[f]) === String(pills[i].dataset.rmValue) ? 'true' : 'false');
     }
+    // Keep the custom color picker's swatch in sync after reset/update.
+    const colorPicker = settingsPanelEl.querySelector('.easepass-rm-swatch-custom');
+    if (colorPicker) {
+      colorPicker.value = (settings.backgroundColor && settings.backgroundColor[0] === '#')
+        ? settings.backgroundColor : '#FFFFFF';
+    }
   }
 
   // ───────── Reading-mode-available pill ─────────
