@@ -2,6 +2,8 @@ function handleContactSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const status = form.querySelector('#formStatus');
+  const siteOrigin = (window.AXOL_SITE && window.AXOL_SITE.origin) || 'https://axolassist.com';
+  const siteHost = siteOrigin.replace(/^https?:\/\//, '');
 
   status.textContent = '';
   status.className = 'form-status';
@@ -25,7 +27,7 @@ function handleContactSubmit(e) {
     "Email: " + data.email + "\n" +
     "Role: "  + data.role  + "\n\n" +
     "Message:\n" + data.message + "\n\n" +
-    "-- Sent via axol-assist.vercel.app contact form"
+    "-- Sent via " + siteHost + " contact form"
   );
 
   const mailtoUrl =
@@ -332,7 +334,7 @@ revealTargets.forEach(el => {
       `</div>` +
       `<button class="epd-close" type="button" aria-label="Close popup preview">✕</button>` +
     `</div>` +
-    `<p class="epd-note">Preview of the extension's toolbar popup. Install Accessibility Surfer to use these controls for real.</p>` +
+    `<p class="epd-note">Preview of the extension's toolbar popup. <a href="${(window.AXOL_SITE && window.AXOL_SITE.chromeWebStoreUrl) || 'https://chrome.google.com/webstore/detail/accessibility-surfer/PLACEHOLDER_EXTENSION_ID'}" data-chrome-install rel="noopener noreferrer">Add to Chrome</a> to use these controls for real.</p>` +
 
     `<h3 class="epd-section-heading">YouTube</h3>` +
     `<div class="epd-toggle-row">` +
@@ -373,7 +375,7 @@ revealTargets.forEach(el => {
     `<button class="epd-reset-all" type="button" id="epd-rm-open">Open in reading mode</button>` +
     `<button class="epd-reset-link" type="button" id="epd-rm-clear" style="display:block;margin-top:0.6rem;">Clear site memory</button>` +
 
-    `<div class="epd-footer">From <a href="https://axol-assist.vercel.app" target="_blank" rel="noopener noreferrer">Axol Assist</a> · ` +
+    `<div class="epd-footer">From <a href="${(window.AXOL_SITE && window.AXOL_SITE.origin) || 'https://axolassist.com'}" target="_blank" rel="noopener noreferrer">Axol Assist</a> · ` +
       `<a href="privacy.html">Privacy Policy</a></div>`;
 
   // ── Open / close ──
@@ -510,4 +512,12 @@ revealTargets.forEach(el => {
   document.body.appendChild(toggle);
   document.body.appendChild(overlay);
   document.body.appendChild(panel);
+})();
+
+(function applyChromeInstallLinks() {
+  const url = window.AXOL_SITE && window.AXOL_SITE.chromeWebStoreUrl;
+  if (!url) return;
+  document.querySelectorAll('[data-chrome-install]').forEach((el) => {
+    el.href = url;
+  });
 })();

@@ -440,3 +440,14 @@ if (rmClearEl) {
     } catch (_) {}
   });
 }
+
+(function wireSiteLinks() {
+  const origin = typeof AXOL_ORIGIN === 'string' ? AXOL_ORIGIN : 'https://axolassist.com';
+  document.querySelectorAll('.footer a[href*="axolassist.com"]').forEach((link) => {
+    if (link.pathname.endsWith('privacy.html')) {
+      link.href = origin + '/privacy.html';
+    } else {
+      link.href = origin + '/';
+    }
+  });
+})();
