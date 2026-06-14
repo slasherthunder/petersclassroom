@@ -987,7 +987,6 @@ footer .dot {
   /* ── Enhanced mobile animations ── */
 
   /* Hero entrance: slower, more deliberate on small screens */
-  .hero-logo     { animation: fadeUp 1.1s ease-out 0.2s both, floatSoft 6s ease-in-out 1.5s infinite; }
   .hero-headline { animation: fadeUp 1s ease-out 0.55s both; }
   .hero-tagline  { animation: fadeUp 1s ease-out 0.8s both; }
   .hero-links    { animation: fadeUp 1s ease-out 1.05s both; }
@@ -1075,11 +1074,6 @@ footer .dot {
   to   { opacity: 1; }
 }
 
-@keyframes floatSoft {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-10px); }
-}
-
 @keyframes gentlePulse {
   0%, 100% { box-shadow: 0 6px 22px rgba(236,72,153,0.5); }
   50%      { box-shadow: 0 8px 32px rgba(236,72,153,0.75), 0 0 0 8px rgba(236,72,153,0.18); }
@@ -1090,8 +1084,7 @@ footer .dot {
   100% { background-position: 200% 50%; }
 }
 
-/* Hero entrance: staggered fade-up + ongoing logo float */
-.hero-logo     { animation: fadeUp 0.9s ease-out 0.15s both, floatSoft 6s ease-in-out 1.2s infinite; }
+/* Hero entrance: staggered fade-up */
 .hero-headline { animation: fadeUp 0.8s ease-out 0.4s both; }
 .hero-tagline  { animation: fadeUp 0.8s ease-out 0.6s both; }
 .hero-links    { animation: fadeUp 0.8s ease-out 0.8s both; }
