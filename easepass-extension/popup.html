@@ -5,8 +5,7 @@
   site" section, each with an enable/disable toggle; three dwell-time
   sliders (video, button, universal); a "How it works" block; the full
   text-accessibility controls (font / size / spacing); and a footer with
-  links to the Axol Assist site, privacy policy, and help. Lexend font,
-  blue and white. Fully keyboard navigable.
+  links to the Axol Assist site, privacy policy, and help.   Lexend font, magenta and white. Fully keyboard navigable.
 
   All webfonts (Lexend UI font + OpenDyslexic/Atkinson previews) are
   bundled locally via fonts.css — no CDN requests, renders fully offline.
@@ -22,14 +21,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:       #0066FF;
-      --blue-deep:  #0050cc;
-      --green:      #22C55E;
-      --text:       #0f1419;
-      --text-muted: #5a6470;
-      --bg:         #ffffff;
-      --bg-soft:    #f1f6ff;
-      --border:     #e2e8ef;
+      --accent:       #B03060;
+      --accent-deep:  #8C2550;
+      --accent-tint:  #F6E1EA;
+      --accent-tint2: #ECC4D6;
+      --text:         #0f1419;
+      --text-muted:   #5a6470;
+      --bg:           #ffffff;
+      --bg-soft:      var(--accent-tint);
+      --border:       #e2e8ef;
     }
 
     html, body {
@@ -56,7 +56,7 @@
       line-height: 1.05;
       text-align: center;
     }
-    h1 .accent { color: var(--blue); }
+    h1 .accent { color: var(--accent); }
 
     .tagline { text-align: center; }
 
@@ -65,7 +65,7 @@
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--blue);
+      color: var(--accent);
       margin: 1.1rem 0 0.5rem;
       padding-top: 0.6rem;
       border-top: 1px solid var(--border);
@@ -101,7 +101,7 @@
       color: var(--text-muted);
       margin-top: 2px;
     }
-    .toggle-info .status.on { color: var(--green); font-weight: 600; }
+    .toggle-info .status.on { color: var(--accent-deep); font-weight: 600; }
 
     .toggle {
       position: relative;
@@ -123,10 +123,10 @@
       transition: transform 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
-    .toggle[aria-checked="true"] { background: var(--blue); }
+    .toggle[aria-checked="true"] { background: var(--accent); }
     .toggle[aria-checked="true"]::after { transform: translateX(22px); }
     .toggle:focus-visible {
-      outline: 3px solid var(--blue);
+      outline: 3px solid var(--accent);
       outline-offset: 3px;
     }
 
@@ -141,17 +141,17 @@
       margin-bottom: 0.4rem;
     }
     .slider-label .value {
-      color: var(--blue);
+      color: var(--accent);
       font-weight: 700;
       font-size: 0.9rem;
     }
     input[type="range"] {
       width: 100%;
-      accent-color: var(--blue);
+      accent-color: var(--accent);
       height: 24px;
     }
     input[type="range"]:focus-visible {
-      outline: 3px solid var(--blue);
+      outline: 3px solid var(--accent);
       outline-offset: 4px;
       border-radius: 4px;
     }
@@ -168,7 +168,7 @@
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--blue);
+      color: var(--accent);
       margin-bottom: 8px;
     }
     .how ol {
@@ -194,7 +194,7 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: var(--blue);
+      background: var(--accent);
       color: #fff;
       font-weight: 700;
       font-size: 0.78rem;
@@ -214,7 +214,7 @@
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--blue);
+      color: var(--accent);
       margin-bottom: 0.4rem;
     }
     .ta-description {
@@ -250,7 +250,7 @@
       padding: 0;
       text-decoration: underline;
     }
-    .ta-reset-link:hover { color: var(--blue); }
+    .ta-reset-link:hover { color: var(--accent); }
 
     /* Font picker */
     .ta-font-grid {
@@ -272,14 +272,14 @@
       font-family: inherit;
       transition: background 0.15s, border-color 0.15s;
     }
-    .ta-font-btn:hover { background: #e0ecff; }
+    .ta-font-btn:hover { background: #ECC4D6; }
     .ta-font-btn[aria-pressed="true"] {
       background: #fff;
-      border-color: var(--blue);
-      color: var(--blue);
+      border-color: var(--accent);
+      color: var(--accent);
     }
     .ta-font-btn:focus-visible {
-      outline: 3px solid var(--blue);
+      outline: 3px solid var(--accent);
       outline-offset: 2px;
     }
     .ta-font-name {
@@ -317,16 +317,16 @@
     }
     .ta-slider-row input[type="range"] {
       flex: 1;
-      accent-color: var(--blue);
+      accent-color: var(--accent);
       height: 24px;
     }
     .ta-slider-row input[type="range"]:focus-visible {
-      outline: 3px solid var(--blue);
+      outline: 3px solid var(--accent);
       outline-offset: 4px;
       border-radius: 4px;
     }
     .ta-slider-value {
-      color: var(--blue);
+      color: var(--accent);
       font-weight: 700;
       font-size: 0.85rem;
       min-width: 42px;
@@ -367,14 +367,14 @@
       text-align: center;
       white-space: nowrap;
     }
-    .ta-pill-btn:hover { background: #e0ecff; }
+    .ta-pill-btn:hover { background: #ECC4D6; }
     .ta-pill-btn[aria-pressed="true"] {
-      background: var(--blue);
+      background: var(--accent);
       color: #fff;
-      border-color: var(--blue);
+      border-color: var(--accent);
     }
     .ta-pill-btn:focus-visible {
-      outline: 3px solid var(--blue);
+      outline: 3px solid var(--accent);
       outline-offset: 2px;
     }
 
@@ -396,7 +396,7 @@
     .ta-reset-all:hover  { background: #2a2f36; }
     .ta-reset-all:active { transform: scale(0.98); }
     .ta-reset-all:focus-visible {
-      outline: 3px solid var(--blue);
+      outline: 3px solid var(--accent);
       outline-offset: 3px;
     }
 
@@ -406,7 +406,7 @@
       left: 50%;
       bottom: 14px;
       transform: translate(-50%, 12px);
-      background: var(--green);
+      background: var(--accent-deep);
       color: #fff;
       font-weight: 700;
       font-size: 0.82rem;
@@ -436,7 +436,7 @@
       color: var(--text-muted);
     }
     .footer a {
-      color: var(--blue);
+      color: var(--accent);
       text-decoration: none;
       font-weight: 600;
     }
@@ -459,8 +459,8 @@
       cursor: pointer;
       transition: background 0.15s;
     }
-    .rm-secondary-btn:hover { background: #e0ecff; }
-    .rm-secondary-btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+    .rm-secondary-btn:hover { background: #ECC4D6; }
+    .rm-secondary-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   </style>
 </head>
 <body>
