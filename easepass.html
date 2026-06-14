@@ -37,16 +37,20 @@
     }
     .page-label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--coral); }
     .product-hero-title {
-      display: flex; align-items: center; gap: clamp(1rem, 3vw, 1.5rem);
-      flex-wrap: wrap; margin: 0;
+      display: flex; align-items: center; gap: 0.32em;
+      flex-wrap: nowrap; margin: 0;
+      font-size: clamp(2.4rem, 7.5vw, 5.4rem);
+      line-height: 1;
     }
     .product-hero-logo {
-      display: block; width: clamp(64px, 12vw, 92px); height: auto; flex-shrink: 0;
-      border-radius: 20px; box-shadow: 0 16px 36px -18px rgba(48, 16, 112, .35);
+      display: block; width: 0.92em; height: 0.92em; flex: 0 0 auto;
+      border-radius: 0.2em; object-fit: contain;
+      box-shadow: 0 0.12em 0.28em -0.12em rgba(48, 16, 112, .35);
     }
     .product-hero-wordmark {
       display: block; font-family: var(--font-display); font-weight: 600;
-      font-size: clamp(2.8rem, 8vw, 5.4rem); letter-spacing: -0.035em; line-height: .98; color: var(--ink);
+      font-size: 1em; letter-spacing: -0.035em; line-height: 1; color: var(--ink);
+      white-space: nowrap;
     }
     .product-hero-wordmark .accent { color: var(--coral-deep); }
     .ep-hero .hero-tagline { margin-left: 0; }
@@ -112,7 +116,7 @@
       <div class="wrap">
         <span class="page-label">Free Chrome extension · v0.5.0</span>
         <h1 class="product-hero-title">
-          <img src="easepasslogo.png" alt="" class="product-hero-logo" aria-hidden="true" width="92" height="92" />
+          <img src="easepasslogo.png" alt="" class="product-hero-logo" aria-hidden="true" />
           <span class="product-hero-wordmark">Accessibility <span class="accent">Surfer.</span></span>
         </h1>
         <p class="hero-tagline">Hover to click. No button needed. Accessibility Surfer adds dwell clicking to every website, with smart YouTube targeting on top.</p>
