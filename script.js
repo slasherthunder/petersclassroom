@@ -311,7 +311,7 @@ revealTargets.forEach(el => {
   toggle.setAttribute('aria-label', 'Preview the Accessibility Surfer extension popup');
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-controls', 'epd-panel');
-  toggle.innerHTML = '<img src="easepasslogo.png" alt="" aria-hidden="true" width="60" height="60" />';
+  toggle.innerHTML = '<img src="assistsurfer.png" alt="" aria-hidden="true" width="60" height="60" />';
 
   const overlay = document.createElement('div');
   overlay.id = 'epd-overlay';
@@ -326,7 +326,7 @@ revealTargets.forEach(el => {
   panel.innerHTML =
     `<div class="epd-head">` +
       `<div>` +
-        `<img src="easepasslogo.png" alt="" class="epd-logo" aria-hidden="true" />` +
+        `<img src="assistsurfer.png" alt="" class="epd-logo" aria-hidden="true" />` +
         `<div class="epd-title">Accessibility <span class="accent">Surfer</span></div>` +
         `<div class="epd-tagline">Hover to click. No button needed.</div>` +
       `</div>` +
