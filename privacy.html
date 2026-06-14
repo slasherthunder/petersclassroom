@@ -14,8 +14,9 @@
   <link rel="icon" type="image/png" href="easepass-extension/icons/icon-48.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <script>document.documentElement.classList.add('js');</script>
   <style>
     .privacy-wrap {
       max-width: 860px;
@@ -43,13 +44,14 @@
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
-  <nav>
+  <nav id="siteNav">
     <a href="index.html" class="nav-logo" aria-label="Axol Assist home">
-      <span class="nav-axolo">Axol</span><span class="nav-assist">Assist</span>
+      <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
+      <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
-      <li><a href="easepass.html">Accessibility Surfer</a></li>
+      <li><a href="easepass.html" class="nav-cta">Accessibility Surfer</a></li>
     </ul>
   </nav>
 
@@ -98,15 +100,18 @@
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-colors">
-      <div class="dot" style="background:var(--red)"></div>
-      <div class="dot" style="background:var(--orange)"></div>
-      <div class="dot" style="background:var(--yellow)"></div>
-      <div class="dot" style="background:var(--green)"></div>
-      <div class="dot" style="background:var(--blue)"></div>
-      <div class="dot" style="background:var(--pink)"></div>
+    <div class="wrap">
+      <div class="footer-top">
+        <a href="index.html" class="footer-brand"><span class="axol-mark" aria-hidden="true"></span>Axol Assist</a>
+        <span class="footer-colors" aria-hidden="true">
+          <svg viewBox="0 0 240 24" fill="none" preserveAspectRatio="none"><path d="M0,14 C40,4 80,22 120,12 C160,2 200,20 240,10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright &copy; 2026 <strong class="accent">Axol Assist</strong>. All rights reserved.</p>
+        <p><a href="index.html">Home</a> &nbsp;·&nbsp; <a href="easepass.html">Accessibility Surfer</a></p>
+      </div>
     </div>
-    <p>Copyright &copy; 2026 <strong class="accent">Axol Assist</strong>. All rights reserved. <a href="index.html">Home</a> · <a href="easepass.html">Accessibility Surfer</a></p>
   </footer>
 
   <!-- Accessibility toolbar is injected by script.js (injectAccessibilityToolbar) -->

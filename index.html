@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axol Assist</title>
+  <title>Axol Assist — assistive technology for real classrooms</title>
   <meta name="description" content="Axol Assist builds affordable, co-developed assistive technology for the classroom — adaptive software and hardware so students of every ability can communicate, learn, and reach their goals." />
 
   <!-- Open Graph / Twitter -->
@@ -17,14 +17,16 @@
   <meta name="twitter:title" content="Axol Assist" />
   <meta name="twitter:description" content="Affordable, co-developed assistive technology for the classroom." />
   <meta name="twitter:image" content="https://axol-assist.vercel.app/logo.png" />
+  <meta name="theme-color" content="#FBFAF8" />
 
   <link rel="preload" as="image" href="logo.png">
   <link rel="icon" type="image/png" href="easepass-extension/icons/icon-48.png">
   <link rel="canonical" href="https://axol-assist.vercel.app/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add('js');</script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -43,209 +45,328 @@
   <a href="#main" class="skip-link">Skip to main content</a>
 
   <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo" aria-label="Axol Assist">
-      <span class="nav-axolo">Axol</span><span class="nav-assist">Assist</span>
+  <nav id="siteNav">
+    <a href="#" class="nav-logo" aria-label="Axol Assist home">
+      <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
+      <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
     <ul class="nav-links">
-      <li><a href="#audiences">Who We Serve</a></li>
+      <li><a href="#audiences">Who we serve</a></li>
       <li><a href="#products">Solutions</a></li>
       <li><a href="#contact" class="nav-cta">Get in touch</a></li>
     </ul>
   </nav>
 
   <main id="main" tabindex="-1">
-  <!-- HERO -->
-  <section class="hero" aria-label="Main content">
-    <img src="logo.png" alt="Axol Assist" class="hero-logo" width="1366" height="768" loading="eager" fetchpriority="high" />
-    <h1 class="hero-headline">Assistive technology built <span class="accent">for real classrooms.</span></h1>
-    <p class="hero-tagline">Free tools for students with motor, communication, and learning differences. Co-developed with the people who use them.</p>
-    <div class="hero-links">
-      <a href="easepass.html" class="hero-link hero-cta-link">Install Accessibility Surfer free →</a>
-      <a href="#audiences" class="hero-link">Learn more</a>
-      <a href="#contact" class="hero-link">Get in touch</a>
-    </div>
-  </section>
 
-  <!-- MISSION -->
-  <div class="mission">
-    <h2>Every learner deserves the tools to be <span class="accent">heard.</span></h2>
-    <p>Every product is <strong>co-developed with parents, students, and accessibility professionals</strong>, grounded in classroom practice and lived experience, so students of every ability can express themselves, build skills, and reach their goals.</p>
-  </div>
-
-  <!-- AUDIENCES -->
-  <section class="audiences" id="audiences">
-    <span class="section-label">Who We Serve</span>
-    <h2>For <span class="accent">everyone</span> in the classroom.</h2>
-    <p>Tools that support the students who use them, and the people who teach alongside them.</p>
-
-    <div class="audience-grid">
-      <div class="audience-card">
-        <h3><span class="card-emoji" aria-hidden="true">💬</span> Students with communication needs</h3>
-        <p>AAC-friendly tools and visual supports for emerging and established communicators.</p>
-      </div>
-      <div class="audience-card">
-        <h3><span class="card-emoji" aria-hidden="true">🖱️</span> Students with motor differences</h3>
-        <p>Switch-accessible interfaces, large targets, and adaptive input from day one.</p>
-      </div>
-      <div class="audience-card">
-        <h3><span class="card-emoji" aria-hidden="true">📚</span> Educators &amp; paraprofessionals</h3>
-        <p>Classroom-ready software and hardware that fits IEP goals and daily routines.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRINCIPLES -->
-  <section class="principles">
-    <span class="section-label">Our Principles</span>
-    <h2>How we <span class="accent">design.</span></h2>
-
-    <div class="principles-grid">
-      <div class="principle">
-        <div class="principle-num">1</div>
-        <h3>Accessibility first</h3>
-        <p>WCAG-aligned interfaces, screen reader support, and switch access. Not added later, built from the start.</p>
-      </div>
-      <div class="principle">
-        <div class="principle-num">2</div>
-        <h3>Co-developed</h3>
-        <p>Built hand-in-hand with parents, students, and accessibility professionals: the people who live this work every day.</p>
-      </div>
-      <div class="principle">
-        <div class="principle-num">3</div>
-        <h3>Evidence-informed</h3>
-        <p>Grounded in research on AAC, literacy, and adaptive learning practices.</p>
-      </div>
-      <div class="principle">
-        <div class="principle-num">4</div>
-        <h3>Affordable</h3>
-        <p>Priced so districts, classrooms, and families can actually use what we make.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section class="about-section" id="about">
-    <h2>Who we <span class="accent">are.</span></h2>
-    <p>Axol Assist was founded by a classroom educator frustrated by how expensive and hard to access assistive technology is for the students who need it most. Every product is built in close collaboration with parents, students, SLPs, and AT specialists — the people who live this work every day. We believe great accessibility tools should be affordable enough for any family and any school.</p>
-  </section>
-
-  <!-- PRODUCTS -->
-  <section class="products" id="products">
-    <span class="section-label">Solutions</span>
-    <h2>What we're <span class="accent">building.</span></h2>
-    <p>A line of assistive technology, designed for real classrooms.</p>
-
-    <div class="product-grid">
-
-      <div class="product-card websites software-card">
-        <div class="card-glow"></div>
-        <span class="card-icon" aria-hidden="true">
-          <img src="software.png" alt="" class="card-icon-img" width="96" height="96" loading="lazy" />
-        </span>
-        <span class="card-badge">Adaptive Software</span>
-        <h3>Web Tools &amp; Communication Boards</h3>
-        <p>Browser-based AAC boards, switch-accessible learning activities, and visual supports that work on any device. Keyboard navigable and screen reader ready.</p>
-        <a href="easepass.html" class="coming-soon-pill">Meet Accessibility Surfer</a>
-        <a href="easepass.html#contact" class="coming-soon-pill" style="margin-top:0.4rem;">Request early access →</a>
-      </div>
-
-      <div class="product-card hardware">
-        <div class="card-glow"></div>
-        <span class="card-icon" aria-hidden="true">
-          <img src="hardware.png" alt="" class="card-icon-img" width="96" height="96" loading="lazy" />
-        </span>
-        <span class="card-badge">Classroom Hardware</span>
-        <h3>Adaptive Switches &amp; Devices</h3>
-        <p>Durable, easy-to-mount hardware: accessible switches, communication aids, and tactile tools designed for daily classroom use and individual access needs.</p>
-        <span class="coming-soon-pill">Coming soon</span>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="notify" id="contact">
-    <h2>Get in <span class="accent">touch.</span></h2>
-    <p>Questions, partnership inquiries, or early-access requests. We'd love to hear from you.</p>
-
-    <div class="contact-grid">
-      <div class="contact-info">
-        <h3>Reach us directly</h3>
-        <p>
-          <a href="mailto:axolassist.business@gmail.com">axolassist.business@gmail.com</a>
-        </p>
-        <p class="contact-note">We typically respond within 2 business days.</p>
-
-        <h3 style="margin-top: 2rem;">Who we hear from</h3>
-        <ul class="contact-list">
-          <li>Parents &amp; families exploring assistive tools</li>
-          <li>Educators &amp; paraprofessionals</li>
-          <li>Accessibility &amp; AT professionals</li>
-          <li>Schools, districts, and partners</li>
-        </ul>
-      </div>
-
-      <form class="contact-form" onsubmit="handleContactSubmit(event)" novalidate>
-
-        <div class="form-row">
-          <label for="cf-name">Name</label>
-          <input type="text" id="cf-name" name="name" required autocomplete="name" />
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow hero-eyebrow">Assistive technology, co-developed</span>
+          <h1 class="hero-headline">The classroom, <span class="accent">accessible to every learner.</span></h1>
+          <p class="hero-tagline">Axol Assist builds adaptive software and hardware for students with motor, communication, and learning differences — designed alongside the people who actually use them.</p>
+          <div class="hero-links">
+            <a href="easepass.html" class="hero-cta-link">
+              Install Accessibility Surfer
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="#audiences" class="hero-link">See who it's for</a>
+          </div>
+          <div class="hero-trust">
+            <span><b>Free</b> Chrome extension</span>
+            <span class="dot-sep" aria-hidden="true"></span>
+            <span><b>WCAG</b>-aligned</span>
+            <span class="dot-sep" aria-hidden="true"></span>
+            <span>Built with <b>SLPs &amp; AT specialists</b></span>
+          </div>
         </div>
 
-        <div class="form-row">
-          <label for="cf-email">Email</label>
-          <input type="email" id="cf-email" name="email" required autocomplete="email" />
+        <div class="hero-stage" aria-hidden="true">
+          <span class="axol-mark"></span>
+          <div class="hero-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" fill="currentColor"><path d="M0,40 C150,90 350,0 600,40 C850,80 1050,10 1200,50 L1200,120 L0,120 Z" opacity="0.55"/><path d="M0,70 C200,110 400,30 600,70 C800,110 1000,40 1200,75 L1200,120 L0,120 Z"/></svg>
+          </div>
+          <span class="hero-badge hero-badge--tl">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 3l3.5 16 2.2-6.3L17 10.5 5 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            Hover to click
+          </span>
+          <span class="hero-badge hero-badge--br">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Accessible by default
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MISSION -->
+    <section class="mission">
+      <div class="wrap reveal">
+        <h2>Every learner deserves the tools to be <span class="accent">heard.</span></h2>
+        <p>Every product is <strong>co-developed with parents, students, and accessibility professionals</strong> — grounded in classroom practice and lived experience, so students of every ability can express themselves, build skills, and reach their goals.</p>
+      </div>
+    </section>
+
+    <!-- AUDIENCES -->
+    <section class="audiences" id="audiences">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Who we serve</span>
+          <h2>For <span class="accent">everyone</span> in the classroom.</h2>
+          <p>Tools that support the students who use them, and the people who teach alongside them.</p>
         </div>
 
-        <div class="form-row">
-          <label for="cf-role">I am a...</label>
-          <select id="cf-role" name="role" required>
-            <option value="">Select an option</option>
-            <option value="Parent / Family member">Parent / Family member</option>
-            <option value="Educator / Paraprofessional">Educator / Paraprofessional</option>
-            <option value="Student">Student</option>
-            <option value="Accessibility / AT professional">Accessibility / AT professional</option>
-            <option value="School / District representative">School / District representative</option>
-            <option value="Other">Other</option>
-          </select>
+        <div class="audience-grid">
+          <article class="audience-card reveal">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v10H9l-4 4V5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 10h.01M12 10h.01M15.5 10h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </span>
+            <h3>Students with communication needs</h3>
+            <p>AAC-friendly tools and visual supports for emerging and established communicators.</p>
+          </article>
+
+          <article class="audience-card reveal">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+            </span>
+            <h3>Students with motor differences</h3>
+            <p>Switch-accessible interfaces, large targets, and adaptive input from day one.</p>
+          </article>
+
+          <article class="audience-card reveal">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 016 4h5v15H6a2 2 0 00-2 1.2V5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M20 5.5A2 2 0 0018 4h-5v15h5a2 2 0 012 1.2V5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Educators &amp; paraprofessionals</h3>
+            <p>Classroom-ready software and hardware that fits IEP goals and daily routines.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEFORE / AFTER DEMO -->
+    <section class="demo" aria-labelledby="demo-h">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">See the difference</span>
+          <h2 id="demo-h">Accessibility you can <span class="accent">watch happen.</span></h2>
+          <p>The same article, before and after. Toggle the controls — exactly the kind of adjustment Accessibility Surfer makes on any page.</p>
         </div>
 
-        <div class="form-row">
-          <label for="cf-message">Message</label>
-          <textarea id="cf-message" name="message" rows="4" required placeholder="Tell us a bit about your interest or question."></textarea>
+        <div class="demo-shell reveal">
+          <div class="demo-pane is-before">
+            <span class="demo-tag"><span class="pip"></span>Before</span>
+            <p class="demo-body-text">Reading on the open web can be exhausting — cramped lines, low contrast, and tiny tap targets make it hard to follow along or click with confidence. <a href="#" class="demo-sample-link" onclick="return false">a hard-to-hit link</a></p>
+          </div>
+          <div class="demo-pane is-after" id="demoAfter">
+            <span class="demo-tag"><span class="pip"></span>After</span>
+            <p class="demo-body-text" id="demoText">Reading on the open web should feel calm. Generous spacing, strong contrast, and large, confident targets let everyone follow along — and <a href="#" class="demo-sample-link" onclick="return false">links are easy to reach</a>.</p>
+          </div>
         </div>
 
-        <div style="display:none" aria-hidden="true">
-          <label for="cf-website">Website (leave blank)</label>
-          <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off" />
+        <div class="demo-controls reveal" role="group" aria-label="Accessibility adjustments">
+          <button class="demo-chip" type="button" data-opt="size" aria-pressed="false">Larger text</button>
+          <button class="demo-chip" type="button" data-opt="space" aria-pressed="false">More spacing</button>
+          <button class="demo-chip" type="button" data-opt="font" aria-pressed="false">Readable font</button>
+          <button class="demo-chip" type="button" data-opt="contrast" aria-pressed="false">Boost contrast</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRINCIPLES -->
+    <section class="principles">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Our principles</span>
+          <h2>How we <span class="accent">design.</span></h2>
+          <p>Four commitments behind everything we ship.</p>
+        </div>
+        <div class="principles-grid">
+          <div class="principle reveal">
+            <span class="principle-num">1</span>
+            <h3>Accessibility first</h3>
+            <p>WCAG-aligned interfaces, screen reader support, and switch access — built in from the start, never bolted on.</p>
+          </div>
+          <div class="principle reveal">
+            <span class="principle-num">2</span>
+            <h3>Co-developed</h3>
+            <p>Built hand-in-hand with parents, students, and accessibility professionals who live this work every day.</p>
+          </div>
+          <div class="principle reveal">
+            <span class="principle-num">3</span>
+            <h3>Evidence-informed</h3>
+            <p>Grounded in research on AAC, literacy, and adaptive learning practices.</p>
+          </div>
+          <div class="principle reveal">
+            <span class="principle-num">4</span>
+            <h3>Affordable</h3>
+            <p>Priced so districts, classrooms, and families can actually use what we make.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="products" id="products">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Solutions</span>
+          <h2>What we're <span class="accent">building.</span></h2>
+          <p>A line of assistive technology designed for real classrooms.</p>
         </div>
 
-        <button type="submit">Send message</button>
-        <p class="form-status" id="formStatus" aria-live="polite" role="status"></p>
-      </form>
-    </div>
-  </section>
+        <div class="product-grid">
+          <article class="product-card websites reveal">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><rect x="5" y="9" width="38" height="30" rx="4" stroke="#C8381F" stroke-width="2.2"/><path d="M5 17h38" stroke="#C8381F" stroke-width="2.2"/><circle cx="9.5" cy="13" r="1.2" fill="#C8381F"/><circle cx="13.5" cy="13" r="1.2" fill="#C8381F"/><path d="M26 28l4 8 1.6-3.4L35 31l-9-3z" fill="#F0573D"/></svg>
+            </span>
+            <span class="card-badge">Adaptive software</span>
+            <h3>Web tools &amp; communication boards</h3>
+            <p>Browser-based AAC boards, switch-accessible activities, and visual supports that work on any device — keyboard navigable and screen-reader ready.</p>
+            <a href="easepass.html" class="coming-soon-pill">Meet Accessibility Surfer</a>
+            <a href="easepass.html#contact" class="coming-soon-pill">Request early access</a>
+          </article>
+
+          <article class="product-card hardware reveal">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><rect x="7" y="7" width="34" height="34" rx="9" stroke="#6B645B" stroke-width="2.2"/><circle cx="24" cy="24" r="8" stroke="#6B645B" stroke-width="2.2"/><circle cx="24" cy="24" r="2.4" fill="#6B645B"/></svg>
+            </span>
+            <span class="card-badge">Classroom hardware</span>
+            <h3>Adaptive switches &amp; devices</h3>
+            <p>Durable, easy-to-mount hardware: accessible switches, communication aids, and tactile tools designed for daily classroom use.</p>
+            <span class="coming-soon-pill">Coming soon</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about-section" id="about">
+      <div class="wrap">
+        <div class="reveal">
+          <span class="eyebrow">Who we are</span>
+          <h2>Founder-built, <span class="accent">classroom-tested.</span></h2>
+        </div>
+        <p class="reveal">Axol Assist was founded by a classroom educator frustrated by how expensive and hard to access assistive technology is for the students who need it most. Every product is built in close collaboration with parents, students, SLPs, and AT specialists — the people who live this work every day. We believe great accessibility tools should be affordable enough for any family and any school.</p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="notify" id="contact">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Get in touch</span>
+          <h2>Let's build access <span class="accent">together.</span></h2>
+          <p>Questions, partnership inquiries, or early-access requests — we'd love to hear from you.</p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-info reveal">
+            <h3>Reach us directly</h3>
+            <p><a href="mailto:axolassist.business@gmail.com">axolassist.business@gmail.com</a></p>
+            <p class="contact-note">We typically respond within 2 business days.</p>
+
+            <h3 style="margin-top: 1.8rem;">Who we hear from</h3>
+            <ul class="contact-list">
+              <li>Parents &amp; families exploring assistive tools</li>
+              <li>Educators &amp; paraprofessionals</li>
+              <li>Accessibility &amp; AT professionals</li>
+              <li>Schools, districts, and partners</li>
+            </ul>
+          </div>
+
+          <form class="contact-form reveal" onsubmit="handleContactSubmit(event)" novalidate>
+            <div class="form-row">
+              <label for="cf-name">Name</label>
+              <input type="text" id="cf-name" name="name" required autocomplete="name" />
+            </div>
+            <div class="form-row">
+              <label for="cf-email">Email</label>
+              <input type="email" id="cf-email" name="email" required autocomplete="email" />
+            </div>
+            <div class="form-row">
+              <label for="cf-role">I am a...</label>
+              <select id="cf-role" name="role" required>
+                <option value="">Select an option</option>
+                <option value="Parent / Family member">Parent / Family member</option>
+                <option value="Educator / Paraprofessional">Educator / Paraprofessional</option>
+                <option value="Student">Student</option>
+                <option value="Accessibility / AT professional">Accessibility / AT professional</option>
+                <option value="School / District representative">School / District representative</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" rows="4" required placeholder="Tell us a bit about your interest or question."></textarea>
+            </div>
+            <div style="display:none" aria-hidden="true">
+              <label for="cf-website">Website (leave blank)</label>
+              <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off" />
+            </div>
+            <button type="submit">Send message</button>
+            <p class="form-status" id="formStatus" aria-live="polite" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
 
   </main>
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-colors">
-      <div class="dot" style="background:var(--red)"></div>
-      <div class="dot" style="background:var(--orange)"></div>
-      <div class="dot" style="background:var(--yellow)"></div>
-      <div class="dot" style="background:var(--green)"></div>
-      <div class="dot" style="background:var(--blue)"></div>
-      <div class="dot" style="background:var(--pink)"></div>
+    <div class="wrap">
+      <div class="footer-top">
+        <a href="#" class="footer-brand">
+          <span class="axol-mark" aria-hidden="true"></span>
+          Axol Assist
+        </a>
+        <span class="footer-colors" aria-hidden="true">
+          <svg viewBox="0 0 240 24" fill="none" preserveAspectRatio="none"><path d="M0,14 C40,4 80,22 120,12 C160,2 200,20 240,10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright &copy; 2026 <strong class="accent">Axol Assist</strong>. All rights reserved.</p>
+        <p><a href="easepass.html">Accessibility Surfer</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a></p>
+      </div>
     </div>
-    <p>Copyright &copy; 2026 <strong class="accent">Axol Assist</strong>. All rights reserved. <a href="privacy.html">Privacy Policy</a></p>
   </footer>
 
-  <!-- Accessibility toolbar is injected by script.js (injectAccessibilityToolbar) -->
-
+  <!-- Accessibility toolbar + Surfer preview are injected by script.js / surfer-demo.js -->
   <script src="surfer-demo.js"></script>
   <script src="script.js"></script>
+
+  <!-- Page micro-interactions: nav shadow, scroll reveal, before/after demo -->
+  <script>
+  (function () {
+    var nav = document.getElementById('siteNav');
+    var onScroll = function () { if (nav) nav.classList.toggle('is-scrolled', window.scrollY > 8); };
+    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Reveal-on-scroll (safe even if script.js also reveals).
+    var reveals = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('reveal-in'); io.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+      reveals.forEach(function (el) { io.observe(el); });
+    } else {
+      reveals.forEach(function (el) { el.classList.add('reveal-in'); });
+    }
+
+    // Before / after live demo.
+    var after = document.getElementById('demoAfter');
+    document.querySelectorAll('.demo-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var on = chip.getAttribute('aria-pressed') !== 'true';
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (after) after.classList.toggle('opt-' + chip.dataset.opt, on);
+      });
+    });
+  })();
+  </script>
 
 </body>
 </html>
