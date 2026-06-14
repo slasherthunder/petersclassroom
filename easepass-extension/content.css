@@ -157,7 +157,7 @@
  * Fixed at top-center of viewport, below YouTube's masthead. Three
  * possible states, each with a colored leading dot:
  *   idle      — gray   — cursor is over plain content
- *   something — amber  — cursor is over an interactive element we don't
+ *   something — magenta — cursor is over an interactive element we don't
  *                        dwell-click (so user knows we see it)
  *   engaged   — blue   — cursor is over a Accessibility Surfer target, ring active
  *
@@ -221,7 +221,7 @@
   background: rgba(28, 21, 14, 0.94) !important;
 }
 .easepass-status-something .easepass-status-dot {
-  background: #F59E0B !important;
+  background: #B03060 !important;
 }
 
 /* ── State: engaged (dwell active) ── */

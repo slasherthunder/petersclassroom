@@ -127,7 +127,7 @@ revealTargets.forEach(el => {
         ${group('Color Filter', 'Color filter',
           btn('saturation', 'default', 'None', true) +
           btn('saturation', 'grayscale', 'Gray', false) +
-          btn('saturation', 'sepia', 'Sepia', false) +
+          btn('saturation', 'sepia', 'Muted', false) +
           btn('saturation', 'inverted', 'Invert', false))}
         <div class="a11y-group">
           <h3>Reading &amp; Motion</h3>

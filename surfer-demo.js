@@ -95,7 +95,7 @@
       '.easepass-status-dot{width:9px!important;height:9px!important;border-radius:50%!important;background:#94a3b8!important;display:inline-block!important;flex-shrink:0!important;transition:background .22s ease,transform .22s ease!important;}',
       '.easepass-status-idle .easepass-status-dot{background:#94a3b8!important;}',
       '.easepass-status-something{background:rgba(28,21,14,.94)!important;}',
-      '.easepass-status-something .easepass-status-dot{background:#F59E0B!important;}',
+      '.easepass-status-something .easepass-status-dot{background:#B03060!important;}',
       '.easepass-status-engaged{background:rgba(0,102,255,.96)!important;}',
       '.easepass-status-engaged .easepass-status-dot{background:#fff!important;animation:easepass-status-pulse 900ms ease-in-out infinite alternate!important;}',
       '@keyframes easepass-status-pulse{from{transform:scale(.85);opacity:.65;}to{transform:scale(1.15);opacity:1;}}',
