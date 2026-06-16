@@ -26,7 +26,12 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.cjs",
+    "dist/index.d.ts",
+    "dist/index.d.cts",
+    "dist/index.js.map",
+    "dist/index.cjs.map",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -69,5 +74,9 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

@@ -125,6 +125,16 @@ npm run build
 
 Build outputs ESM + CJS to `dist/` and syncs the CDN IIFE to `/cdn/accessflow.js`.
 
+## Publishing
+
+See [PUBLISHING.md](./PUBLISHING.md). Quick path:
+
+```bash
+./scripts/setup-accessflow-publish.sh
+```
+
+Or tag `accessflow-v1.0.0` after adding `NPM_TOKEN` to GitHub Actions secrets.
+
 ## Privacy
 
 AccessFlow does not collect visitor data. Settings stay in the visitor's browser.
