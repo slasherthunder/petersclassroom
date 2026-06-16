@@ -1,5 +1,0 @@
-{
-  "position": "bottom-right",
-  "accentColor": "#B03060",
-  "featuresJson": "{\"textSize\":true,\"lineSpacing\":true,\"letterSpacing\":true,\"wordSpacing\":true,\"font\":true,\"textAlign\":true,\"contrast\":true,\"colorFilter\":true,\"linkHighlight\":true,\"readableWidth\":true,\"underlineLinks\":true,\"enhancedFocus\":true,\"highlightHeadings\":true,\"readingGuide\":true,\"reduceMotion\":true,\"pauseAnimations\":true,\"bigCursor\":true,\"keyboardNav\":true}"
-}

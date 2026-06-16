@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AccessFlow Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1.5rem; line-height: 1.6; }
+    h1 { color: #B03060; }
+  </style>
+</head>
+<body>
+  <h1>AccessFlow demo</h1>
+  <p>Open this file after uploading the <code>accessflow/</code> folder to your server, or run a local static server in this directory.</p>
+  <p>Click the accessibility button in the corner to try font, contrast, spacing, and motion controls.</p>
+<!-- AccessFlow by Axolo Assist — paste before </body> -->
+<link rel="stylesheet" href="accessflow.css">
+<script>
+window.AccessFlowConfig = window.AccessFlowConfig || {
+  position: 'bottom-right',
+  accentColor: '#B03060'
+};
+</script>
+
+<div class="axolo-toolbar-root" id="axoloAssistToolbarRoot" data-position="bottom-right">
+  <button class="a11y-toggle" id="a11yToggle" type="button" aria-label="Open accessibility settings" aria-expanded="false" aria-controls="a11yPanel">
+    <img src="accessibility.png" alt="" width="60" height="60" aria-hidden="true" />
+  </button>
+  <div class="a11y-overlay" id="a11yOverlay" aria-hidden="true"></div>
+  <aside class="a11y-panel" id="a11yPanel" role="dialog" aria-labelledby="a11yTitle" aria-modal="true" tabindex="-1">
+    <div class="a11y-panel-header">
+      <h2 id="a11yTitle">Accessibility</h2>
+      <button class="a11y-close" id="a11yClose" type="button" aria-label="Close accessibility settings">✕</button>
+    </div>
+    <div class="a11y-group" data-feature="text_size">
+      <h3>Text Size</h3>
+      <div class="a11y-options" role="group" aria-label="Text size">
+        <button class="a11y-btn" type="button" data-setting="text-size" data-value="default" aria-pressed="true">A</button>
+        <button class="a11y-btn" type="button" data-setting="text-size" data-value="lg" aria-pressed="false" style="font-size:0.95rem;">A+</button>
+        <button class="a11y-btn" type="button" data-setting="text-size" data-value="xl" aria-pressed="false" style="font-size:1.05rem;">A++</button>
+        <button class="a11y-btn" type="button" data-setting="text-size" data-value="xxl" aria-pressed="false" style="font-size:1.15rem;">A+++</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="line_spacing">
+      <h3>Line Spacing</h3>
+      <div class="a11y-options" role="group" aria-label="Line spacing">
+        <button class="a11y-btn" type="button" data-setting="line-spacing" data-value="default" aria-pressed="true">Normal</button>
+        <button class="a11y-btn" type="button" data-setting="line-spacing" data-value="wide" aria-pressed="false">Wide</button>
+        <button class="a11y-btn" type="button" data-setting="line-spacing" data-value="wider" aria-pressed="false">Wider</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="letter_spacing">
+      <h3>Letter Spacing</h3>
+      <div class="a11y-options" role="group" aria-label="Letter spacing">
+        <button class="a11y-btn" type="button" data-setting="letter-spacing" data-value="default" aria-pressed="true">Normal</button>
+        <button class="a11y-btn" type="button" data-setting="letter-spacing" data-value="wide" aria-pressed="false">Wide</button>
+        <button class="a11y-btn" type="button" data-setting="letter-spacing" data-value="wider" aria-pressed="false">Wider</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="word_spacing">
+      <h3>Word Spacing</h3>
+      <div class="a11y-options" role="group" aria-label="Word spacing">
+        <button class="a11y-btn" type="button" data-setting="word-spacing" data-value="default" aria-pressed="true">Normal</button>
+        <button class="a11y-btn" type="button" data-setting="word-spacing" data-value="wide" aria-pressed="false">Wide</button>
+        <button class="a11y-btn" type="button" data-setting="word-spacing" data-value="wider" aria-pressed="false">Wider</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="font">
+      <h3>Font</h3>
+      <div class="a11y-options" role="group" aria-label="Font choice">
+        <button class="a11y-btn" type="button" data-setting="font" data-value="default" aria-pressed="true">Default</button>
+        <button class="a11y-btn" type="button" data-setting="font" data-value="dyslexia" aria-pressed="false">Dyslexia-friendly</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="text_align">
+      <h3>Text Align</h3>
+      <div class="a11y-options" role="group" aria-label="Text alignment">
+        <button class="a11y-btn" type="button" data-setting="text-align" data-value="default" aria-pressed="true">Left</button>
+        <button class="a11y-btn" type="button" data-setting="text-align" data-value="center" aria-pressed="false">Center</button>
+        <button class="a11y-btn" type="button" data-setting="text-align" data-value="justify" aria-pressed="false">Justify</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="readable_width">
+      <h3>Content Width</h3>
+      <div class="a11y-options" role="group" aria-label="Content width">
+        <button class="a11y-btn" type="button" data-setting="readable-width" data-value="default" aria-pressed="true">Full</button>
+        <button class="a11y-btn" type="button" data-setting="readable-width" data-value="narrow" aria-pressed="false">Narrow</button>
+        <button class="a11y-btn" type="button" data-setting="readable-width" data-value="wide" aria-pressed="false">Wide</button>
+      </div>
+      <p class="aat-group-hint">Narrows content columns for easier reading</p>
+    </div>
+    <div class="a11y-group" data-feature="contrast">
+      <h3>Contrast</h3>
+      <div class="a11y-options" role="group" aria-label="Contrast mode">
+        <button class="a11y-btn" type="button" data-setting="contrast" data-value="default" aria-pressed="true">Normal</button>
+        <button class="a11y-btn" type="button" data-setting="contrast" data-value="dark" aria-pressed="false">Dark</button>
+        <button class="a11y-btn" type="button" data-setting="contrast" data-value="high" aria-pressed="false">High</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="color_filter">
+      <h3>Color Filter</h3>
+      <div class="a11y-options" role="group" aria-label="Color filter">
+        <button class="a11y-btn" type="button" data-setting="saturation" data-value="default" aria-pressed="true">None</button>
+        <button class="a11y-btn" type="button" data-setting="saturation" data-value="grayscale" aria-pressed="false">Gray</button>
+        <button class="a11y-btn" type="button" data-setting="saturation" data-value="sepia" aria-pressed="false">Muted</button>
+        <button class="a11y-btn" type="button" data-setting="saturation" data-value="inverted" aria-pressed="false">Invert</button>
+      </div>
+    </div>
+    <div class="a11y-group" data-feature="reading_motion">
+      <h3>Reading &amp; Motion</h3>
+      <div class="a11y-toggle-row" data-feature="underline_links">
+        <label for="sw-underline-links">Underline links</label>
+        <button class="a11y-switch" id="sw-underline-links" type="button" data-toggle="underline-links" role="switch" aria-checked="false" aria-label="Underline all links"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="enhanced_focus">
+        <label for="sw-enhanced-focus">Enhanced focus</label>
+        <button class="a11y-switch" id="sw-enhanced-focus" type="button" data-toggle="enhanced-focus" role="switch" aria-checked="false" aria-label="Enhanced focus indicators"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="highlight_headings">
+        <label for="sw-highlight-headings">Highlight headings</label>
+        <button class="a11y-switch" id="sw-highlight-headings" type="button" data-toggle="highlight-headings" role="switch" aria-checked="false" aria-label="Highlight headings"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="reading_guide">
+        <label for="sw-reading-guide">Reading guide</label>
+        <button class="a11y-switch" id="sw-reading-guide" type="button" data-toggle="reading-guide" role="switch" aria-checked="false" aria-label="Reading guide bar that follows the cursor"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="link_highlight">
+        <label for="sw-link-highlight">Highlight links</label>
+        <button class="a11y-switch" id="sw-link-highlight" type="button" data-toggle="link-highlight" role="switch" aria-checked="false" aria-label="Highlight all links with a yellow background"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="keyboard_nav">
+        <label for="sw-keyboard-nav">Keyboard nav helper</label>
+        <button class="a11y-switch" id="sw-keyboard-nav" type="button" data-toggle="keyboard-nav" role="switch" aria-checked="false" aria-label="Highlight the focused element clearly for keyboard users"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="reduce_motion">
+        <label for="sw-reduce-motion">Reduce motion</label>
+        <button class="a11y-switch" id="sw-reduce-motion" type="button" data-toggle="reduce-motion" role="switch" aria-checked="false" aria-label="Reduce motion and animations"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="pause_animations">
+        <label for="sw-pause-animations">Pause animations</label>
+        <button class="a11y-switch" id="sw-pause-animations" type="button" data-toggle="pause-animations" role="switch" aria-checked="false" aria-label="Pause all animations"></button>
+      </div>
+      <div class="a11y-toggle-row" data-feature="big_cursor">
+        <label for="sw-big-cursor">Large cursor</label>
+        <button class="a11y-switch" id="sw-big-cursor" type="button" data-toggle="big-cursor" role="switch" aria-checked="false" aria-label="Enlarge cursor"></button>
+      </div>
+    </div>
+    <button class="a11y-reset" id="a11yReset" type="button">Reset all settings</button>
+  </aside>
+</div>
+
+<script src="accessflow.js" defer></script>
+
+</body>
+</html>

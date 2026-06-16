@@ -1,9 +1,16 @@
 (function () {
   'use strict';
 
-  var CDN = 'https://axoloassist.com/cdn';
+  function getScriptBase() {
+    var s = document.currentScript;
+    if (s && s.src) return s.src.replace(/[^\/]+$/, '');
+    var q = document.querySelector('script[src*="accessflow.js"]');
+    if (q && q.src) return q.src.replace(/[^\/]+$/, '');
+    return './';
+  }
   var pageConfig = window.AccessFlowConfig || {};
-  var STORAGE_KEY = pageConfig.storageKey || 'accessflow-wix-settings-v1';
+  var BASE = pageConfig.baseUrl || getScriptBase();
+  var STORAGE_KEY = pageConfig.storageKey || 'accessflow-settings-v1';
   var root = document.documentElement;
 
   var toggleBtn = document.getElementById('a11yToggle');
@@ -17,8 +24,8 @@
     return;
   }
 
-  var iconUrl = pageConfig.iconUrl || CDN + '/accessibility.png';
-  var fontBaseUrl = pageConfig.fontBaseUrl || CDN + '/fonts/';
+  var iconUrl = pageConfig.iconUrl || BASE + 'accessibility.png';
+  var fontBaseUrl = pageConfig.fontBaseUrl || BASE + 'fonts/';
   var accentColor = pageConfig.accentColor || '#B03060';
 
   var icon = toggleBtn.querySelector('img');

@@ -1,8 +1,0 @@
-{
-  "$schema": "https://dev.wix.com/wix-cli/schemas/wix-config.json",
-  "appId": "00000000-0000-0000-0000-000000000000",
-  "projectId": "accessflow-wix",
-  "projectType": "App",
-  "appName": "AccessFlow by Axolo Assist",
-  "appDescription": "Free accessibility toolbar that gives every visitor controls for font, contrast, spacing, and motion. Works on any Wix site. No configuration required."
-}
