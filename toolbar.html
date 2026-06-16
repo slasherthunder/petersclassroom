@@ -172,156 +172,352 @@
       flex-shrink: 0;
     }
 
-    /* ── Trust / real-world usage ── */
-    .af-trust-section {
-      padding: clamp(2.5rem, 5vw, 3.5rem) 0;
+    /* ── Unified product section (install + trust + features) ── */
+    .af-product-section {
+      padding: clamp(2.75rem, 5vw, 4rem) 0 clamp(3rem, 6vw, 4.5rem);
       background:
-        radial-gradient(90% 80% at 100% 0%, rgba(176, 48, 96, .07) 0%, transparent 55%),
-        var(--paper);
+        radial-gradient(85% 70% at 0% 0%, rgba(176, 48, 96, .06) 0%, transparent 50%),
+        radial-gradient(60% 50% at 100% 20%, rgba(48, 16, 112, .05) 0%, transparent 45%),
+        var(--bg-alt);
       border-bottom: 1px solid var(--border);
     }
-    .af-trust-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
-      gap: clamp(1.5rem, 4vw, 2.5rem);
-      align-items: stretch;
+    .af-product-head {
+      text-align: center;
+      max-width: 40rem;
+      margin: 0 auto 2rem;
     }
-    .af-trust-copy { min-width: 0; }
-    .af-trust-copy .eyebrow { margin-bottom: .9rem; }
-    .af-trust-copy h2 {
-      font-size: clamp(1.65rem, 3.2vw, 2.35rem);
-      letter-spacing: -0.03em;
-      line-height: 1.06;
-      margin: 0;
-      max-width: 18ch;
+    .af-product-head h2 {
+      font-size: clamp(2rem, 4.5vw, 2.85rem);
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+      margin-top: .65rem;
     }
-    .af-trust-copy h2 .accent { color: var(--coral-deep); }
-    .af-trust-lead {
-      margin: 1rem 0 0;
-      max-width: 42em;
-      font-size: 1.02rem;
-      line-height: 1.62;
+    .af-product-head p {
+      margin-top: .75rem;
       color: var(--text-muted);
-    }
-    .af-trust-badges {
-      list-style: none;
-      margin: 1.35rem 0 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-    }
-    .af-trust-badges li {
-      display: inline-flex;
-      align-items: center;
-      gap: .4rem;
-      font-size: .82rem;
-      font-weight: 600;
-      color: var(--ink-soft);
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: var(--r-pill);
-      padding: .45rem .8rem;
-      box-shadow: var(--shadow-sm);
-    }
-    .af-trust-badges svg {
-      width: 14px;
-      height: 14px;
-      color: var(--coral-deep);
-      flex-shrink: 0;
+      font-size: 1.05rem;
+      line-height: 1.58;
     }
 
-    .af-trust-card {
-      background: linear-gradient(155deg, var(--white) 0%, var(--coral-tint) 120%);
-      border: 1px solid var(--line);
-      border-radius: var(--r-lg);
-      padding: 1.5rem 1.45rem;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
+    /* Workflow timeline */
+    .af-workflow {
       position: relative;
-      overflow: hidden;
+      max-width: 920px;
+      margin: 0 auto 1.75rem;
     }
-    .af-trust-card::before {
-      content: "";
+    .af-workflow-track {
+      display: none;
+    }
+    @media (min-width: 769px) {
+      .af-workflow-track {
+        display: block;
+        position: absolute;
+        top: 22px;
+        left: 12%;
+        right: 12%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--coral-tint2), var(--coral), var(--purple));
+        border-radius: 2px;
+        z-index: 0;
+      }
+    }
+    .af-workflow-steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .85rem;
+      position: relative;
+      z-index: 1;
+    }
+    .af-workflow-step {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem 1rem 1.1rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .af-workflow-step::after {
+      content: "→";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--purple), var(--coral));
+      right: -0.55rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--coral);
+      z-index: 2;
+      display: none;
     }
-    .af-trust-card-label {
+    @media (min-width: 769px) {
+      .af-workflow-step:not(:last-child)::after { display: block; }
+    }
+    .af-workflow-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--coral);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: .78rem;
+      font-weight: 700;
+      margin-bottom: .55rem;
+    }
+    .af-workflow-step h3 {
+      font-size: .95rem;
+      font-weight: 600;
+      margin: 0 0 .3rem;
+      letter-spacing: -0.01em;
+    }
+    .af-workflow-step p {
+      margin: 0;
+      font-size: .84rem;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .af-install-label {
+      text-align: center;
       font-family: var(--font-display);
       font-size: .72rem;
       font-weight: 600;
       letter-spacing: .1em;
       text-transform: uppercase;
       color: var(--coral-deep);
-      margin: 0 0 .65rem;
+      margin: 0 0 .85rem;
     }
-    .af-trust-card h3 {
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
-      margin: 0 0 .65rem;
-      color: var(--ink);
-    }
-    .af-trust-card p {
-      margin: 0;
-      font-size: .96rem;
-      line-height: 1.58;
-      color: var(--text-muted);
-      flex: 1;
-    }
-    .af-trust-card-link {
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      margin-top: 1.15rem;
-      font-family: var(--font-display);
-      font-size: .9rem;
-      font-weight: 600;
-      color: var(--coral-deep);
-      text-decoration: none;
-      width: fit-content;
-    }
-    .af-trust-card-link svg {
-      width: 1em;
-      height: 1em;
-      transition: transform .2s var(--ease);
-    }
-    .af-trust-card-link:hover { color: var(--coral-press); }
-    .af-trust-card-link:hover svg { transform: translateX(3px); }
 
-    /* ── Install (centerpiece) ── */
     .af-install-section {
-      padding: clamp(4rem, 9vw, 6.5rem) 0;
-      background: var(--bg-alt);
-      border-bottom: 1px solid var(--border);
+      padding: 0;
+      background: transparent;
+      border: none;
     }
-
-    .af-install-head {
-      text-align: center;
-      max-width: 540px;
-      margin: 0 auto 3rem;
-    }
-    .af-install-head h2 {
-      font-size: clamp(1.75rem, 4vw, 2.25rem);
-      margin-top: .75rem;
-    }
-    .af-install-head p {
-      margin-top: .75rem;
-      color: var(--text-muted);
-      font-size: 1.02rem;
-      line-height: 1.6;
-    }
+    .af-install-head { display: none; }
 
     .af-install-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
+      gap: 1rem;
       max-width: 960px;
       margin: 0 auto;
+    }
+
+    .af-section-divider {
+      max-width: 920px;
+      margin: 2rem auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+      border: 0;
+    }
+
+    /* Credibility block */
+    .af-cred-block {
+      max-width: 920px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1.25rem;
+      align-items: center;
+      padding: 1.35rem 1.4rem;
+      background: linear-gradient(135deg, var(--white) 0%, var(--coral-tint) 140%);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    .af-cred-block h3 {
+      font-size: 1.2rem;
+      margin: 0 0 .4rem;
+      letter-spacing: -0.02em;
+    }
+    .af-cred-eyebrow {
+      font-family: var(--font-display);
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--coral-deep);
+      margin: 0 0 .35rem;
+    }
+    .af-cred-block p {
+      margin: 0;
+      font-size: .94rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      max-width: 52em;
+    }
+    .af-cred-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      margin-top: .65rem;
+      font-family: var(--font-display);
+      font-size: .86rem;
+      font-weight: 600;
+      color: var(--coral-deep);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .af-cred-link:hover { color: var(--coral-press); }
+    .af-cred-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .5rem .85rem;
+      border-radius: var(--r-pill);
+      background: var(--white);
+      border: 1px solid var(--line);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+    .af-cred-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #1f9d63;
+      box-shadow: 0 0 0 3px rgba(31, 157, 99, .15);
+    }
+
+    /* Feature showcase */
+    .af-showcase {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .af-showcase-head {
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+    .af-showcase-head h3 {
+      font-size: clamp(1.45rem, 3vw, 1.85rem);
+      letter-spacing: -0.03em;
+      margin: .5rem 0 0;
+    }
+    .af-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .65rem;
+      margin-bottom: 1.25rem;
+    }
+    .af-showcase-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .55rem;
+      padding: .85rem .9rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: .88rem;
+      line-height: 1.4;
+      color: var(--ink-soft);
+      transition: border-color .2s, box-shadow .2s, transform .2s var(--ease);
+    }
+    .af-showcase-item:hover {
+      border-color: var(--coral-tint2);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-2px);
+    }
+    .af-showcase-item svg {
+      width: 16px;
+      height: 16px;
+      color: var(--coral-deep);
+      flex-shrink: 0;
+      margin-top: .1rem;
+    }
+    .af-showcase-item strong {
+      display: block;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: .1rem;
+      font-size: .9rem;
+    }
+
+    .af-product-preview {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1rem 1rem .75rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .af-preview-chrome {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      padding-bottom: .65rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: .75rem;
+      grid-column: 1 / -1;
+    }
+    .af-preview-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--line-strong);
+    }
+    .af-preview-dot:nth-child(1) { background: #e8a0a0; }
+    .af-preview-dot:nth-child(2) { background: #e8d4a0; }
+    .af-preview-dot:nth-child(3) { background: #a8d4a8; }
+    .af-preview-url {
+      margin-left: .5rem;
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--text-muted);
+      background: var(--bg-alt);
+      padding: .25rem .55rem;
+      border-radius: 6px;
+      flex: 1;
+      max-width: 14rem;
+    }
+    .af-preview-body p {
+      margin: 0;
+      font-size: .88rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      max-width: 36em;
+    }
+    .af-preview-toggle {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      box-shadow: 0 12px 28px -12px rgba(48, 16, 112, .4);
+      flex-shrink: 0;
+    }
+    .af-preview-toggle img {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .af-product-foot {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .5rem .75rem;
+      max-width: 920px;
+      margin: 1.5rem auto 0;
+    }
+    .af-product-foot span {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      padding: .4rem .75rem;
     }
 
     .af-code-card {
@@ -447,136 +643,16 @@
       color: var(--text);
     }
 
-    /* ── Steps ── */
-    .af-steps-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
-      max-width: 920px;
-      margin: 0 auto;
-    }
-    .af-step {
-      text-align: center;
-      padding: 1.5rem 1.25rem;
-    }
-    .af-step-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: var(--coral-tint);
-      color: var(--coral-deep);
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: .85rem;
-      margin-bottom: .85rem;
-    }
-    .af-step h3 {
-      font-size: 1rem;
-      margin-bottom: .35rem;
-    }
-    .af-step p {
-      font-size: .9rem;
-      line-height: 1.55;
-      color: var(--text-muted);
-    }
-
-    /* ── Platform grid ── */
-    .af-platform-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: .85rem;
-      max-width: 720px;
-      margin: 2.5rem auto 0;
-    }
-    .af-platform {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: .75rem;
-      padding: .85rem 1rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--af-r);
-      font-weight: 600;
-      font-size: .92rem;
-    }
-    .af-platform-check {
-      display: inline-flex;
-      align-items: center;
-      gap: .3rem;
-      font-size: .72rem;
-      font-weight: 600;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      color: var(--coral-deep);
-    }
-    .af-platform-check svg {
-      width: 14px;
-      height: 14px;
-      stroke: var(--coral-deep);
-    }
-
-    /* ── Features ── */
-    .af-feature-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      max-width: 880px;
-      margin: 0 auto;
-    }
-    .af-feature {
-      padding: 1.35rem 1.25rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--af-r);
-    }
-    .af-feature h3 {
-      font-size: 1rem;
-      margin-bottom: .35rem;
-    }
-    .af-feature p {
-      font-size: .9rem;
-      line-height: 1.55;
-      color: var(--text-muted);
-    }
-
-    .af-benefits-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem 2.5rem;
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    .af-benefit {
-      flex: 1 1 180px;
-      max-width: 220px;
-    }
-    .af-benefit strong {
-      display: block;
-      font-family: var(--font-display);
-      font-size: 1.05rem;
-      color: var(--text);
-      margin-bottom: .25rem;
-    }
-    .af-benefit span {
-      font-size: .88rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
     .af-contact-block { margin-top: 0; }
 
     @media (max-width: 768px) {
-      .af-trust-grid { grid-template-columns: 1fr; }
+      .af-workflow-steps { grid-template-columns: 1fr; }
+      .af-workflow-step::after { display: none !important; }
       .af-install-grid,
-      .af-steps-row,
-      .af-feature-grid,
-      .af-platform-grid { grid-template-columns: 1fr; }
+      .af-showcase-grid { grid-template-columns: 1fr; }
+      .af-cred-block { grid-template-columns: 1fr; }
+      .af-product-preview { grid-template-columns: 1fr; }
+      .af-preview-toggle { justify-self: end; }
       .af-hero-meta span::before { display: none; }
       .af-hero-meta { flex-direction: column; gap: .35rem; }
     }
@@ -625,53 +701,36 @@
       </div>
     </header>
 
-    <section class="af-trust-section" id="trust" aria-labelledby="af-trust-heading">
+    <section class="af-product-section" id="install">
       <div class="wrap">
-        <div class="af-trust-grid reveal">
-          <div class="af-trust-copy">
-            <span class="eyebrow">In the wild</span>
-            <h2 id="af-trust-heading">Already powering <span class="accent">real websites</span></h2>
-            <p class="af-trust-lead">AccessFlow is already being used by organizations that want a simple way to provide visitor-controlled accessibility features.</p>
-            <ul class="af-trust-badges" aria-label="AccessFlow highlights">
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Live on production websites
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Installs in under a minute
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                No account required
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                WCAG-aligned approach
-              </li>
-            </ul>
-          </div>
-
-          <article class="af-trust-card">
-            <p class="af-trust-card-label">Live example</p>
-            <h3>Surf Del Mar Festival</h3>
-            <p>AccessFlow powers the accessibility toolbar on the Surf Del Mar Festival website, helping visitors customize text, contrast, spacing, motion, and more.</p>
-            <a class="af-trust-card-link" href="https://surfdelmarfestival.com/" target="_blank" rel="noopener noreferrer">
-              Visit surfdelmarfestival.com
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="af-install-section" id="install">
-      <div class="wrap">
-        <div class="af-install-head reveal">
+        <header class="af-product-head reveal">
           <span class="eyebrow">Install</span>
-          <h2>One line of code. <span class="accent">Done.</span></h2>
-          <p>Pick your stack, copy, paste. AccessFlow loads from our CDN and injects the toolbar. No file uploads, no configuration.</p>
+          <h2>One line of code. <span class="accent">Live in minutes.</span></h2>
+          <p>Pick your stack, copy, paste. AccessFlow loads from our CDN or npm and injects the toolbar automatically.</p>
+        </header>
+
+        <div class="af-workflow reveal" aria-label="Installation workflow">
+          <div class="af-workflow-track" aria-hidden="true"></div>
+          <ol class="af-workflow-steps">
+            <li class="af-workflow-step">
+              <span class="af-workflow-num">1</span>
+              <h3>Choose your method</h3>
+              <p>Script tag for any site, or npm for React, Next.js, Astro, and Vite.</p>
+            </li>
+            <li class="af-workflow-step">
+              <span class="af-workflow-num">2</span>
+              <h3>Paste one line</h3>
+              <p>Add the script before <code>&lt;/body&gt;</code>, or import in your app entry.</p>
+            </li>
+            <li class="af-workflow-step">
+              <span class="af-workflow-num">3</span>
+              <h3>Toolbar goes live</h3>
+              <p>Visitors get controls instantly. Settings save in the browser per visitor.</p>
+            </li>
+          </ol>
         </div>
+
+        <p class="af-install-label reveal">Step 2 · Copy your install code</p>
 
         <div class="af-install-grid">
           <article class="af-code-card reveal" id="install-script">
@@ -694,7 +753,7 @@
               </div>
             </div>
             <div class="af-supported">
-              <div class="af-supported-label">Supported</div>
+              <div class="af-supported-label">Works with</div>
               <div class="af-supported-chips">
                 <span class="af-chip">Wix</span>
                 <span class="af-chip">Squarespace</span>
@@ -726,130 +785,100 @@
               <div class="af-code-row">
                 <div class="af-code-toolbar">
                   <span class="af-code-lang">JavaScript</span>
-                  <button type="button" class="af-copy-btn" data-copy='import "@axol-assist/accessflow";' aria-label="Copy import statement">
+                  <button type="button" class="af-copy-btn" data-copy='import "@axol-assist/accessflow/auto";' aria-label="Copy import statement">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2" stroke="currentColor" stroke-width="1.8"/></svg>
                     Copy
                   </button>
                 </div>
-                <pre class="af-code" tabindex="0"><code><span class="tok-kw">import</span> <span class="tok-str">"@axol-assist/accessflow"</span>;</code></pre>
+                <pre class="af-code" tabindex="0"><code><span class="tok-kw">import</span> <span class="tok-str">"@axol-assist/accessflow/auto"</span>;</code></pre>
               </div>
             </div>
             <div class="af-supported">
-              <div class="af-supported-label">Supported</div>
+              <div class="af-supported-label">Works with</div>
               <div class="af-supported-chips">
                 <span class="af-chip">React</span>
                 <span class="af-chip">Next.js</span>
                 <span class="af-chip">Vite</span>
+                <span class="af-chip">Astro</span>
                 <span class="af-chip">Remix</span>
               </div>
             </div>
           </article>
         </div>
 
-        <div class="af-platform-grid reveal">
-          <div class="af-platform">
-            <span>Wix</span>
-            <span class="af-platform-check"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Supported</span>
-          </div>
-          <div class="af-platform">
-            <span>WordPress</span>
-            <span class="af-platform-check"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Supported</span>
-          </div>
-          <div class="af-platform">
-            <span>Squarespace</span>
-            <span class="af-platform-check"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Supported</span>
-          </div>
-          <div class="af-platform">
-            <span>Webflow</span>
-            <span class="af-platform-check"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Supported</span>
-          </div>
-          <div class="af-platform">
-            <span>React</span>
-            <span class="af-platform-check"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Supported</span>
-          </div>
-          <div class="af-platform">
-            <span>Next.js</span>
-            <span class="af-platform-check"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Supported</span>
-          </div>
-        </div>
-      </div>
-    </section>
+        <hr class="af-section-divider" aria-hidden="true" />
 
-    <section class="principles" id="how">
-      <div class="wrap">
-        <div class="sec-head reveal" style="text-align:center; max-width:480px; margin-inline:auto;">
-          <span class="eyebrow">How it works</span>
-          <h2>Three steps. <span class="accent">Under a minute.</span></h2>
+        <div class="af-cred-block reveal" id="trust">
+          <div>
+            <p class="af-cred-eyebrow">Already powering real websites</p>
+            <h3>Surf Del Mar Festival</h3>
+            <p>AccessFlow powers the accessibility toolbar on the Surf Del Mar Festival website, giving visitors control over text size, contrast, spacing, motion, and more.</p>
+            <a class="af-cred-link" href="https://surfdelmarfestival.com/" target="_blank" rel="noopener noreferrer">
+              surfdelmarfestival.com →
+            </a>
+          </div>
+          <span class="af-cred-badge">
+            <span class="af-cred-badge-dot" aria-hidden="true"></span>
+            Live in production
+          </span>
         </div>
-        <div class="af-steps-row">
-          <div class="af-step reveal">
-            <span class="af-step-num">1</span>
-            <h3>Choose install method</h3>
-            <p>Script tag for any site, or npm for React and Next.js.</p>
-          </div>
-          <div class="af-step reveal">
-            <span class="af-step-num">2</span>
-            <h3>Paste one line of code</h3>
-            <p>Add the script before <code>&lt;/body&gt;</code>, or import in your app entry.</p>
-          </div>
-          <div class="af-step reveal">
-            <span class="af-step-num">3</span>
-            <h3>Toolbar appears automatically</h3>
-            <p>Visitors get font, contrast, spacing, and motion controls. Settings saved in the browser.</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <section class="mission">
-      <div class="wrap reveal" style="text-align:center; max-width:560px; margin-inline:auto;">
-        <h2>Visitor controls, <span class="accent">zero overhead.</span></h2>
-        <p style="margin-top:.85rem; color:var(--text-muted); line-height:1.65;">15+ toolbar controls for typography, contrast, spacing, and motion. No monthly widget fees. No file management.</p>
-      </div>
-    </section>
+        <hr class="af-section-divider" aria-hidden="true" />
 
-    <section class="principles features-section" id="features">
-      <div class="wrap">
-        <div class="sec-head reveal" style="text-align:center; max-width:480px; margin-inline:auto;">
-          <span class="eyebrow">Features</span>
-          <h2>What visitors <span class="accent">get.</span></h2>
-        </div>
-        <div class="af-feature-grid">
-          <article class="af-feature reveal">
-            <h3>Font &amp; text size</h3>
-            <p>OpenDyslexic and scaling up to 200% for dyslexia and low vision.</p>
-          </article>
-          <article class="af-feature reveal">
-            <h3>Contrast &amp; color</h3>
-            <p>Dark mode, high contrast, grayscale, sepia, and invert in one click.</p>
-          </article>
-          <article class="af-feature reveal">
-            <h3>Spacing controls</h3>
-            <p>Independent letter, word, and line spacing for dense pages.</p>
-          </article>
-          <article class="af-feature reveal">
-            <h3>Reading &amp; motion</h3>
-            <p>Reading guide, link highlight, enhanced focus, reduce motion, large cursor.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+        <div class="af-showcase reveal" id="features">
+          <div class="af-showcase-head">
+            <span class="eyebrow">What visitors get</span>
+            <h3>Controls that work <span class="accent">out of the box.</span></h3>
+          </div>
 
-    <section class="audiences">
-      <div class="wrap">
-        <div class="af-benefits-bar reveal">
-          <div class="af-benefit">
-            <strong>Free</strong>
-            <span>No subscription or license key</span>
+          <div class="af-showcase-grid">
+            <div class="af-showcase-item">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>15+ accessibility controls</strong> Font, contrast, spacing, motion, and more.</span>
+            </div>
+            <div class="af-showcase-item">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Typography adjustments</strong> OpenDyslexic and scaling up to 200%.</span>
+            </div>
+            <div class="af-showcase-item">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Contrast controls</strong> Dark, high contrast, grayscale, sepia, invert.</span>
+            </div>
+            <div class="af-showcase-item">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Motion reduction</strong> Reduce motion and pause animations.</span>
+            </div>
+            <div class="af-showcase-item">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Saved visitor preferences</strong> Settings persist in localStorage.</span>
+            </div>
+            <div class="af-showcase-item">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>No account required</strong> Free for visitors and site owners.</span>
+            </div>
           </div>
-          <div class="af-benefit">
-            <strong>CDN-hosted</strong>
-            <span>Always up to date, zero maintenance</span>
+
+          <div class="af-product-preview" aria-hidden="true">
+            <div class="af-preview-chrome">
+              <span class="af-preview-dot"></span>
+              <span class="af-preview-dot"></span>
+              <span class="af-preview-dot"></span>
+              <span class="af-preview-url">yoursite.com</span>
+            </div>
+            <div class="af-preview-body">
+              <p>Your page content stays exactly where it is. AccessFlow adds a floating toolbar so visitors can adapt the site to how they read and navigate.</p>
+            </div>
+            <div class="af-preview-toggle">
+              <img src="accessibility.png" alt="" width="52" height="52" />
+            </div>
           </div>
-          <div class="af-benefit">
-            <strong>Private</strong>
-            <span>Settings stay in the visitor's browser</span>
-          </div>
+        </div>
+
+        <div class="af-product-foot reveal">
+          <span>Free · no subscription</span>
+          <span>CDN-hosted · zero maintenance</span>
+          <span>Privacy-conscious · no data collection</span>
+          <span>WCAG-aligned approach</span>
         </div>
       </div>
     </section>
