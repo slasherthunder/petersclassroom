@@ -299,6 +299,25 @@
   background: #2a241e;
 }
 
+.axolo-toolbar-root .aat-powered-by {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.axolo-toolbar-root .aat-powered-by a {
+  color: var(--aat-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.axolo-toolbar-root .aat-powered-by a:hover {
+  text-decoration: underline;
+}
+
 .a11y-reading-guide {
   position: fixed;
   left: 0;

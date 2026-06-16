@@ -14,7 +14,7 @@ npm install @axol-assist/accessflow
 import '@axol-assist/accessflow/auto';
 ```
 
-CSS and fonts are bundled in the JS — no separate stylesheet import required for Vite, Astro, Next.js, etc.
+Styles, fonts, and the toggle icon are bundled in the JS — no separate asset requests.
 
 **Manual control** (no auto-init):
 
@@ -97,7 +97,7 @@ Optional configuration before the script:
 </script>
 ```
 
-Styles and fonts are inlined in the CDN bundle. The toggle icon loads from `https://axolassist.com/cdn/accessibility.png` by default.
+Styles, fonts, and the toggle icon are inlined in the CDN bundle.
 
 ## Configuration
 
@@ -105,9 +105,10 @@ Styles and fonts are inlined in the CDN bundle. The toggle icon loads from `http
 |--------|---------|-------------|
 | `position` | `bottom-right` | Toolbar button placement |
 | `accentColor` | `#B03060` | Active control color |
-| `iconUrl` | `https://axolassist.com/cdn/accessibility.png` | Toggle button image |
+| `iconUrl` | bundled icon | Toggle button image (override with your own URL) |
 | `cssUrl` | — | Load stylesheet via `<link>` instead of bundled CSS |
 | `skipCssInject` | `false` | Skip bundled CSS inject (use with `cssUrl`) |
+| `showBranding` | `true` | Show “Powered by Axolo Assist” in the panel footer |
 | `skipAutoInit` | `false` | CDN/auto entry only — disable auto boot |
 | `storageKey` | `accessflow-settings-v1` | localStorage key |
 | `features` | all enabled | Toggle toolbar sections |

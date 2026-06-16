@@ -86,6 +86,7 @@ export function getToolbarMarkup(position: AccessFlowPosition): string {
     '<button class="a11y-switch" id="sw-big-cursor" type="button" data-toggle="big-cursor" role="switch" aria-checked="false" aria-label="Enlarge cursor"></button></div>' +
     '</div>' +
     '<button class="a11y-reset" id="a11yReset" type="button">Reset all settings</button>' +
+    '<p class="aat-powered-by">Powered by <a href="https://axolassist.com" target="_blank" rel="noopener noreferrer">Axolo Assist</a></p>' +
     '</aside></div>'
   );
 }

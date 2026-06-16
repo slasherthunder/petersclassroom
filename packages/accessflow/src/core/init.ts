@@ -1,9 +1,9 @@
 import stylesheet from '../assets/accessflow.css';
+import defaultIcon from '../assets/accessibility-icon.png';
 import fontRegular from '../assets/fonts/opendyslexic-7.woff';
 import fontBold from '../assets/fonts/opendyslexic-8.woff';
 import {
   DEFAULT_ACCENT,
-  DEFAULT_CDN,
   DEFAULT_POSITION,
   DEFAULTS,
   FEATURE_MAP,
@@ -333,7 +333,11 @@ export function init(config: AccessFlowConfig = {}): void {
   abortController = new AbortController();
 
   const icon = toggleBtn.querySelector('img');
-  if (icon) icon.src = mergedConfig.iconUrl || `${DEFAULT_CDN}accessibility.png`;
+  if (icon) icon.src = mergedConfig.iconUrl || defaultIcon;
+
+  if (mergedConfig.showBranding === false) {
+    toolbarRoot.querySelector('.aat-powered-by')?.classList.add('aaf-hidden');
+  }
 
   toolbarRoot.setAttribute('data-position', position);
   applyAccent(accentColor);

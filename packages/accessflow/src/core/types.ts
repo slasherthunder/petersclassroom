@@ -31,6 +31,7 @@ export interface AccessFlowConfig {
   storageKey?: string;
   skipCssInject?: boolean;
   skipAutoInit?: boolean;
+  showBranding?: boolean;
   features?: AccessFlowFeatures;
 }
 

@@ -299,6 +299,25 @@
   background: #2a241e;
 }
 
+.axolo-toolbar-root .aat-powered-by {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.axolo-toolbar-root .aat-powered-by a {
+  color: var(--aat-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.axolo-toolbar-root .aat-powered-by a:hover {
+  text-decoration: underline;
+}
+
 .a11y-reading-guide {
   position: fixed;
   left: 0;
@@ -377,6 +396,7 @@ html[data-contrast="dark"] .axolo-toolbar-root .a11y-btn:hover { background: #34
 html[data-contrast="dark"] .axolo-toolbar-root .a11y-close { background: #2a2438; color: #ece8e2; }
 html[data-contrast="dark"] .axolo-toolbar-root .a11y-toggle-row label { color: #ece8e2; }
 html[data-contrast="dark"] .axolo-toolbar-root .a11y-toggle-row { border-bottom-color: #2a2438; }
+html[data-contrast="dark"] .axolo-toolbar-root .aat-powered-by { color: #9ca3af; }
 html[data-contrast="high"] body { background: #000 !important; color: #fff !important; }
 html[data-contrast="high"] body *:not(.a11y-toggle):not(.a11y-toggle *):not(.axolo-toolbar-root):not(.axolo-toolbar-root *):not(svg):not(svg *) {
   background-color: #000 !important;

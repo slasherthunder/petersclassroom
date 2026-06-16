@@ -14,6 +14,7 @@ export default defineConfig([
     outDir: 'dist',
     loader: {
       '.css': 'text',
+      '.png': 'dataurl',
       '.woff': 'dataurl',
       '.woff2': 'dataurl',
     },
@@ -21,6 +22,7 @@ export default defineConfig([
       options.loader = {
         ...options.loader,
         '.css': 'text',
+        '.png': 'dataurl',
         '.woff': 'dataurl',
         '.woff2': 'dataurl',
       };
@@ -34,10 +36,17 @@ export default defineConfig([
     sourcemap: true,
     outDir: 'dist/cdn',
     outExtension: () => ({ js: '.js' }),
+    loader: {
+      '.css': 'text',
+      '.png': 'dataurl',
+      '.woff': 'dataurl',
+      '.woff2': 'dataurl',
+    },
     esbuildOptions(options) {
       options.loader = {
         ...options.loader,
         '.css': 'text',
+        '.png': 'dataurl',
         '.woff': 'dataurl',
         '.woff2': 'dataurl',
       };
