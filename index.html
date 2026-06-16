@@ -3,19 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axol Assist: tools for a more usable web</title>
-  <meta name="description" content="Axol Assist builds browser tools that help people navigate, read, and interact with websites more independently when standard interfaces get in the way." />
+  <title>Axol Assist · Accessibility software for the web</title>
+  <meta name="description" content="Axol Assist builds practical accessibility software for browsers and websites. Adaptive tools that help people browse, read, and interact more comfortably." />
 
-  <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Axol Assist" />
-  <meta property="og:title" content="Axol Assist: The web should adapt to you" />
-  <meta property="og:description" content="Browser tools that help people use websites more independently. Less strain, less clicking, more control." />
+  <meta property="og:title" content="Axol Assist · The web should adapt to you" />
+  <meta property="og:description" content="Accessibility software for browsers and websites. Practical tools built for real browsing." />
   <meta property="og:url" content="https://axolassist.com/" />
   <meta property="og:image" content="https://axolassist.com/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Axol Assist" />
-  <meta name="twitter:description" content="Browser tools that help people use websites more independently." />
+  <meta name="twitter:description" content="Accessibility software for browsers and websites." />
   <meta name="twitter:image" content="https://axolassist.com/logo.png" />
   <meta name="theme-color" content="#FBFAF8" />
 
@@ -34,23 +33,23 @@
     "name": "Axol Assist",
     "url": "https://axolassist.com",
     "logo": "https://axolassist.com/logo.png",
-    "description": "Browser accessibility tools for more independent web use",
+    "description": "Accessibility software for browsers and websites",
     "email": "axolassist.business@gmail.com",
     "sameAs": []
   }
   </script>
 </head>
-<body>
+<body class="home">
 
   <a href="#main" class="skip-link">Skip to main content</a>
 
-  <!-- NAV -->
   <nav id="siteNav">
     <a href="#" class="nav-logo" aria-label="Axol Assist home">
       <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
       <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
     <ul class="nav-links">
+      <li><a href="#build">What we build</a></li>
       <li><a href="#audiences">Who it's for</a></li>
       <li><a href="#products">Products</a></li>
       <li><a href="#contact" class="nav-cta">Get in touch</a></li>
@@ -60,218 +59,276 @@
   <main id="main" tabindex="-1">
 
     <!-- HERO -->
-    <header class="hero">
+    <header class="hero home-hero">
       <div class="wrap hero-inner">
         <div class="hero-copy">
-          <span class="eyebrow hero-eyebrow">Axol Assist</span>
+          <span class="eyebrow hero-eyebrow">Accessibility software</span>
           <h1 class="hero-headline">The web should <span class="accent">adapt to you.</span></h1>
-          <p class="hero-tagline">The internet assumes everyone clicks the same way, reads the same way, and navigates the same way. Real people don't. We build tools that make websites easier to use when standard interfaces get in the way.</p>
+          <p class="hero-tagline">Axol Assist builds software that makes the web easier to use. From browser tools to website widgets, we create practical accessibility products for people who need the internet to work differently.</p>
           <div class="hero-links">
-            <a href="https://chrome.google.com/webstore/detail/accessibility-surfer/PLACEHOLDER_EXTENSION_ID" class="hero-cta-link" data-chrome-install rel="noopener noreferrer">
-              Add to Chrome
+            <a href="#products" class="btn btn-primary btn-arrow">
+              Explore Products
               <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a href="easepass.html" class="hero-link">Learn about Accessibility Surfer</a>
+            <a href="https://chrome.google.com/webstore/detail/accessibility-surfer/PLACEHOLDER_EXTENSION_ID" class="btn btn-ghost" data-chrome-install rel="noopener noreferrer">Add Accessibility Surfer</a>
           </div>
           <div class="hero-trust">
-            <span><b>Free</b> Chrome extension</span>
+            <span><b>Browser</b> and <b>website</b> tools</span>
             <span class="dot-sep" aria-hidden="true"></span>
-            <span>Works on <b>every site</b></span>
+            <span><b>Privacy-conscious</b> by design</span>
             <span class="dot-sep" aria-hidden="true"></span>
             <span><b>No account</b> required</span>
           </div>
         </div>
 
-        <div class="hero-stage" aria-hidden="true">
-          <span class="axol-mark"></span>
+        <div class="home-hero-visual" aria-hidden="true">
+          <div class="home-product-stack">
+            <article class="home-product-chip">
+              <img src="assistsurfer.png" alt="" width="40" height="40" />
+              <div>
+                <strong>Accessibility Surfer</strong>
+                <span>Browser extension</span>
+              </div>
+            </article>
+            <article class="home-product-chip">
+              <img src="accessibility.png" alt="" width="40" height="40" />
+              <div>
+                <strong>AccessFlow</strong>
+                <span>Website widget</span>
+              </div>
+            </article>
+            <article class="home-product-chip is-muted">
+              <span class="home-product-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+              <div>
+                <strong>More coming</strong>
+                <span>Adaptive web tools</span>
+              </div>
+            </article>
+          </div>
         </div>
       </div>
     </header>
 
-    <!-- MISSION -->
-    <section class="mission">
+    <!-- PROBLEM -->
+    <section class="home-problem" id="problem">
       <div class="wrap reveal">
-        <h2>Most websites weren't built with <span class="accent">everyone in mind.</span></h2>
-        <p>Tiny click targets. Gray text on gray backgrounds. Walls of dense copy with nowhere to rest your eyes. Millions of people hit these barriers every day, and most sites never offer a way around them. We think you should be able to adapt the page to fit you, not force yourself to fit the page.</p>
+        <div class="sec-head">
+          <span class="eyebrow">The problem</span>
+          <h2>Most of the web still wasn't built for <span class="accent">everyone.</span></h2>
+        </div>
+        <div class="home-problem-body">
+          <p>Tiny click targets, dense layouts, low contrast, and interfaces that assume one way to read, navigate, and interact. Millions of people run into these barriers every day.</p>
+          <p>Adaptive browsing should not mean fighting the page. Axol Assist exists to build software that helps people adjust the web to fit how they actually use it, whether through the browser or on the sites they visit.</p>
+        </div>
       </div>
     </section>
 
-    <!-- AUDIENCES -->
-    <section class="audiences" id="audiences">
+    <!-- WHAT WE BUILD -->
+    <section class="home-build section--alt" id="build">
       <div class="wrap">
-        <div class="sec-head reveal">
+        <div class="sec-head sec-head--center reveal">
+          <span class="eyebrow">What we build</span>
+          <h2>Software for <span class="accent">accessible experiences.</span></h2>
+          <p>Three lanes of work. One mission: make the web more usable without asking people to change who they are.</p>
+        </div>
+
+        <div class="home-build-grid">
+          <article class="home-build-card reveal">
+            <span class="home-build-label">Browser accessibility</span>
+            <h3>Accessibility Surfer</h3>
+            <p>Adaptive reading, navigation, and dwell-clicking tools that work across the sites you already use.</p>
+          </article>
+          <article class="home-build-card reveal">
+            <span class="home-build-label">Website accessibility</span>
+            <h3>AccessFlow</h3>
+            <p>A lightweight accessibility toolbar site owners can add with one script tag or npm import.</p>
+          </article>
+          <article class="home-build-card reveal">
+            <span class="home-build-label">Future products</span>
+            <h3>In development</h3>
+            <p>Input alternatives, reading assistance, adaptive web tools, and accessibility innovations we are building next.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHO IT'S FOR -->
+    <section class="home-audiences" id="audiences">
+      <div class="wrap">
+        <div class="sec-head sec-head--center reveal">
           <span class="eyebrow">Who it's for</span>
           <h2>When the default web <span class="accent">doesn't fit.</span></h2>
-          <p>Accessibility isn't a niche. It's anyone whose body, vision, focus, or energy level makes the standard interface harder than it should be.</p>
+          <p>Anyone whose body, vision, focus, or energy makes standard interfaces harder than they should be.</p>
         </div>
 
-        <div class="audience-grid">
-          <article class="audience-card reveal">
-            <span class="icon" aria-hidden="true">
+        <div class="home-audience-grid">
+          <article class="home-audience-card reveal">
+            <span class="home-audience-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
             </span>
-            <h3>Mobility, pain &amp; repetitive strain</h3>
-            <p>Tremors, chronic pain, RSI, spinal cord injury, MS, ALS, a wrist in a cast. When every click costs effort, hover-to-click and larger targets can mean getting through your day without burning out.</p>
+            <h3>Mobility &amp; pain</h3>
+            <p>Tremors, RSI, chronic pain, or limited reach. Tools that reduce clicking strain and enlarge targets.</p>
           </article>
-
-          <article class="audience-card reveal">
-            <span class="icon" aria-hidden="true">
+          <article class="home-audience-card reveal">
+            <span class="home-audience-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
             </span>
-            <h3>Low vision, dyslexia &amp; focus</h3>
-            <p>Blurry type, harsh contrast, lines that swim on the page, tabs that won't stay still. Adjust fonts, spacing, and contrast on any site, or strip a page down to what you actually came to read.</p>
+            <h3>Vision &amp; reading</h3>
+            <p>Low vision, dyslexia, and focus challenges. Adjust type, spacing, contrast, and reading layout on any page.</p>
           </article>
-
-          <article class="audience-card reveal">
-            <span class="icon" aria-hidden="true">
+          <article class="home-audience-card reveal">
+            <span class="home-audience-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 016 4h5v15H6a2 2 0 00-2 1.2V5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M20 5.5A2 2 0 0018 4h-5v15h5a2 2 0 012 1.2V5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
             </span>
-            <h3>Eye tracking, head pointers &amp; fatigue</h3>
-            <p>Eye gaze, head trackers, mouth sticks, joysticks, and plain old screen fatigue after hours online. If moving a cursor is easier than clicking one, or reading one more dense page feels impossible, you're who we build for.</p>
+            <h3>Alternative input</h3>
+            <p>Eye gaze, head pointers, joysticks, and screen fatigue. Browse with less precision and less exhaustion.</p>
           </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- BEFORE / AFTER DEMO -->
-    <section class="demo" aria-labelledby="demo-h">
-      <div class="wrap">
-        <div class="sec-head reveal">
-          <span class="eyebrow">See the difference</span>
-          <h2 id="demo-h">Adapt the page. <span class="accent">Not yourself.</span></h2>
-          <p>Same article, two ways to read it. Toggle the controls. This is what Accessibility Surfer lets you do on any site you open.</p>
-        </div>
-
-        <div class="demo-shell reveal">
-          <div class="demo-pane is-before">
-            <span class="demo-tag"><span class="pip"></span>Before</span>
-            <p class="demo-body-text">11px gray text on a white-gray background. Lines stacked tight. A link the size of a breadcrumb crumb. Your eyes work overtime just to stay on the sentence, and your hand misses <a href="#" class="demo-sample-link" onclick="return false">the target</a> half the time.</p>
-          </div>
-          <div class="demo-pane is-after" id="demoAfter">
-            <span class="demo-tag"><span class="pip"></span>After</span>
-            <p class="demo-body-text" id="demoText">Larger type. Breathing room between lines. Contrast that doesn't fight you. The same article, adjusted to how you actually read, with <a href="#" class="demo-sample-link" onclick="return false">links you can hit</a> without squinting or overshooting.</p>
-          </div>
-        </div>
-
-        <div class="demo-controls reveal" role="group" aria-label="Accessibility adjustments">
-          <button class="demo-chip" type="button" data-opt="size" aria-pressed="false">Larger text</button>
-          <button class="demo-chip" type="button" data-opt="space" aria-pressed="false">More spacing</button>
-          <button class="demo-chip" type="button" data-opt="font" aria-pressed="false">Readable font</button>
-          <button class="demo-chip" type="button" data-opt="contrast" aria-pressed="false">Boost contrast</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRINCIPLES -->
-    <section class="principles">
-      <div class="wrap">
-        <div class="sec-head reveal">
-          <span class="eyebrow">How we build</span>
-          <h2>Practical tools, <span class="accent">not paperwork.</span></h2>
-          <p>Four rules we don't bend on.</p>
-        </div>
-        <div class="principles-grid">
-          <div class="principle reveal">
-            <span class="principle-num">1</span>
-            <h3>Start with the barrier</h3>
-            <p>Can't click reliably? Text too small to track? Page layout fighting your screen reader? We name the problem first, then build something that actually addresses it.</p>
-          </div>
-          <div class="principle reveal">
-            <span class="principle-num">2</span>
-            <h3>Ship with the people who use it</h3>
-            <p>Real testers with real disabilities, real input devices, real daily browsing. Not a checklist run once before launch.</p>
-          </div>
-          <div class="principle reveal">
-            <span class="principle-num">3</span>
-            <h3>Works where you already are</h3>
-            <p>Your browser, your sites, your routine. No new platform to learn, no IT ticket to file, no hardware to mount.</p>
-          </div>
-          <div class="principle reveal">
-            <span class="principle-num">4</span>
-            <h3>Free to try, fair to keep</h3>
-            <p>The tools people depend on shouldn't be priced like luxury goods. We keep costs down so more people can actually use what we make.</p>
-          </div>
         </div>
       </div>
     </section>
 
     <!-- PRODUCTS -->
-    <section class="products" id="products">
+    <section class="home-products section--alt" id="products">
       <div class="wrap">
-        <div class="sec-head reveal">
+        <div class="sec-head sec-head--center reveal">
           <span class="eyebrow">Products</span>
-          <h2>What we're <span class="accent">shipping.</span></h2>
-          <p>Browser tools for more independent browsing, starting with one extension that does a lot.</p>
+          <h2>What we're <span class="accent">shipping today.</span></h2>
+          <p>Two products, equal priority. Same design standard, same commitment to practical accessibility.</p>
         </div>
 
-        <article class="product-spotlight reveal">
-          <div class="product-spotlight-head">
-            <img src="assistsurfer.png" alt="" class="product-spotlight-logo" aria-hidden="true" width="72" height="72" />
-            <div class="product-spotlight-title">
-              <span class="card-badge">Free Chrome extension</span>
-              <h3>Accessibility Surfer</h3>
+        <div class="home-product-grid">
+          <article class="home-product-card reveal">
+            <div class="home-product-card-top">
+              <img src="assistsurfer.png" alt="" class="home-product-logo" width="56" height="56" aria-hidden="true" />
+              <div>
+                <span class="card-badge">Chrome extension</span>
+                <h3>Accessibility Surfer</h3>
+              </div>
             </div>
-          </div>
-          <p>Navigate with less clicking. Read with less strain. Adjust text, spacing, and contrast on any page, or let hover-to-click handle the buttons for you. Works with a mouse, trackpad, head tracker, or eye gaze device.</p>
-          <div class="product-spotlight-actions">
-            <a href="https://chrome.google.com/webstore/detail/accessibility-surfer/PLACEHOLDER_EXTENSION_ID" class="btn btn-primary" data-chrome-install rel="noopener noreferrer">Add to Chrome</a>
-            <a href="easepass.html" class="hero-link">Meet Accessibility Surfer</a>
-          </div>
-        </article>
+            <p>Navigate with less clicking. Read with less strain. Adjust text, spacing, and contrast on any site, or use dwell-clicking when buttons are hard to hit.</p>
+            <a href="easepass.html" class="btn btn-primary btn-arrow">
+              Learn More
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
 
-        <article class="product-spotlight reveal">
-          <div class="product-spotlight-head">
-            <img src="accessibility.png" alt="" class="product-spotlight-logo" aria-hidden="true" width="72" height="72" />
-            <div class="product-spotlight-title">
-              <span class="card-badge">Script or npm</span>
-              <h3>AccessFlow</h3>
+          <article class="home-product-card reveal">
+            <div class="home-product-card-top">
+              <img src="accessibility.png" alt="" class="home-product-logo" width="56" height="56" aria-hidden="true" />
+              <div>
+                <span class="card-badge">Website widget</span>
+                <h3>AccessFlow</h3>
+              </div>
             </div>
-          </div>
-          <p>One script tag or npm import adds a visitor-controlled accessibility toolbar — font, contrast, spacing, and motion on any site. Installs in under a minute.</p>
-          <div class="product-spotlight-actions">
-            <a href="toolbar.html#install" class="btn btn-primary">Install AccessFlow</a>
-            <a href="toolbar.html" class="coming-soon-pill">View docs</a>
-          </div>
-        </article>
+            <p>One script tag or npm import adds a visitor-controlled accessibility toolbar. Font, contrast, spacing, and motion controls for any website.</p>
+            <a href="toolbar.html" class="btn btn-primary btn-arrow">
+              View Docs
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+        </div>
       </div>
     </section>
 
-    <!-- ABOUT -->
-    <section class="about-section" id="about">
-      <div class="wrap">
-        <div class="reveal">
-          <span class="eyebrow">Who we are</span>
-          <h2>Founder-built. <span class="accent">User-tested.</span></h2>
+    <!-- WHY -->
+    <section class="home-why" id="why">
+      <div class="wrap reveal">
+        <div class="sec-head">
+          <span class="eyebrow">Our mission</span>
+          <h2>Why Axol Assist <span class="accent">exists.</span></h2>
         </div>
-        <p class="reveal">Axol Assist started because the web kept assuming everyone interacts with it the same way, and the tools meant to help were either buried in OS settings or priced out of reach. We're a small, mission-driven team building practical browser tools for people who need the internet to work differently. No corporate accessibility theater. Just software that respects how you actually browse.</p>
+        <div class="home-why-body">
+          <p>Accessibility tools are often expensive, buried in browser settings, or built for compliance checklists instead of daily browsing. People who need help the most are left searching for workarounds.</p>
+          <p>We build practical software that meets people where they already are: in the browser, on the sites they visit, without new hardware or enterprise contracts. Our goal is simple: help more people browse comfortably, read clearly, and interact with less strain.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST -->
+    <section class="home-trust section--alt" id="trust">
+      <div class="wrap">
+        <div class="sec-head sec-head--center reveal">
+          <span class="eyebrow">How we work</span>
+          <h2>Built on <span class="accent">principles.</span></h2>
+        </div>
+
+        <div class="home-trust-grid">
+          <article class="home-trust-card reveal">
+            <span class="home-trust-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.7"/></svg>
+            </span>
+            <h3>Works on existing websites</h3>
+            <p>No platform migration. Tools that layer onto the web you already use.</p>
+          </article>
+          <article class="home-trust-card reveal">
+            <span class="home-trust-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 20c4-4 7-7.5 7-11a7 7 0 10-14 0c0 3.5 3 7 7 11z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
+            </span>
+            <h3>Built with user feedback</h3>
+            <p>Designed with input from people who rely on assistive tech every day.</p>
+          </article>
+          <article class="home-trust-card reveal">
+            <span class="home-trust-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V7l7-4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Privacy-conscious</h3>
+            <p>Settings stay on the device. We do not sell visitor data.</p>
+          </article>
+          <article class="home-trust-card reveal">
+            <span class="home-trust-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </span>
+            <h3>No account required</h3>
+            <p>Install and use. No sign-up wall between you and the tool.</p>
+          </article>
+          <article class="home-trust-card reveal">
+            <span class="home-trust-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M18 10l2 2-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>WCAG-aligned</h3>
+            <p>Controls mapped to familiar accessibility needs and standards.</p>
+          </article>
+          <article class="home-trust-card reveal">
+            <span class="home-trust-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Accessible by default</h3>
+            <p>Keyboard support, clear focus, and readable UI in our own products.</p>
+          </article>
+        </div>
       </div>
     </section>
 
     <!-- CONTACT -->
-    <section class="notify" id="contact">
+    <section class="home-contact" id="contact">
       <div class="wrap">
         <div class="sec-head reveal">
-          <span class="eyebrow">Get in touch</span>
-          <h2>Say <span class="accent">hello.</span></h2>
-          <p>Early access, feedback, partnerships, or just a question. We read everything.</p>
+          <span class="eyebrow">Contact</span>
+          <h2>Get in <span class="accent">touch.</span></h2>
+          <p>Questions, feedback, partnerships, or early access. We read every message.</p>
         </div>
 
-        <div class="contact-grid">
-          <div class="contact-info reveal">
-            <h3>Reach us directly</h3>
-            <p><a href="mailto:axolassist.business@gmail.com">axolassist.business@gmail.com</a></p>
-            <p class="contact-note">We typically respond within 2 business days.</p>
-
-            <h3 style="margin-top: 1.8rem;">Who we hear from</h3>
-            <ul class="contact-list">
-              <li>People using assistive tech day to day</li>
-              <li>Family members and caregivers</li>
-              <li>Accessibility and AT professionals</li>
-              <li>Developers and potential partners</li>
-            </ul>
+        <div class="home-contact-grid">
+          <div class="home-contact-aside reveal">
+            <div class="home-contact-block">
+              <h3>Email</h3>
+              <p><a href="mailto:axolassist.business@gmail.com">axolassist.business@gmail.com</a></p>
+              <p class="contact-note">We typically respond within 2 business days.</p>
+            </div>
+            <div class="home-contact-block">
+              <h3>We hear from</h3>
+              <ul class="contact-list">
+                <li>People using assistive technology</li>
+                <li>Caregivers and family members</li>
+                <li>Accessibility professionals</li>
+                <li>Developers and partners</li>
+              </ul>
+            </div>
           </div>
 
-          <form class="contact-form reveal" onsubmit="handleContactSubmit(event)" novalidate>
+          <form class="contact-form home-contact-form reveal" onsubmit="handleContactSubmit(event)" novalidate>
             <div class="form-row">
               <label for="cf-name">Name</label>
               <input type="text" id="cf-name" name="name" required autocomplete="name" />
@@ -293,13 +350,13 @@
             </div>
             <div class="form-row">
               <label for="cf-message">Message</label>
-              <textarea id="cf-message" name="message" rows="4" required placeholder="Tell us a bit about your interest or question."></textarea>
+              <textarea id="cf-message" name="message" rows="5" required placeholder="Tell us about your question or how we can help."></textarea>
             </div>
             <div style="display:none" aria-hidden="true">
               <label for="cf-website">Website (leave blank)</label>
               <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off" />
             </div>
-            <button type="submit">Send message</button>
+            <button type="submit" class="btn btn-primary">Send message</button>
             <p class="form-status" id="formStatus" aria-live="polite" role="status"></p>
           </form>
         </div>
@@ -308,38 +365,55 @@
 
   </main>
 
-  <!-- FOOTER -->
-  <footer>
+  <footer class="home-footer">
     <div class="wrap">
-      <div class="footer-top">
-        <a href="#" class="footer-brand">
-          <span class="axol-mark" aria-hidden="true"></span>
-          Axol Assist
-        </a>
-        <span class="footer-colors" aria-hidden="true">
-          <svg viewBox="0 0 240 24" fill="none" preserveAspectRatio="none"><path d="M0,14 C40,4 80,22 120,12 C160,2 200,20 240,10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
-        </span>
+      <div class="home-footer-grid">
+        <div class="home-footer-brand">
+          <a href="#" class="footer-brand">
+            <span class="axol-mark" aria-hidden="true"></span>
+            Axol Assist
+          </a>
+          <p>Accessibility software for browsers and websites.</p>
+        </div>
+        <div class="home-footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="easepass.html">Accessibility Surfer</a></li>
+            <li><a href="toolbar.html">AccessFlow</a></li>
+          </ul>
+        </div>
+        <div class="home-footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#why">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="home-footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="toolbar.html">Documentation</a></li>
+            <li><a href="privacy.html">Accessibility Statement</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="footer-bottom">
-        <p>Copyright &copy; 2026 <strong class="accent">Axol Assist</strong>. All rights reserved.</p>
-        <p><a href="easepass.html">Accessibility Surfer</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a></p>
+      <div class="home-footer-bottom">
+        <p>Copyright &copy; 2026 <strong>Axol Assist</strong>. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- Accessibility toolbar + Surfer preview are injected by script.js / surfer-demo.js -->
   <script src="surfer-demo.js"></script>
   <script src="site-config.js"></script>
   <script src="script.js"></script>
 
-  <!-- Page micro-interactions: nav shadow, scroll reveal, before/after demo -->
   <script>
   (function () {
     var nav = document.getElementById('siteNav');
     var onScroll = function () { if (nav) nav.classList.toggle('is-scrolled', window.scrollY > 8); };
     onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Reveal-on-scroll (safe even if script.js also reveals).
     var reveals = document.querySelectorAll('.reveal');
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (entries) {
@@ -351,16 +425,6 @@
     } else {
       reveals.forEach(function (el) { el.classList.add('reveal-in'); });
     }
-
-    // Before / after live demo.
-    var after = document.getElementById('demoAfter');
-    document.querySelectorAll('.demo-chip').forEach(function (chip) {
-      chip.addEventListener('click', function () {
-        var on = chip.getAttribute('aria-pressed') !== 'true';
-        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
-        if (after) after.classList.toggle('opt-' + chip.dataset.opt, on);
-      });
-    });
   })();
   </script>
 
