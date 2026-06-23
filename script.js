@@ -316,7 +316,19 @@ revealTargets.forEach(el => {
   toggle.setAttribute('aria-label', 'Preview the Accessibility Surfer extension popup');
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-controls', 'epd-panel');
+  toggle.setAttribute('aria-describedby', 'epd-bubble');
   toggle.innerHTML = '<img src="assistsurfer.png" alt="" aria-hidden="true" width="60" height="60" />';
+
+  const launcher = document.createElement('div');
+  launcher.className = 'epd-launcher';
+  launcher.setAttribute('role', 'group');
+  launcher.setAttribute('aria-label', 'Accessibility Surfer preview');
+  const bubble = document.createElement('span');
+  bubble.className = 'epd-bubble';
+  bubble.id = 'epd-bubble';
+  bubble.textContent = 'Try Accessibility Surfer';
+  launcher.appendChild(toggle);
+  launcher.appendChild(bubble);
 
   const overlay = document.createElement('div');
   overlay.id = 'epd-overlay';
@@ -514,7 +526,7 @@ revealTargets.forEach(el => {
     });
   }
 
-  document.body.appendChild(toggle);
+  document.body.appendChild(launcher);
   document.body.appendChild(overlay);
   document.body.appendChild(panel);
 })();
