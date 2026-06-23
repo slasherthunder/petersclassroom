@@ -82,7 +82,6 @@ revealTargets.forEach(el => {
   // loads (index, easepass, privacy). Idempotent: bails if already present
   // (e.g. an older page that still has the static markup).
   function injectAccessibilityToolbar() {
-    if (document.body && document.body.hasAttribute('data-skip-a11y-toolbar')) return;
     if (document.getElementById('a11yPanel')) return;
     const group = (heading, label, buttons) =>
       `<div class="a11y-group">
@@ -225,6 +224,7 @@ revealTargets.forEach(el => {
   function openPanel() {
     panel.classList.add('open');
     overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
     root.classList.add('a11y-locked');
     toggleBtn.setAttribute('aria-expanded', 'true');
     setTimeout(() => panel.focus(), 50);
@@ -232,6 +232,7 @@ revealTargets.forEach(el => {
   function closePanel() {
     panel.classList.remove('open');
     overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
     root.classList.remove('a11y-locked');
     toggleBtn.setAttribute('aria-expanded', 'false');
     toggleBtn.focus();
@@ -383,6 +384,7 @@ revealTargets.forEach(el => {
   // ── Open / close ──
   function open() {
     overlay.classList.add('epd-open');
+    overlay.setAttribute('aria-hidden', 'false');
     panel.classList.add('epd-open');
     toggle.setAttribute('aria-expanded', 'true');
     panel.focus();
@@ -396,6 +398,7 @@ revealTargets.forEach(el => {
   }
   function close() {
     overlay.classList.remove('epd-open');
+    overlay.setAttribute('aria-hidden', 'true');
     panel.classList.remove('epd-open');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.focus();
@@ -522,4 +525,95 @@ revealTargets.forEach(el => {
   document.querySelectorAll('[data-chrome-install]').forEach((el) => {
     el.href = url;
   });
+})();
+
+/* ───────── SITE ACCESSIBILITY ENHANCEMENTS ───────── */
+(function initSiteAccessibility() {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion) {
+    document.documentElement.classList.add('reveal-static');
+  }
+
+  const nav = document.getElementById('siteNav');
+  const menu = document.getElementById('siteNavMenu');
+  const toggle = document.querySelector('.nav-toggle');
+  if (nav && menu && toggle) {
+    const setOpen = (open) => {
+      nav.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+    toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+
+  function trapFocus(container, e) {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(container.querySelectorAll(
+      'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )).filter((el) => !el.disabled && el.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  document.querySelectorAll('.a11y-switch[data-toggle]').forEach((sw) => {
+    sw.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        sw.click();
+      }
+    });
+  });
+
+  const a11yPanel = document.getElementById('a11yPanel');
+  const a11yOverlay = document.getElementById('a11yOverlay');
+  if (a11yPanel && a11yOverlay) {
+    const a11yToggle = document.getElementById('a11yToggle');
+    const observer = new MutationObserver(() => {
+      const open = a11yPanel.classList.contains('open');
+      a11yOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+    });
+    observer.observe(a11yPanel, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('keydown', (e) => {
+      if (a11yPanel.classList.contains('open')) trapFocus(a11yPanel, e);
+    });
+    if (a11yToggle) a11yToggle.setAttribute('aria-haspopup', 'dialog');
+  }
+
+  const epdPanel = document.getElementById('epd-panel');
+  const epdOverlay = document.getElementById('epd-overlay');
+  if (epdPanel && epdOverlay) {
+    const epdObserver = new MutationObserver(() => {
+      const open = epdPanel.classList.contains('epd-open');
+      epdOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+    });
+    epdObserver.observe(epdPanel, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('keydown', (e) => {
+      if (epdPanel.classList.contains('epd-open')) trapFocus(epdPanel, e);
+    });
+    epdPanel.querySelectorAll('.epd-switch').forEach((sw) => {
+      sw.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          sw.click();
+        }
+      });
+    });
+  }
 })();

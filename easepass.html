@@ -92,6 +92,10 @@
       transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
     }
+    @media (prefers-reduced-motion: reduce) {
+      .carousel-track { transition: none; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
     .carousel-slide {
       flex: 0 0 100%;
       margin: 0;
@@ -202,14 +206,17 @@
   <a href="#main" class="skip-link">Skip to main content</a>
 
   <!-- NAV -->
-  <nav id="siteNav">
+  <nav id="siteNav" aria-label="Main navigation">
     <a href="/" class="nav-logo" aria-label="Axol Assist, back to home">
       <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
       <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
-    <ul class="nav-links">
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="siteNavMenu" aria-label="Open menu">
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <ul class="nav-links" id="siteNavMenu">
       <li><a href="/#products">All products</a></li>
-      <li><a href="/#audiences">Who it's for</a></li>
+      <li><a href="#for-whom">Who it's for</a></li>
       <li><a href="https://chromewebstore.google.com/detail/accessibility-surfer/pccmbliammnfaklpblehkonmhcdnedhn" class="nav-cta" data-chrome-install rel="noopener noreferrer">Add to Chrome</a></li>
     </ul>
   </nav>
@@ -484,7 +491,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer>
+  <footer role="contentinfo">
     <div class="wrap">
       <div class="footer-top">
         <a href="/" class="footer-brand"><span class="axol-mark" aria-hidden="true"></span>Axol Assist</a>
@@ -507,6 +514,8 @@
     var nav = document.getElementById('siteNav');
     var onScroll = function () { if (nav) nav.classList.toggle('is-scrolled', window.scrollY > 8); };
     onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) document.documentElement.classList.add('reveal-static');
     var reveals = document.querySelectorAll('.reveal');
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('reveal-in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
@@ -554,6 +563,8 @@
       carousel.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(index - 1); }
         if (e.key === 'ArrowRight') { e.preventDefault(); goTo(index + 1); }
+        if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+        if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
       });
       goTo(0);
     }

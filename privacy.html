@@ -44,12 +44,15 @@
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
-  <nav id="siteNav">
+  <nav id="siteNav" aria-label="Main navigation">
     <a href="index.html" class="nav-logo" aria-label="Axol Assist home">
       <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
       <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
-    <ul class="nav-links">
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="siteNavMenu" aria-label="Open menu">
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <ul class="nav-links" id="siteNavMenu">
       <li><a href="index.html">Home</a></li>
       <li><a href="easepass.html" class="nav-cta">Accessibility Surfer</a></li>
     </ul>
@@ -99,7 +102,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer>
+  <footer role="contentinfo">
     <div class="wrap">
       <div class="footer-top">
         <a href="index.html" class="footer-brand"><span class="axol-mark" aria-hidden="true"></span>Axol Assist</a>

@@ -40,22 +40,24 @@
   }
   </script>
 </head>
-<body data-live-demo="home" data-skip-a11y-toolbar>
+<body>
 
   <a href="#main" class="skip-link">Skip to main content</a>
 
   <!-- NAV -->
-  <nav id="siteNav">
-    <a href="#" class="nav-logo" aria-label="Axol Assist home">
+  <nav id="siteNav" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo" aria-label="Axol Assist home">
       <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
       <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
-    <ul class="nav-links">
-      <li><a href="#stories">Stories</a></li>
-      <li><a href="#try-live">Try Surfer</a></li>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="siteNavMenu" aria-label="Open menu">
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <ul class="nav-links" id="siteNavMenu">
+      <li><a href="#problem">The problem</a></li>
+      <li><a href="#build">What we build</a></li>
       <li><a href="#products">Products</a></li>
-      <li><a href="#why">About</a></li>
-      <li><span data-smart-cta="nav" class="smart-cta-host"></span></li>
+      <li><a href="#contact" class="nav-cta">Get in touch</a></li>
     </ul>
   </nav>
 
@@ -67,17 +69,20 @@
         <div class="hero-copy">
           <span class="eyebrow hero-eyebrow">Axol Assist</span>
           <h1 class="hero-headline">The web should <span class="accent">adapt to you.</span></h1>
-          <p class="hero-tagline">Practical accessibility software for people who browse differently and for teams who want their sites to work for everyone. Install in under a minute, or try it on this page right now.</p>
+          <p class="hero-tagline">Axol Assist is an accessibility technology company building software that helps people read, navigate, and interact with the web on their own terms. For individuals who browse differently, and for teams who want their sites to work for everyone.</p>
           <div class="hero-links">
-            <span data-smart-cta="hero" class="smart-cta-host"></span>
-            <a href="#try-live" class="hero-link" data-open-live-demo>Experience Accessibility Surfer</a>
+            <a href="#products" class="hero-cta-link">
+              Explore products
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="#why" class="hero-link">Why we exist</a>
           </div>
           <div class="hero-trust">
-            <span><b>Free</b> Chrome extension</span>
+            <span><b>Browser</b> and <b>website</b> tools</span>
             <span class="dot-sep" aria-hidden="true"></span>
-            <span>Live in <b>under a minute</b></span>
+            <span>Built with <b>user feedback</b></span>
             <span class="dot-sep" aria-hidden="true"></span>
-            <span><b>No account</b> required</span>
+            <span><b>Privacy-conscious</b></span>
           </div>
         </div>
 
@@ -137,35 +142,38 @@
       </div>
     </section>
 
-    <!-- HUMAN STORIES -->
-    <section class="stories-section section--alt" id="stories">
+    <!-- WHO IT'S FOR -->
+    <section class="audiences" id="audiences">
       <div class="wrap">
-        <div class="sec-head sec-head--center reveal">
-          <span class="eyebrow">Real challenges</span>
-          <h2>Built for moments when the default web <span class="accent">gets in the way.</span></h2>
-          <p>Every feature starts with a person, not a checkbox. Here is how Axol Assist shows up in everyday browsing.</p>
+        <div class="sec-head reveal">
+          <span class="eyebrow">Who it's for</span>
+          <h2>When the default web <span class="accent">doesn't fit.</span></h2>
+          <p>Accessibility is not a niche. It is anyone whose body, vision, focus, or energy level makes the standard interface harder than it should be.</p>
         </div>
 
-        <div class="story-grid">
-          <article class="story-card reveal">
-            <p class="story-challenge"><span class="story-label">Challenge</span> For students overwhelmed by cluttered school portals</p>
-            <h3>Cut through the noise before homework even starts</h3>
-            <p class="story-solution"><span class="story-label">Solution</span> Reading mode and visual clutter controls strip dense portals down to the assignment, syllabus, or link you actually need.</p>
-            <p class="story-result"><span class="story-label">Result</span> Less time fighting the interface. More time doing the work.</p>
+        <div class="audience-grid">
+          <article class="audience-card reveal">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+            </span>
+            <h3>Mobility, pain &amp; repetitive strain</h3>
+            <p>Tremors, chronic pain, RSI, spinal cord injury, MS, ALS, a wrist in a cast. When every click costs effort, hover-to-click and larger targets can mean getting through your day without burning out.</p>
           </article>
 
-          <article class="story-card reveal">
-            <p class="story-challenge"><span class="story-label">Challenge</span> For parents struggling to read small text online</p>
-            <h3>Make any website readable in seconds</h3>
-            <p class="story-solution"><span class="story-label">Solution</span> Larger type, wider spacing, and high contrast apply instantly on forms, medical portals, and news sites without changing how the site is built.</p>
-            <p class="story-result"><span class="story-label">Result</span> Important information becomes legible without asking someone else for help.</p>
+          <article class="audience-card reveal">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+            </span>
+            <h3>Low vision, dyslexia &amp; focus</h3>
+            <p>Blurry type, harsh contrast, lines that swim on the page, tabs that won't stay still. Adjust fonts, spacing, and contrast on any site, or strip a page down to what you actually came to read.</p>
           </article>
 
-          <article class="story-card reveal">
-            <p class="story-challenge"><span class="story-label">Challenge</span> For people who cannot reliably click small targets</p>
-            <h3>Navigate by hovering, not forcing every click</h3>
-            <p class="story-solution"><span class="story-label">Solution</span> Dwell clicking turns hover into action on links and buttons across the sites you already use, including smarter timing on YouTube.</p>
-            <p class="story-result"><span class="story-label">Result</span> More independence online with less pain, fatigue, and missed clicks.</p>
+          <article class="audience-card reveal">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 016 4h5v15H6a2 2 0 00-2 1.2V5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M20 5.5A2 2 0 0018 4h-5v15h5a2 2 0 012 1.2V5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Eye tracking, head pointers &amp; fatigue</h3>
+            <p>Eye gaze, head trackers, mouth sticks, joysticks, and plain old screen fatigue after hours online. If moving a cursor is easier than clicking one, or reading one more dense page feels impossible, you're who we build for.</p>
           </article>
         </div>
       </div>
@@ -239,15 +247,15 @@
               <span class="card-badge">Free Chrome extension</span>
             </div>
             <h3>Accessibility Surfer</h3>
-            <p class="product-card-lead">For anyone who needs the web to feel less physically and visually demanding.</p>
-            <p>When clicking hurts, text is too small, or a page feels impossible to parse, Surfer adds personal controls on every site you visit: dwell clicking, readable typography, contrast adjustments, and reading mode.</p>
+            <p class="product-card-lead">Personal browsing controls for any site you visit.</p>
+            <p>Navigate with less clicking. Read with less strain. Adjust text, spacing, and contrast on any page, use hover-to-click when buttons are hard to hit, or open reading mode when a page is too dense. Works with a mouse, trackpad, head tracker, or eye gaze device.</p>
             <ul class="product-card-features">
               <li>Dwell clicking &amp; pointer assistance</li>
               <li>Text, font, and contrast controls</li>
               <li>Reading mode for articles</li>
             </ul>
             <div class="product-card-actions">
-              <span data-smart-cta="product" class="smart-cta-host"></span>
+              <a href="https://chromewebstore.google.com/detail/accessibility-surfer/pccmbliammnfaklpblehkonmhcdnedhn" class="btn btn-primary" data-chrome-install rel="noopener noreferrer">Add to Chrome</a>
               <a href="easepass.html" class="textlink">Product details <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             </div>
           </article>
@@ -274,37 +282,34 @@
       </div>
     </section>
 
-    <!-- TRY IT LIVE -->
-    <section class="try-live-section" id="try-live" aria-labelledby="try-live-h">
+    <!-- INTERACTIVE DEMO -->
+    <section class="demo demo-showcase" id="demo" aria-labelledby="demo-h">
       <div class="wrap">
-        <div class="try-live-grid reveal">
-          <div class="try-live-copy">
-            <span class="eyebrow">Experience Accessibility Surfer</span>
-            <h2 id="try-live-h">Try the extension on <span class="accent">this page.</span></h2>
-            <p>Open the live panel to preview Accessibility Surfer's reading and focus controls. No screenshots. No sandbox. Just this site, adjusted in real time.</p>
-            <ul class="try-live-points" role="list">
-              <li>Same text and contrast tools as the Chrome extension</li>
-              <li>Reset anytime with one button</li>
-              <li>Add to Chrome to use Surfer on every site you visit</li>
-            </ul>
-            <div class="try-live-actions">
-              <button type="button" class="btn btn-primary" data-open-live-demo>Try Accessibility Surfer</button>
-              <span data-smart-cta="inline" class="smart-cta-host smart-cta-host--inline"></span>
-            </div>
+        <div class="demo-showcase-intro reveal">
+          <div class="sec-head">
+            <span class="eyebrow">Product showcase</span>
+            <h2 id="demo-h">Try <span class="accent">Accessibility Surfer.</span></h2>
+            <p>Same article, two ways to read it. Toggle the controls below, or open the floating preview in the corner to explore the full extension panel.</p>
           </div>
-          <div class="try-live-preview" aria-hidden="true">
-            <div class="try-live-preview-card">
-              <p class="try-live-preview-kicker">Accessibility Surfer preview</p>
-              <ul class="try-live-preview-list">
-                <li>Reduce visual clutter</li>
-                <li>Increase font size</li>
-                <li>High contrast mode</li>
-                <li>Dyslexia-friendly font</li>
-                <li>Reading focus mode</li>
-              </ul>
-              <p class="try-live-preview-note">Under 200ms transitions. Respects reduced motion.</p>
-            </div>
+          <p class="demo-showcase-note">This demo shows text adaptation from Accessibility Surfer. AccessFlow brings similar controls to your own site for every visitor.</p>
+        </div>
+
+        <div class="demo-shell reveal">
+          <div class="demo-pane is-before">
+            <span class="demo-tag"><span class="pip"></span>Before</span>
+            <p class="demo-body-text">11px gray text on a white-gray background. Lines stacked tight. A link the size of a breadcrumb crumb. Your eyes work overtime just to stay on the sentence, and your hand misses <span class="demo-sample-link" role="text">the target</span> half the time.</p>
           </div>
+          <div class="demo-pane is-after" id="demoAfter">
+            <span class="demo-tag"><span class="pip"></span>After</span>
+            <p class="demo-body-text" id="demoText">Larger type. Breathing room between lines. Contrast that doesn't fight you. The same article, adjusted to how you actually read, with <span class="demo-sample-link" role="text">links you can hit</span> without squinting or overshooting.</p>
+          </div>
+        </div>
+
+        <div class="demo-controls reveal" role="group" aria-label="Accessibility adjustments">
+          <button class="demo-chip" type="button" data-opt="size" aria-pressed="false">Larger text</button>
+          <button class="demo-chip" type="button" data-opt="space" aria-pressed="false">More spacing</button>
+          <button class="demo-chip" type="button" data-opt="font" aria-pressed="false">Readable font</button>
+          <button class="demo-chip" type="button" data-opt="contrast" aria-pressed="false">Boost contrast</button>
         </div>
       </div>
     </section>
@@ -315,13 +320,10 @@
         <div class="why-grid">
           <div class="why-copy reveal">
             <span class="eyebrow">Why Axol Assist exists</span>
-            <h2>We built this after watching students struggle with inaccessible websites <span class="accent">before they could even start their assignments.</span></h2>
-            <p class="why-origin">School portals, news sites, and homework platforms were already hard enough. Then the layout, the tiny type, and the click targets made getting started the hardest part.</p>
-            <p>Axol Assist exists to close that gap with software that adapts to people, not the other way around. We build browser tools for individuals and embeddable tools for site owners. We test with real users, keep data in the browser, and ship things people can actually afford to use.</p>
-            <blockquote class="why-quote">
-              <p>Accessibility should feel practical on day one: readable, navigable, and respectful of how people already browse.</p>
-            </blockquote>
-            <p id="accessibility-statement" class="why-commitment"><strong>Our commitment:</strong> build accessibility technology that is usable immediately, privacy-conscious, and honest about what it can and cannot fix.</p>
+            <h2>Software that adapts to <span class="accent">people.</span></h2>
+            <p>Accessibility tools should be practical, not performative. Too many solutions are expensive, buried in settings, or hidden behind overlays that site owners never enable. Real users are left to fight the default web on their own.</p>
+            <p>Axol Assist exists to build software that meets people where they are. We ship browser tools for individuals and embeddable tools for site owners. We test with real users, keep data in the browser, and charge fairly so more people can actually use what we make.</p>
+            <p class="why-commitment"><strong>Our commitment:</strong> build accessibility technology that is usable on day one, respectful of privacy, and honest about what it can and cannot fix.</p>
           </div>
           <div class="why-principles reveal">
             <div class="why-principle">
@@ -346,6 +348,24 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ACCESSIBILITY STATEMENT -->
+    <section class="why-section section--alt" id="accessibility-statement" aria-labelledby="a11y-statement-heading">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Accessibility</span>
+          <h2 id="a11y-statement-heading">Built for <span class="accent">everyone who visits.</span></h2>
+          <p>This site follows semantic HTML, keyboard navigation, visible focus states, and screen reader-friendly landmarks. Motion is reduced automatically when your system prefers it. Use the accessibility button in the corner to adjust text, contrast, spacing, and motion on any page.</p>
+        </div>
+        <ul class="contact-list reveal" style="max-width: 42rem; margin-top: 1.5rem;">
+          <li>Full keyboard navigation and logical tab order</li>
+          <li>ARIA labels on interactive controls, dialogs, and toggles</li>
+          <li>WCAG-oriented color contrast on body text and controls</li>
+          <li>Respects <code>prefers-reduced-motion</code> with no autoplay animations</li>
+          <li>Contact us at <a href="mailto:axolassist.business@gmail.com">axolassist.business@gmail.com</a> to report barriers</li>
+        </ul>
       </div>
     </section>
 
@@ -411,10 +431,10 @@
   </main>
 
   <!-- FOOTER -->
-  <footer>
+  <footer role="contentinfo">
     <div class="wrap footer-grid">
       <div class="footer-brand-col">
-        <a href="#" class="footer-brand">
+        <a href="index.html" class="footer-brand">
           <span class="axol-mark" aria-hidden="true"></span>
           Axol Assist
         </a>
@@ -458,8 +478,6 @@
   <!-- Accessibility toolbar + Surfer preview are injected by script.js / surfer-demo.js -->
   <script src="surfer-demo.js"></script>
   <script src="site-config.js"></script>
-  <script src="live-demo.js"></script>
-  <script src="smart-cta.js"></script>
   <script src="script.js"></script>
 
   <!-- Page micro-interactions: nav shadow, scroll reveal, before/after demo -->
@@ -468,6 +486,9 @@
     var nav = document.getElementById('siteNav');
     var onScroll = function () { if (nav) nav.classList.toggle('is-scrolled', window.scrollY > 8); };
     onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) document.documentElement.classList.add('reveal-static');
 
     var reveals = document.querySelectorAll('.reveal');
     if ('IntersectionObserver' in window) {
@@ -480,6 +501,15 @@
     } else {
       reveals.forEach(function (el) { el.classList.add('reveal-in'); });
     }
+
+    var after = document.getElementById('demoAfter');
+    document.querySelectorAll('.demo-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var on = chip.getAttribute('aria-pressed') !== 'true';
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (after) after.classList.toggle('opt-' + chip.dataset.opt, on);
+      });
+    });
   })();
   </script>
 

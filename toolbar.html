@@ -657,6 +657,24 @@
 
     .af-contact-block { margin-top: 0; }
 
+    .af-copy-btn:focus-visible {
+      outline: 3px solid var(--coral);
+      outline-offset: 2px;
+    }
+    .af-cred-link:focus-visible,
+    .af-install-pill:focus-visible {
+      outline: 3px solid var(--coral);
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .af-workflow-step,
+      .af-workflow-track::after { transition: none !important; }
+      .af-workflow-step { opacity: 1 !important; transform: none !important; }
+      .af-workflow.reveal-in .af-workflow-track::after { transform: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
     @media (max-width: 900px) {
       .af-workflow {
         max-width: 840px;
@@ -708,12 +726,15 @@
 
   <a href="#main" class="skip-link">Skip to main content</a>
 
-  <nav id="siteNav">
+  <nav id="siteNav" aria-label="Main navigation">
     <a href="/" class="nav-logo" aria-label="Axol Assist, back to home">
       <span class="axol-mark" role="img" aria-label="Axol the axolotl"></span>
       <span><span class="nav-axolo">Axol</span> <span class="nav-assist">Assist</span></span>
     </a>
-    <ul class="nav-links">
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="siteNavMenu" aria-label="Open menu">
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <ul class="nav-links" id="siteNavMenu">
       <li><a href="/#products">Products</a></li>
       <li><a href="#install">Install</a></li>
       <li><a href="#contact" class="nav-cta">Contact</a></li>
@@ -986,7 +1007,7 @@
 
   </main>
 
-  <footer>
+  <footer role="contentinfo">
     <div class="wrap">
       <div class="footer-top">
         <a href="/" class="footer-brand"><span class="axol-mark" aria-hidden="true"></span>Axol Assist</a>
@@ -1100,6 +1121,9 @@
     var onScroll = function () { if (nav) nav.classList.toggle('is-scrolled', window.scrollY > 8); };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) document.documentElement.classList.add('reveal-static');
 
     var reveals = document.querySelectorAll('.reveal');
     if ('IntersectionObserver' in window) {
