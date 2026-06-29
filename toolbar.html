@@ -25,6 +25,7 @@
   <style>
     body.af-page {
       --af-r: 12px;
+      --af-muted: #524a42;
       --code-bg: #15110E;
       --code-text: #F3F0EA;
       --code-muted: #938B80;
@@ -82,10 +83,10 @@
 
     .af-hero-lead {
       margin: 1.25rem auto 0;
-      max-width: 36rem;
-      font-size: clamp(1.05rem, 2.2vw, 1.2rem);
-      line-height: 1.65;
-      color: var(--text-muted);
+      max-width: 38rem;
+      font-size: clamp(1.12rem, 2.4vw, 1.32rem);
+      line-height: 1.62;
+      color: var(--af-muted);
     }
 
     .af-hero-actions {
@@ -131,21 +132,26 @@
       border-color: var(--coral-deep);
     }
 
-    .af-hero-meta {
-      margin-top: 1.75rem;
+    .af-hero-badges {
+      list-style: none;
+      margin: 1.75rem 0 0;
+      padding: 0;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: .5rem 1.25rem;
-      font-size: .86rem;
-      color: var(--text-muted);
+      gap: .5rem;
     }
-    .af-hero-meta span::before {
-      content: "·";
-      margin-right: 1.25rem;
-      color: var(--border);
+    .af-hero-badges li {
+      font-family: var(--font-display);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      padding: .42rem .85rem;
+      box-shadow: var(--shadow-sm);
     }
-    .af-hero-meta span:first-child::before { display: none; }
 
     .af-hero-proof {
       display: inline-flex;
@@ -194,7 +200,7 @@
     }
     .af-product-head p {
       margin-top: .75rem;
-      color: var(--text-muted);
+      color: var(--af-muted);
       font-size: 1.05rem;
       line-height: 1.58;
     }
@@ -204,18 +210,21 @@
       position: relative;
       max-width: 980px;
       margin: 0 auto 2.2rem;
-      padding: .5rem 0 0;
+      padding: 0;
+      --af-step-circle: 48px;
     }
     .af-workflow-track {
       position: absolute;
-      top: 74px;
-      left: 16%;
-      right: 16%;
-      height: 1px;
+      top: calc(var(--af-step-circle) / 2);
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 2px;
+      margin-top: -1px;
       background: var(--line-strong);
       border-radius: 999px;
       z-index: 0;
       overflow: hidden;
+      pointer-events: none;
     }
     .af-workflow-track::after {
       content: "";
@@ -238,8 +247,11 @@
       z-index: 1;
     }
     .af-workflow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      padding: 0 .6rem;
+      padding: 0 .75rem;
       opacity: 0;
       transform: translateY(14px);
       transition: opacity .4s ease, transform .4s ease;
@@ -254,8 +266,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
+      width: var(--af-step-circle);
+      height: var(--af-step-circle);
       border-radius: 50%;
       border: 1px solid var(--line);
       background: var(--white);
@@ -265,7 +277,9 @@
       font-weight: 500;
       letter-spacing: .08em;
       text-transform: uppercase;
-      margin-bottom: .95rem;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
     }
     .af-workflow-step:first-child .af-workflow-num {
       background: var(--coral);
@@ -275,23 +289,31 @@
     }
     .af-workflow-icon {
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: 22px;
       height: 22px;
       color: var(--coral-deep);
-      margin-bottom: .55rem;
+      margin-top: 1rem;
+      margin-bottom: .65rem;
+    }
+    .af-workflow-icon svg {
+      width: 100%;
+      height: 100%;
     }
     .af-workflow-step h3 {
       font-size: clamp(1.1rem, 2.4vw, 1.375rem);
       font-weight: 600;
       letter-spacing: -0.02em;
       margin: 0 0 .45rem;
+      width: 100%;
     }
     .af-workflow-step p {
-      margin: 0 auto;
-      font-size: .94rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-      max-width: 180px;
+      margin: 0;
+      font-size: .96rem;
+      line-height: 1.55;
+      color: var(--af-muted);
+      max-width: 200px;
     }
 
     .af-install-label {
@@ -318,6 +340,7 @@
       gap: 1rem;
       max-width: 960px;
       margin: 0 auto;
+      align-items: stretch;
     }
 
     .af-section-divider {
@@ -360,7 +383,7 @@
       margin: 0;
       font-size: .94rem;
       line-height: 1.55;
-      color: var(--text-muted);
+      color: var(--af-muted);
       max-width: 52em;
     }
     .af-cred-link {
@@ -533,6 +556,9 @@
     }
 
     .af-code-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: calc(var(--af-r) + 2px);
@@ -559,36 +585,52 @@
       margin: .15rem 0 0;
     }
 
-    .af-code-stack { padding: 0; }
+    .af-code-stack {
+      padding: 0;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+    }
 
     .af-code-row {
       border-bottom: 1px solid rgba(255,255,255,.06);
+      display: flex;
+      flex-direction: column;
     }
     .af-code-row:last-child { border-bottom: none; }
+    .af-code-card:not(:has(.af-code-row + .af-code-row)) .af-code-row {
+      flex: 1;
+    }
+    .af-code-card:not(:has(.af-code-row + .af-code-row)) pre.af-code {
+      flex: 1;
+      min-height: 5.5rem;
+    }
 
     .af-code-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: .75rem;
-      padding: .55rem .85rem;
+      gap: 1rem;
+      min-height: 44px;
+      padding: .6rem 1rem;
       background: #1e1914;
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .af-code-lang {
       font-family: var(--mono);
       font-size: .68rem;
-      font-weight: 500;
-      letter-spacing: .06em;
+      font-weight: 600;
+      letter-spacing: .08em;
       text-transform: uppercase;
       color: var(--code-muted);
+      padding: .2rem 0;
     }
 
     .af-copy-btn {
       display: inline-flex;
       align-items: center;
       gap: .35rem;
-      padding: .3rem .65rem;
+      padding: .38rem .75rem;
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 6px;
       background: transparent;
@@ -598,6 +640,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: background .15s, border-color .15s;
+      flex-shrink: 0;
     }
     .af-copy-btn:hover {
       background: rgba(255,255,255,.06);
@@ -631,6 +674,7 @@
     .af-supported {
       padding: .85rem 1.15rem 1.1rem;
       border-top: 1px solid var(--border);
+      margin-top: auto;
     }
     .af-supported-label {
       font-size: .72rem;
@@ -686,15 +730,17 @@
 
     @media (max-width: 768px) {
       .af-workflow {
-        padding-left: 1.4rem;
+        padding-left: 0;
+        --af-step-circle: 44px;
       }
       .af-workflow-track {
-        top: 0;
-        bottom: 0;
-        left: .7rem;
+        top: calc(var(--af-step-circle) / 2);
+        bottom: calc(var(--af-step-circle) / 2);
+        left: calc(var(--af-step-circle) / 2);
         right: auto;
-        width: 1px;
+        width: 2px;
         height: auto;
+        margin-top: 0;
       }
       .af-workflow-track::after {
         transform: scaleY(0);
@@ -703,22 +749,44 @@
       .af-workflow.reveal-in .af-workflow-track::after { transform: scaleY(1); }
       .af-workflow-steps {
         grid-template-columns: 1fr;
-        gap: 1.4rem;
+        gap: 1.75rem;
       }
       .af-workflow-step {
+        display: grid;
+        grid-template-columns: var(--af-step-circle) minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+        column-gap: 1rem;
+        row-gap: 0;
+        align-items: start;
         text-align: left;
-        padding: 0 0 0 1.25rem;
+        padding: 0;
       }
       .af-workflow-num {
-        margin-bottom: .7rem;
+        grid-column: 1;
+        grid-row: 1 / span 3;
+        align-self: start;
+        margin-top: 0;
+      }
+      .af-workflow-icon {
+        grid-column: 2;
+        grid-row: 1;
+        margin: .15rem 0 .45rem;
+        justify-self: start;
+      }
+      .af-workflow-step h3 {
+        grid-column: 2;
+        grid-row: 2;
+      }
+      .af-workflow-step p {
+        grid-column: 2;
+        grid-row: 3;
+        max-width: none;
       }
       .af-install-grid,
       .af-showcase-grid { grid-template-columns: 1fr; }
       .af-cred-block { grid-template-columns: 1fr; }
       .af-product-preview { grid-template-columns: 1fr; }
       .af-preview-toggle { justify-self: end; }
-      .af-hero-meta span::before { display: none; }
-      .af-hero-meta { flex-direction: column; gap: .35rem; }
     }
   </style>
 </head>
@@ -760,11 +828,11 @@
             <strong>npm</strong> install
           </a>
         </div>
-        <div class="af-hero-meta">
-          <span>No account required</span>
-          <span>WCAG-oriented controls</span>
-          <span>Settings persist per visitor</span>
-        </div>
+        <ul class="af-hero-badges" aria-label="Product highlights">
+          <li>No account required</li>
+          <li>WCAG-oriented controls</li>
+          <li>Settings persist per visitor</li>
+        </ul>
       </div>
     </header>
 
