@@ -41,7 +41,7 @@ Per-deck heuristic scan for:
 Outputs an **Accessibility Score (0–100)** and issue list in the Scanner panel.
 
 ### Toolbar UI
-Floating, draggable toolbar in the reviewer with panels: Font, Spacing, Contrast, Focus, Scanner, TTS, Motor. Designed to stay compact and not block flashcard content.
+Floating **accessibility.png** button in the reviewer (draggable). Tap to open a slide-in panel with tabs: Font, Spacing, Contrast, Focus, Scanner, TTS, Motor. Escape or the overlay closes the panel.
 
 ## Requirements
 

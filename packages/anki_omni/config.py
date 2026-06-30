@@ -25,8 +25,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "largeButtons": False,
     "keyboardNav": True,
     "autoRead": False,
-    "toolbarX": 12,
-    "toolbarY": 12,
+    "toolbarX": -1,
+    "toolbarY": -1,
     "activePanel": None,
     "panelOpen": False,
     "shortcuts": {

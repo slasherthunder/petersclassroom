@@ -15,8 +15,20 @@ def _on_webview_will_set_content(web_content, context) -> None:
         return
     package = mw.addonManager.addonFromModule(__name__.split(".")[0])
     base = f"/_addons/{package}/web"
+    web_content.head += f'<script>window.AOA_ASSET_BASE="{base}/";</script>'
     web_content.css.append(f"{base}/reviewer.css")
     web_content.js.append(f"{base}/reviewer.js")
+
+
+def _on_card_will_show(text: str, card, kind: str) -> str:
+    if not kind.startswith("review"):
+        return text
+    return (
+        text
+        + "<script>if (typeof onShownHook !== 'undefined') {"
+        + "onShownHook.push(function () { if (window.AoaBoot) window.AoaBoot(); });"
+        + "} if (window.AoaBoot) window.AoaBoot();</script>"
+    )
 
 
 def _on_state_did_change(new_state: str, old_state: str) -> None:
@@ -73,6 +85,7 @@ def register_hooks() -> None:
     addon_root = __name__.split(".")[0]
     mw.addonManager.setWebExports(addon_root, r"web/.*\.(js|css|woff|woff2|png)")
     gui_hooks.webview_will_set_content.append(_on_webview_will_set_content)
+    gui_hooks.card_will_show.append(_on_card_will_show)
     gui_hooks.webview_did_receive_js_message.append(bridge.handle_js_message)
     gui_hooks.reviewer_did_show_question.append(bridge.on_reviewer_state)
     gui_hooks.reviewer_did_show_answer.append(bridge.on_reviewer_state)

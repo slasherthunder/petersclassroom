@@ -179,6 +179,9 @@ def _toggle_toolbar() -> None:
 def on_reviewer_state(card) -> None:
     _register_shortcuts()
     _push_config()
+    web = _reviewer_web()
+    if web is not None:
+        web.eval("window.AoaBoot && window.AoaBoot();")
     cfg = config.load_config()
     if not cfg.get("autoRead"):
         return

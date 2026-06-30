@@ -28,8 +28,8 @@
     largeButtons: false,
     keyboardNav: true,
     autoRead: false,
-    toolbarX: 12,
-    toolbarY: 12,
+    toolbarX: -1,
+    toolbarY: -1,
     activePanel: null,
     panelOpen: false,
   };
@@ -39,6 +39,7 @@
   var assetBase = '';
 
   function resolveAssetBase() {
+    if (window.AOA_ASSET_BASE) return window.AOA_ASSET_BASE;
     var scripts = document.getElementsByTagName('script');
     for (var i = 0; i < scripts.length; i++) {
       var src = scripts[i].src || '';
@@ -89,6 +90,13 @@
 
   function answerEl() {
     return qs('#answer') || qs('.answer') || null;
+  }
+
+  function ensurePosition() {
+    if (state.toolbarX < 0 || state.toolbarY < 0) {
+      state.toolbarX = Math.max(16, window.innerWidth - 76);
+      state.toolbarY = Math.max(16, window.innerHeight - 76);
+    }
   }
 
   function stripHtml(html) {
@@ -474,6 +482,7 @@
     }
     root.classList.toggle('is-open', isOpen);
 
+    ensurePosition();
     root.style.left = state.toolbarX + 'px';
     root.style.top = state.toolbarY + 'px';
 
@@ -628,11 +637,21 @@
     document.body.appendChild(root);
 
     var icon = qs('.aoa-fab-icon', root);
-    if (icon && assetBase) icon.src = assetBase + 'accessibility.png';
+    if (icon) {
+      icon.src = (assetBase || window.AOA_ASSET_BASE || '') + 'accessibility.png';
+      icon.onerror = function () {
+        icon.style.display = 'none';
+        var fab = qs('.aoa-fab', root);
+        if (fab) fab.classList.add('aoa-fab-fallback');
+      };
+    }
 
     bindToolbar();
     applyAll();
     if (state.panelOpen && state.activePanel) syncControls();
+
+    var fab = qs('.aoa-fab', root);
+    if (fab) fab.classList.add('is-ready');
 
     document.addEventListener('mousemove', onRulerMove);
     document.addEventListener('mousemove', onDwellMove);
@@ -647,9 +666,17 @@
     }
 
     requestAnimationFrame(function () {
-      var fab = qs('.aoa-fab', root);
-      if (fab) fab.classList.add('is-ready');
+      ensurePosition();
+      if (root) {
+        root.style.left = state.toolbarX + 'px';
+        root.style.top = state.toolbarY + 'px';
+      }
     });
+  }
+
+  function boot() {
+    initToolbar();
+    if (root && window.AoaBridge) window.AoaBridge.onCardShown();
   }
 
   /* ── Bridge API (Python callbacks) ── */
@@ -691,9 +718,7 @@
     },
   };
 
-  function boot() {
-    initToolbar();
-  }
+  window.AoaBoot = boot;
 
   if (typeof onUpdateHook !== 'undefined') {
     onUpdateHook.push(function () {
@@ -705,9 +730,7 @@
       boot();
       if (window.AoaBridge) window.AoaBridge.onCardShown();
     });
-  } else if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
   }
+
+  boot();
 })();
