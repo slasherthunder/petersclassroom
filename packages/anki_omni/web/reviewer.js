@@ -261,8 +261,9 @@
   /* ── Scanner UI ── */
   function renderScanResults(data) {
     scanCache = data;
-    var body = qs('[data-panel="scanner"] .aoa-panel-body', root);
-    if (!body) return;
+    var section = qs('[data-panel="scanner"] .aoa-panel-body', root);
+    if (!section) return;
+    var body = qs('.aoa-scan-results', section) || section;
     if (!data) {
       body.innerHTML = '<p class="aoa-muted">Run a scan to analyze the current deck.</p>';
       return;
@@ -293,7 +294,8 @@
   }
 
   function runScan() {
-    var body = qs('[data-panel="scanner"] .aoa-panel-body', root);
+    var section = qs('[data-panel="scanner"] .aoa-panel-body', root);
+    var body = section ? (qs('.aoa-scan-results', section) || section) : null;
     if (body) body.innerHTML = '<p class="aoa-muted">Scanning deck…</p>';
     pycmd('aoa:scanDeck');
   }
@@ -316,7 +318,11 @@
       '<div class="aoa-overlay" aria-hidden="true"></div>' +
       '<aside class="aoa-drawer" id="aoaPanel" role="dialog" aria-modal="true" aria-labelledby="aoaTitle" hidden tabindex="-1">' +
       '<header class="aoa-drawer-header">' +
+      '<div class="aoa-drawer-heading">' +
+      '<p class="aoa-drawer-kicker">Anki Omni</p>' +
       '<h2 id="aoaTitle">Accessibility</h2>' +
+      '<p class="aoa-drawer-subtitle">Adjust reading, focus, speech, and motor tools for your review session.</p>' +
+      '</div>' +
       '<button type="button" class="aoa-panel-close" data-action="close-panel" aria-label="Close accessibility settings">×</button>' +
       '</header>' +
       '<nav class="aoa-tabs" role="tablist" aria-label="Accessibility features">' +
@@ -353,82 +359,103 @@
     );
   }
 
+  function sectionIntro(text) {
+    return '<p class="aoa-section-intro">' + text + '</p>';
+  }
+
+  function settingCard(title, content) {
+    return '<div class="aoa-card">' + (title ? '<h3 class="aoa-card-title">' + title + '</h3>' : '') + content + '</div>';
+  }
+
+  function rangeField(id, label, settingKey, min, max, step, suffix) {
+    suffix = suffix || '';
+    return (
+      '<div class="aoa-field">' +
+      '<label class="aoa-label" for="' + id + '">' + label +
+      ' <span class="aoa-value" data-val="' + settingKey + '"></span>' + suffix + '</label>' +
+      '<input type="range" id="' + id + '" min="' + min + '" max="' + max + '" step="' + step + '" data-setting="' + settingKey + '" aria-valuemin="' + min + '" aria-valuemax="' + max + '">' +
+      '</div>'
+    );
+  }
+
   function fontPanel() {
     return (
-      '<label class="aoa-field">Font size <span data-val="fontSize"></span>%' +
-      '<input type="range" min="80" max="200" step="5" data-setting="fontSize"></label>' +
-      '<div class="aoa-btn-row" role="group" aria-label="Font family">' +
+      sectionIntro('Make card text easier to read with scalable type and dyslexia-friendly options.') +
+      settingCard('Text size', rangeField('aoa-font-size', 'Font size', 'fontSize', 80, 200, 5, '%')) +
+      settingCard('Typeface', '<div class="aoa-btn-row" role="group" aria-label="Font family">' +
       optionBtn('fontFamily', 'default', 'Default') +
       optionBtn('fontFamily', 'sans', 'Sans') +
       optionBtn('fontFamily', 'serif', 'Serif') +
       optionBtn('fontFamily', 'dyslexia', 'Dyslexia') +
-      '</div>'
+      '</div>')
     );
   }
 
   function spacingPanel() {
     return (
-      '<label class="aoa-field">Line spacing <span data-val="lineSpacing"></span>' +
-      '<input type="range" min="1" max="2.5" step="0.1" data-setting="lineSpacing"></label>' +
-      '<label class="aoa-field">Letter spacing <span data-val="letterSpacing"></span>px' +
-      '<input type="range" min="0" max="6" step="0.5" data-setting="letterSpacing"></label>' +
-      '<label class="aoa-field">Word spacing <span data-val="wordSpacing"></span>px' +
-      '<input type="range" min="0" max="12" step="1" data-setting="wordSpacing"></label>'
+      sectionIntro('Loosen lines and letters when dense card templates feel hard to scan.') +
+      settingCard('Line spacing', rangeField('aoa-line-spacing', 'Line spacing', 'lineSpacing', 1, 2.5, 0.1, '')) +
+      settingCard('Letter spacing', rangeField('aoa-letter-spacing', 'Letter spacing', 'letterSpacing', 0, 6, 0.5, 'px')) +
+      settingCard('Word spacing', rangeField('aoa-word-spacing', 'Word spacing', 'wordSpacing', 0, 12, 1, 'px'))
     );
   }
 
   function contrastPanel() {
     return (
-      '<div class="aoa-btn-row" role="group" aria-label="Contrast mode">' +
+      sectionIntro('Tune contrast and target size without leaving the reviewer.') +
+      settingCard('Color mode', '<div class="aoa-btn-row" role="group" aria-label="Contrast mode">' +
       optionBtn('contrast', 'default', 'Normal') +
       optionBtn('contrast', 'high', 'High') +
       optionBtn('contrast', 'dark', 'Dark') +
       optionBtn('contrast', 'light', 'Light') +
-      '</div>' +
-      toggleRow('largeUi', 'Large UI mode') +
-      toggleRow('largeButtons', 'Large answer buttons (in card area)')
+      '</div>') +
+      settingCard('Display size', toggleRow('largeUi', 'Large UI mode', 'Increases control and label sizes in this panel.') +
+      toggleRow('largeButtons', 'Large answer buttons', 'Expands tappable targets inside the card area.'))
     );
   }
 
   function focusPanel() {
     return (
-      toggleRow('focusMode', 'Focus mode (dim outside card)') +
-      toggleRow('readingRuler', 'Reading ruler') +
+      sectionIntro('Reduce visual noise and reveal answer content at a comfortable pace.') +
+      settingCard('Attention', toggleRow('focusMode', 'Focus mode', 'Dims everything outside the active card.') +
+      toggleRow('hideDistractions', 'Hide distractions', 'Minimizes extra chrome while you study.')) +
+      settingCard('Reading support', toggleRow('readingRuler', 'Reading ruler', 'Highlights the line you are reading.') +
       '<div class="aoa-btn-row" role="group" aria-label="Ruler follow mode">' +
       optionBtn('rulerFollow', 'cursor', 'Follow cursor') +
       optionBtn('rulerFollow', 'center', 'Center line') +
       '</div>' +
-      toggleRow('progressiveReveal', 'Progressive reveal (answer steps)') +
-      toggleRow('hideDistractions', 'Hide distractions (minimal chrome)')
+      toggleRow('progressiveReveal', 'Progressive reveal', 'Shows multi-step answers one section at a time.'))
     );
   }
 
   function scannerPanel() {
     return (
-      '<p class="aoa-muted">Analyzes cards in the current deck for length, readability, images, and formatting.</p>' +
+      sectionIntro('Review deck-wide accessibility signals such as length, readability, and missing image descriptions.') +
+      settingCard('Deck analysis', '<p class="aoa-hint">Runs locally on your collection. No data leaves your device.</p>' +
       '<button type="button" class="aoa-primary" data-action="scan-deck">Scan current deck</button>' +
-      '<div class="aoa-scan-results"></div>'
+      '<div class="aoa-scan-results"></div>')
     );
   }
 
   function ttsPanel() {
     return (
-      '<p class="aoa-muted">Uses your device voice only — nothing is sent online.</p>' +
+      sectionIntro('Hear the current question or answer with your device voice.') +
+      settingCard('Read aloud', '<p class="aoa-hint">Uses local text-to-speech only — nothing is sent online.</p>' +
       '<div class="aoa-btn-row">' +
-      '<button type="button" class="aoa-primary" data-action="read-question">Read Question</button>' +
-      '<button type="button" class="aoa-primary" data-action="read-answer">Read Answer</button>' +
+      '<button type="button" class="aoa-secondary" data-action="read-question">Read question</button>' +
+      '<button type="button" class="aoa-secondary" data-action="read-answer">Read answer</button>' +
       '</div>' +
-      toggleRow('autoRead', 'Auto-read when card is shown')
+      toggleRow('autoRead', 'Auto-read cards', 'Speaks each side automatically when it appears.'))
     );
   }
 
   function motorPanel() {
     return (
-      toggleRow('dwellClick', 'Dwell clicking (hover to click)') +
-      '<label class="aoa-field">Dwell duration <span data-val="dwellMs"></span>ms' +
-      '<input type="range" min="400" max="2500" step="100" data-setting="dwellMs"></label>' +
-      toggleRow('keyboardNav', 'Keyboard focus highlights') +
-      '<p class="aoa-muted">Shortcuts: Alt+Q read question, Alt+A read answer, Alt+Shift+A toggle toolbar.</p>'
+      sectionIntro('Support pointer and keyboard control during review.') +
+      settingCard('Pointer access', toggleRow('dwellClick', 'Dwell clicking', 'Hover over a target to activate it without pressing.') +
+      rangeField('aoa-dwell-ms', 'Dwell duration', 'dwellMs', 400, 2500, 100, 'ms')) +
+      settingCard('Keyboard', toggleRow('keyboardNav', 'Focus highlights', 'Makes keyboard focus easier to see.') +
+      '<p class="aoa-hint">Shortcuts: Alt+Q read question · Alt+A read answer · Alt+Shift+A toggle panel.</p>')
     );
   }
 
@@ -436,11 +463,15 @@
     return '<button type="button" class="aoa-opt" data-option="' + key + '" data-value="' + value + '">' + label + '</button>';
   }
 
-  function toggleRow(key, label) {
+  function toggleRow(key, label, hint) {
+    var id = 'aoa-sw-' + key;
     return (
       '<div class="aoa-toggle-row">' +
-      '<span>' + label + '</span>' +
-      '<button type="button" class="aoa-switch" role="switch" data-toggle="' + key + '" aria-checked="false"></button>' +
+      '<div class="aoa-toggle-copy">' +
+      '<span class="aoa-toggle-label" id="' + id + '-label">' + label + '</span>' +
+      (hint ? '<span class="aoa-hint">' + hint + '</span>' : '') +
+      '</div>' +
+      '<button type="button" class="aoa-switch" role="switch" id="' + id + '" data-toggle="' + key + '" aria-labelledby="' + id + '-label" aria-checked="false"></button>' +
       '</div>'
     );
   }
@@ -481,6 +512,7 @@
       overlay.setAttribute('aria-hidden', String(!isOpen));
     }
     root.classList.toggle('is-open', isOpen);
+    root.classList.toggle('aoa-large-ui', !!state.largeUi);
 
     ensurePosition();
     root.style.left = state.toolbarX + 'px';
