@@ -64,6 +64,11 @@ def _setup_menu() -> None:
     submenu.addAction(act_reset)
 
 
+def _on_main_window_did_init() -> None:
+    _setup_menu()
+    bridge._register_shortcuts()
+
+
 def register_hooks() -> None:
     addon_root = __name__.split(".")[0]
     mw.addonManager.setWebExports(addon_root, r"web/.*\.(js|css|woff|woff2)")
@@ -72,5 +77,4 @@ def register_hooks() -> None:
     gui_hooks.reviewer_did_show_question.append(bridge.on_reviewer_state)
     gui_hooks.reviewer_did_show_answer.append(bridge.on_reviewer_state)
     gui_hooks.state_did_change.append(_on_state_did_change)
-    gui_hooks.main_window_did_init.append(lambda _mw: _setup_menu())
-    gui_hooks.main_window_did_init.append(lambda _mw: bridge._register_shortcuts())
+    gui_hooks.main_window_did_init.append(_on_main_window_did_init)
