@@ -1,0 +1,616 @@
+/**
+ * Anki Omni Accessibility — reviewer toolbar & features
+ * Axol Assist · https://axolassist.com/anki-omni/
+ */
+(function () {
+  'use strict';
+
+  if (window.__aoaLoaded) return;
+  window.__aoaLoaded = true;
+
+  var STORAGE_KEY = 'aoa-settings-v1';
+
+  var defaults = {
+    fontSize: 100,
+    fontFamily: 'default',
+    lineSpacing: 1.5,
+    letterSpacing: 0,
+    wordSpacing: 0,
+    contrast: 'default',
+    largeUi: false,
+    focusMode: false,
+    readingRuler: false,
+    rulerFollow: 'cursor',
+    progressiveReveal: false,
+    hideDistractions: false,
+    dwellClick: false,
+    dwellMs: 800,
+    largeButtons: false,
+    keyboardNav: true,
+    autoRead: false,
+    toolbarX: 12,
+    toolbarY: 12,
+    activePanel: null,
+    toolbarCollapsed: false,
+  };
+
+  var state = Object.assign({}, defaults);
+  var root, panel, rulerEl, dwellSession, scanCache;
+
+  function pycmd(msg) {
+    if (typeof window.pycmd === 'function') return window.pycmd(msg);
+    return null;
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (_) {}
+    pycmd('aoa:saveConfig:' + JSON.stringify(state));
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) Object.assign(state, defaults, JSON.parse(raw));
+    } catch (_) {}
+  }
+
+  function qs(sel, ctx) {
+    return (ctx || document).querySelector(sel);
+  }
+
+  function qsa(sel, ctx) {
+    return Array.prototype.slice.call((ctx || document).querySelectorAll(sel));
+  }
+
+  function cardRoot() {
+    return qs('#qa') || qs('.card') || document.body;
+  }
+
+  function questionEl() {
+    return qs('#qarea') || qs('.question') || qs('#question') || cardRoot();
+  }
+
+  function answerEl() {
+    return qs('#answer') || qs('.answer') || null;
+  }
+
+  function stripHtml(html) {
+    var d = document.createElement('div');
+    d.innerHTML = html || '';
+    return (d.textContent || d.innerText || '').trim();
+  }
+
+  /* ── Visual accessibility ── */
+  function applyVisual() {
+    var html = document.documentElement;
+    html.setAttribute('data-aoa-font-size', String(state.fontSize));
+    html.setAttribute('data-aoa-font-family', state.fontFamily);
+    html.setAttribute('data-aoa-line-spacing', String(state.lineSpacing));
+    html.setAttribute('data-aoa-letter-spacing', String(state.letterSpacing));
+    html.setAttribute('data-aoa-word-spacing', String(state.wordSpacing));
+    html.setAttribute('data-aoa-contrast', state.contrast);
+    html.style.setProperty('--aoa-font-size', String(state.fontSize));
+    html.style.setProperty('--aoa-line-height', String(state.lineSpacing));
+    html.style.setProperty('--aoa-letter', String(state.letterSpacing));
+    html.style.setProperty('--aoa-word', String(state.wordSpacing));
+    html.style.fontSize = (state.fontSize / 100 * 16) + 'px';
+    html.toggleAttribute('data-aoa-large-ui', !!state.largeUi);
+    html.toggleAttribute('data-aoa-large-buttons', !!state.largeButtons);
+    html.toggleAttribute('data-aoa-keyboard-nav', !!state.keyboardNav);
+  }
+
+  /* ── Focus + reading modes ── */
+  function applyFocusMode() {
+    document.documentElement.toggleAttribute('data-aoa-focus-mode', !!state.focusMode);
+  }
+
+  function applyReadingRuler() {
+    if (state.readingRuler) {
+      if (!rulerEl) {
+        rulerEl = document.createElement('div');
+        rulerEl.className = 'aoa-reading-ruler';
+        rulerEl.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(rulerEl);
+      }
+      if (state.rulerFollow === 'center') {
+        var h = window.innerHeight;
+        rulerEl.style.top = Math.round(h / 2 - 2) + 'px';
+      }
+    } else if (rulerEl) {
+      rulerEl.remove();
+      rulerEl = null;
+    }
+  }
+
+  function onRulerMove(e) {
+    if (!state.readingRuler || !rulerEl || state.rulerFollow !== 'cursor') return;
+    rulerEl.style.top = (e.clientY - 2) + 'px';
+  }
+
+  function applyProgressiveReveal() {
+    var answer = answerEl();
+    if (!answer) return;
+    if (!state.progressiveReveal) {
+      qsa('.aoa-reveal-step', answer).forEach(function (el) {
+        el.classList.remove('aoa-reveal-hidden');
+      });
+      return;
+    }
+    if (answer.getAttribute('data-aoa-reveal-ready')) return;
+    var steps = [];
+    qsa('p, li, div, h1, h2, h3, h4, blockquote, tr', answer).forEach(function (el) {
+      if (el.closest('.aoa-toolbar-root')) return;
+      if (stripHtml(el.innerHTML).length < 2) return;
+      steps.push(el);
+    });
+    if (!steps.length) {
+      steps = [answer];
+    }
+    steps.forEach(function (el, i) {
+      el.classList.add('aoa-reveal-step');
+      if (i > 0) el.classList.add('aoa-reveal-hidden');
+    });
+    answer.setAttribute('data-aoa-reveal-ready', '1');
+    answer.addEventListener('click', onRevealClick);
+  }
+
+  function onRevealClick(e) {
+    if (!state.progressiveReveal) return;
+    var hidden = qsa('.aoa-reveal-hidden', answerEl() || document);
+    if (hidden.length) {
+      hidden[0].classList.remove('aoa-reveal-hidden');
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+
+  function applyHideDistractions() {
+    document.documentElement.toggleAttribute('data-aoa-hide-distractions', !!state.hideDistractions);
+    pycmd('aoa:hideDistractions:' + (state.hideDistractions ? '1' : '0'));
+  }
+
+  /* ── Motor: dwell clicking ── */
+  function isDwellTarget(el) {
+    if (!el || el.closest('.aoa-toolbar-root')) return false;
+    var tag = (el.tagName || '').toLowerCase();
+    if (tag === 'a' || tag === 'button' || el.getAttribute('role') === 'button') return true;
+    if (el.onclick || el.getAttribute('tabindex') === '0') return true;
+    return false;
+  }
+
+  function cancelDwell() {
+    if (!dwellSession) return;
+    if (dwellSession.ring) dwellSession.ring.remove();
+    if (dwellSession.raf) cancelAnimationFrame(dwellSession.raf);
+    dwellSession = null;
+  }
+
+  function startDwell(el) {
+    cancelDwell();
+    var ring = document.createElement('div');
+    ring.className = 'aoa-dwell-ring';
+    var rect = el.getBoundingClientRect();
+    ring.style.left = rect.left + 'px';
+    ring.style.top = rect.top + 'px';
+    ring.style.width = rect.width + 'px';
+    ring.style.height = rect.height + 'px';
+    document.body.appendChild(ring);
+    var start = performance.now();
+    var duration = Math.max(400, Number(state.dwellMs) || 800);
+
+    function tick(now) {
+      var p = Math.min(1, (now - start) / duration);
+      ring.style.setProperty('--aoa-dwell-progress', String(p));
+      if (p >= 1) {
+        cancelDwell();
+        el.click();
+        return;
+      }
+      dwellSession.raf = requestAnimationFrame(tick);
+    }
+    dwellSession = { el: el, ring: ring, raf: requestAnimationFrame(tick) };
+  }
+
+  function onDwellMove(e) {
+    if (!state.dwellClick) return;
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!isDwellTarget(el)) {
+      cancelDwell();
+      return;
+    }
+    if (dwellSession && dwellSession.el === el) return;
+    startDwell(el);
+  }
+
+  /* ── TTS triggers ── */
+  function readQuestion() {
+    pycmd('aoa:readQuestion');
+  }
+
+  function readAnswer() {
+    pycmd('aoa:readAnswer');
+  }
+
+  /* ── Scanner UI ── */
+  function renderScanResults(data) {
+    scanCache = data;
+    var body = qs('[data-panel="scanner"] .aoa-panel-body', root);
+    if (!body) return;
+    if (!data) {
+      body.innerHTML = '<p class="aoa-muted">Run a scan to analyze the current deck.</p>';
+      return;
+    }
+    var html = '';
+    html += '<div class="aoa-scan-summary">';
+    html += '<div class="aoa-score-ring" data-score="' + data.deckScore + '">';
+    html += '<span class="aoa-score-value">' + data.deckScore + '</span>';
+    html += '<span class="aoa-score-label">Deck score</span></div>';
+    html += '<div><strong>' + escapeHtml(data.deckName || 'Deck') + '</strong>';
+    html += '<p class="aoa-muted">' + data.totalCards + ' cards · ' + (data.flaggedCards || 0) + ' with issues</p></div></div>';
+    if (data.issues && data.issues.length) {
+      html += '<ul class="aoa-issue-list">';
+      data.issues.forEach(function (item) {
+        html += '<li><span class="aoa-issue-score">' + item.score + '</span>';
+        html += '<div><div class="aoa-issue-title">' + escapeHtml(item.preview || 'Card #' + item.cardId) + '</div>';
+        html += '<ul class="aoa-issue-tags">';
+        (item.issues || []).forEach(function (tag) {
+          html += '<li>' + escapeHtml(tag) + '</li>';
+        });
+        html += '</ul></div></li>';
+      });
+      html += '</ul>';
+    } else {
+      html += '<p class="aoa-muted">No major issues detected in this deck.</p>';
+    }
+    body.innerHTML = html;
+  }
+
+  function runScan() {
+    var body = qs('[data-panel="scanner"] .aoa-panel-body', root);
+    if (body) body.innerHTML = '<p class="aoa-muted">Scanning deck…</p>';
+    pycmd('aoa:scanDeck');
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ── Toolbar markup ── */
+  function toolbarMarkup() {
+    return (
+      '<div class="aoa-toolbar-root" role="region" aria-label="Anki Omni Accessibility toolbar">' +
+      '<div class="aoa-toolbar-bar" data-aoa-drag-handle>' +
+      '<button type="button" class="aoa-tb-btn" data-action="toggle-collapse" aria-label="Collapse toolbar" title="Collapse">≡</button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="font" aria-pressed="false"><span class="aoa-tb-icon">A</span><span class="aoa-tb-label">Font</span></button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="spacing" aria-pressed="false"><span class="aoa-tb-icon">↕</span><span class="aoa-tb-label">Spacing</span></button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="contrast" aria-pressed="false"><span class="aoa-tb-icon">◐</span><span class="aoa-tb-label">Contrast</span></button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="focus" aria-pressed="false"><span class="aoa-tb-icon">◎</span><span class="aoa-tb-label">Focus</span></button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="scanner" aria-pressed="false"><span class="aoa-tb-icon">✓</span><span class="aoa-tb-label">Scanner</span></button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="tts" aria-pressed="false"><span class="aoa-tb-icon">🔊</span><span class="aoa-tb-label">TTS</span></button>' +
+      '<button type="button" class="aoa-tb-btn" data-panel="motor" aria-pressed="false"><span class="aoa-tb-icon">⌖</span><span class="aoa-tb-label">Motor</span></button>' +
+      '</div>' +
+      '<div class="aoa-panel" hidden>' +
+      panelSection('font', 'Font', fontPanel()) +
+      panelSection('spacing', 'Spacing', spacingPanel()) +
+      panelSection('contrast', 'Contrast', contrastPanel()) +
+      panelSection('focus', 'Focus & Reading', focusPanel()) +
+      panelSection('scanner', 'Accessibility Scanner', scannerPanel()) +
+      panelSection('tts', 'Text to Speech', ttsPanel()) +
+      panelSection('motor', 'Motor Accessibility', motorPanel()) +
+      '</div>' +
+      '<p class="aoa-powered">Powered by <a href="https://axolassist.com/anki-omni/" target="_blank" rel="noopener">Axol Assist</a></p>' +
+      '</div>'
+    );
+  }
+
+  function panelSection(id, title, body) {
+    return (
+      '<section class="aoa-panel-section" data-panel="' + id + '" hidden>' +
+      '<header class="aoa-panel-header"><h3>' + title + '</h3>' +
+      '<button type="button" class="aoa-panel-close" data-action="close-panel" aria-label="Close panel">×</button></header>' +
+      '<div class="aoa-panel-body">' + body + '</div></section>'
+    );
+  }
+
+  function fontPanel() {
+    return (
+      '<label class="aoa-field">Font size <span data-val="fontSize"></span>%' +
+      '<input type="range" min="80" max="200" step="5" data-setting="fontSize"></label>' +
+      '<div class="aoa-btn-row" role="group" aria-label="Font family">' +
+      optionBtn('fontFamily', 'default', 'Default') +
+      optionBtn('fontFamily', 'sans', 'Sans') +
+      optionBtn('fontFamily', 'serif', 'Serif') +
+      optionBtn('fontFamily', 'dyslexia', 'Dyslexia') +
+      '</div>'
+    );
+  }
+
+  function spacingPanel() {
+    return (
+      '<label class="aoa-field">Line spacing <span data-val="lineSpacing"></span>' +
+      '<input type="range" min="1" max="2.5" step="0.1" data-setting="lineSpacing"></label>' +
+      '<label class="aoa-field">Letter spacing <span data-val="letterSpacing"></span>px' +
+      '<input type="range" min="0" max="6" step="0.5" data-setting="letterSpacing"></label>' +
+      '<label class="aoa-field">Word spacing <span data-val="wordSpacing"></span>px' +
+      '<input type="range" min="0" max="12" step="1" data-setting="wordSpacing"></label>'
+    );
+  }
+
+  function contrastPanel() {
+    return (
+      '<div class="aoa-btn-row" role="group" aria-label="Contrast mode">' +
+      optionBtn('contrast', 'default', 'Normal') +
+      optionBtn('contrast', 'high', 'High') +
+      optionBtn('contrast', 'dark', 'Dark') +
+      optionBtn('contrast', 'light', 'Light') +
+      '</div>' +
+      toggleRow('largeUi', 'Large UI mode') +
+      toggleRow('largeButtons', 'Large answer buttons (in card area)')
+    );
+  }
+
+  function focusPanel() {
+    return (
+      toggleRow('focusMode', 'Focus mode (dim outside card)') +
+      toggleRow('readingRuler', 'Reading ruler') +
+      '<div class="aoa-btn-row" role="group" aria-label="Ruler follow mode">' +
+      optionBtn('rulerFollow', 'cursor', 'Follow cursor') +
+      optionBtn('rulerFollow', 'center', 'Center line') +
+      '</div>' +
+      toggleRow('progressiveReveal', 'Progressive reveal (answer steps)') +
+      toggleRow('hideDistractions', 'Hide distractions (minimal chrome)')
+    );
+  }
+
+  function scannerPanel() {
+    return (
+      '<p class="aoa-muted">Analyzes cards in the current deck for length, readability, images, and formatting.</p>' +
+      '<button type="button" class="aoa-primary" data-action="scan-deck">Scan current deck</button>' +
+      '<div class="aoa-scan-results"></div>'
+    );
+  }
+
+  function ttsPanel() {
+    return (
+      '<p class="aoa-muted">Uses your device voice only — nothing is sent online.</p>' +
+      '<div class="aoa-btn-row">' +
+      '<button type="button" class="aoa-primary" data-action="read-question">Read Question</button>' +
+      '<button type="button" class="aoa-primary" data-action="read-answer">Read Answer</button>' +
+      '</div>' +
+      toggleRow('autoRead', 'Auto-read when card is shown')
+    );
+  }
+
+  function motorPanel() {
+    return (
+      toggleRow('dwellClick', 'Dwell clicking (hover to click)') +
+      '<label class="aoa-field">Dwell duration <span data-val="dwellMs"></span>ms' +
+      '<input type="range" min="400" max="2500" step="100" data-setting="dwellMs"></label>' +
+      toggleRow('keyboardNav', 'Keyboard focus highlights') +
+      '<p class="aoa-muted">Shortcuts: Alt+Q read question, Alt+A read answer, Alt+Shift+A toggle toolbar.</p>'
+    );
+  }
+
+  function optionBtn(key, value, label) {
+    return '<button type="button" class="aoa-opt" data-option="' + key + '" data-value="' + value + '">' + label + '</button>';
+  }
+
+  function toggleRow(key, label) {
+    return (
+      '<div class="aoa-toggle-row">' +
+      '<span>' + label + '</span>' +
+      '<button type="button" class="aoa-switch" role="switch" data-toggle="' + key + '" aria-checked="false"></button>' +
+      '</div>'
+    );
+  }
+
+  /* ── Toolbar interactions ── */
+  function syncControls() {
+    if (!root) return;
+    qsa('[data-setting]', root).forEach(function (input) {
+      var key = input.getAttribute('data-setting');
+      if (input.type === 'range') input.value = state[key];
+      var val = qs('[data-val="' + key + '"]', root);
+      if (val) val.textContent = state[key];
+    });
+    qsa('[data-option]', root).forEach(function (btn) {
+      var key = btn.getAttribute('data-option');
+      var value = btn.getAttribute('data-value');
+      btn.setAttribute('aria-pressed', String(state[key] === value));
+    });
+    qsa('[data-toggle]', root).forEach(function (btn) {
+      var key = btn.getAttribute('data-toggle');
+      var on = !!state[key];
+      btn.setAttribute('aria-checked', String(on));
+      btn.classList.toggle('is-on', on);
+    });
+    root.classList.toggle('is-collapsed', !!state.toolbarCollapsed);
+    root.style.left = state.toolbarX + 'px';
+    root.style.top = state.toolbarY + 'px';
+  }
+
+  function openPanel(id) {
+    state.activePanel = id;
+    var panelWrap = qs('.aoa-panel', root);
+    if (panelWrap) panelWrap.hidden = false;
+    qsa('.aoa-panel-section', root).forEach(function (sec) {
+      sec.hidden = sec.getAttribute('data-panel') !== id;
+    });
+    qsa('[data-panel].aoa-tb-btn', root).forEach(function (btn) {
+      btn.setAttribute('aria-pressed', String(btn.getAttribute('data-panel') === id));
+    });
+    if (id === 'scanner' && scanCache) renderScanResults(scanCache);
+    saveState();
+  }
+
+  function closePanel() {
+    state.activePanel = null;
+    var panelWrap = qs('.aoa-panel', root);
+    if (panelWrap) panelWrap.hidden = true;
+    qsa('[data-panel].aoa-tb-btn', root).forEach(function (btn) {
+      btn.setAttribute('aria-pressed', 'false');
+    });
+    saveState();
+  }
+
+  function applyAll() {
+    applyVisual();
+    applyFocusMode();
+    applyReadingRuler();
+    applyProgressiveReveal();
+    applyHideDistractions();
+    syncControls();
+  }
+
+  function bindToolbar() {
+    root.addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn || !root.contains(btn)) return;
+
+      if (btn.getAttribute('data-action') === 'toggle-collapse') {
+        state.toolbarCollapsed = !state.toolbarCollapsed;
+        applyAll();
+        saveState();
+        return;
+      }
+      if (btn.getAttribute('data-action') === 'close-panel') {
+        closePanel();
+        return;
+      }
+      if (btn.getAttribute('data-action') === 'scan-deck') {
+        runScan();
+        return;
+      }
+      if (btn.getAttribute('data-action') === 'read-question') {
+        readQuestion();
+        return;
+      }
+      if (btn.getAttribute('data-action') === 'read-answer') {
+        readAnswer();
+        return;
+      }
+      var panelId = btn.getAttribute('data-panel');
+      if (panelId) {
+        if (state.activePanel === panelId) closePanel();
+        else openPanel(panelId);
+        return;
+      }
+      var optKey = btn.getAttribute('data-option');
+      if (optKey) {
+        state[optKey] = btn.getAttribute('data-value');
+        applyAll();
+        saveState();
+        return;
+      }
+      var toggleKey = btn.getAttribute('data-toggle');
+      if (toggleKey) {
+        state[toggleKey] = !state[toggleKey];
+        applyAll();
+        saveState();
+      }
+    });
+
+    root.addEventListener('input', function (e) {
+      var input = e.target;
+      if (!input.matches('[data-setting]')) return;
+      var key = input.getAttribute('data-setting');
+      state[key] = input.type === 'range' ? Number(input.value) : input.value;
+      applyAll();
+      saveState();
+    });
+
+    var handle = qs('[data-aoa-drag-handle]', root);
+    var dragging = false;
+    var offsetX = 0;
+    var offsetY = 0;
+
+    handle.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button') && !e.target.closest('[data-action="toggle-collapse"]')) return;
+      dragging = true;
+      offsetX = e.clientX - root.offsetLeft;
+      offsetY = e.clientY - root.offsetTop;
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      state.toolbarX = Math.max(0, Math.min(window.innerWidth - 80, e.clientX - offsetX));
+      state.toolbarY = Math.max(0, Math.min(window.innerHeight - 40, e.clientY - offsetY));
+      root.style.left = state.toolbarX + 'px';
+      root.style.top = state.toolbarY + 'px';
+    });
+    document.addEventListener('mouseup', function () {
+      if (dragging) saveState();
+      dragging = false;
+    });
+  }
+
+  function initToolbar() {
+    if (qs('.aoa-toolbar-root')) return;
+    loadState();
+    var wrap = document.createElement('div');
+    wrap.innerHTML = toolbarMarkup();
+    root = wrap.firstElementChild;
+    document.body.appendChild(root);
+    bindToolbar();
+    applyAll();
+    if (state.activePanel) openPanel(state.activePanel);
+
+    document.addEventListener('mousemove', onRulerMove);
+    document.addEventListener('mousemove', onDwellMove);
+    document.addEventListener('mouseleave', cancelDwell);
+
+    var resp = pycmd('aoa:getConfig');
+    if (resp) {
+      try {
+        Object.assign(state, defaults, JSON.parse(resp));
+        applyAll();
+      } catch (_) {}
+    }
+  }
+
+  /* ── Bridge API (Python callbacks) ── */
+  window.AoaBridge = {
+    applyConfig: function (cfg) {
+      Object.assign(state, defaults, cfg || {});
+      applyAll();
+    },
+    onScanResult: function (data) {
+      renderScanResults(data);
+    },
+    toggleToolbar: function () {
+      if (!root) return;
+      root.classList.toggle('aoa-hidden');
+    },
+    refreshCard: function () {
+      var answer = answerEl();
+      if (answer) answer.removeAttribute('data-aoa-reveal-ready');
+      applyAll();
+      if (state.autoRead) {
+        var showingAnswer = answer && answer.offsetParent !== null && !answer.hidden;
+        pycmd(showingAnswer ? 'aoa:autoReadAnswer' : 'aoa:autoReadQuestion');
+      }
+    },
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToolbar);
+  } else {
+    initToolbar();
+  }
+
+  /* Re-apply when Anki swaps card HTML */
+  var refreshTimer;
+  var observer = new MutationObserver(function () {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(function () {
+      if (window.AoaBridge) window.AoaBridge.refreshCard();
+    }, 120);
+  });
+  observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+})();

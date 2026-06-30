@@ -1,0 +1,448 @@
+/* Anki Omni Accessibility — reviewer styles
+   Axol Assist · https://axolassist.com/anki-omni/ */
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/opendyslexic-7.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/opendyslexic-8.woff') format('woff');
+}
+
+:root {
+  --aoa-accent: #2a9d9d;
+  --aoa-accent-rgb: 42, 157, 157;
+  --aoa-surface: rgba(255, 255, 255, 0.96);
+  --aoa-border: rgba(0, 0, 0, 0.1);
+  --aoa-text: #1a1a1a;
+  --aoa-muted: #5c534c;
+  --aoa-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+}
+
+/* ── Visual: font / spacing ── */
+html[data-aoa-line-spacing] #qa,
+html[data-aoa-line-spacing] .card {
+  line-height: var(--aoa-line-height, 1.5);
+}
+
+html[data-aoa-letter-spacing] #qa,
+html[data-aoa-letter-spacing] .card {
+  letter-spacing: calc(var(--aoa-letter, 0) * 1px);
+}
+
+html[data-aoa-word-spacing] #qa,
+html[data-aoa-word-spacing] .card {
+  word-spacing: calc(var(--aoa-word, 0) * 1px);
+}
+
+html[data-aoa-font-family='dyslexia'] #qa,
+html[data-aoa-font-family='dyslexia'] .card {
+  font-family: 'OpenDyslexic', system-ui, sans-serif !important;
+}
+
+html[data-aoa-font-family='sans'] #qa,
+html[data-aoa-font-family='sans'] .card {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+}
+
+html[data-aoa-font-family='serif'] #qa,
+html[data-aoa-font-family='serif'] .card {
+  font-family: Georgia, 'Times New Roman', serif !important;
+}
+
+/* Contrast modes */
+html[data-aoa-contrast='high'] body {
+  background: #000 !important;
+  color: #fff !important;
+}
+html[data-aoa-contrast='high'] #qa,
+html[data-aoa-contrast='high'] .card,
+html[data-aoa-contrast='high'] a {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+html[data-aoa-contrast='dark'] body {
+  background: #121212 !important;
+  color: #f2f2f2 !important;
+}
+
+html[data-aoa-contrast='light'] body {
+  background: #fafafa !important;
+  color: #111 !important;
+}
+
+html[data-aoa-large-ui] {
+  font-size: 18px;
+}
+
+html[data-aoa-large-buttons] a,
+html[data-aoa-large-buttons] button {
+  min-height: 48px !important;
+  min-width: 48px !important;
+  padding: 12px 16px !important;
+}
+
+html[data-aoa-keyboard-nav] :focus-visible {
+  outline: 3px solid var(--aoa-accent) !important;
+  outline-offset: 3px !important;
+}
+
+/* Focus mode */
+html[data-aoa-focus-mode] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  z-index: 9990;
+}
+
+html[data-aoa-focus-mode] #qa,
+html[data-aoa-focus-mode] .card {
+  position: relative;
+  z-index: 9991;
+  background: #fff;
+  color: #111;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  max-width: min(92vw, 720px);
+  margin: 2rem auto;
+}
+
+/* Reading ruler */
+.aoa-reading-ruler {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(var(--aoa-accent-rgb), 0.35);
+  border-top: 2px solid var(--aoa-accent);
+  border-bottom: 2px solid var(--aoa-accent);
+  pointer-events: none;
+  z-index: 9992;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.04);
+}
+
+/* Progressive reveal */
+.aoa-reveal-hidden {
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* Hide distractions inside card */
+html[data-aoa-hide-distractions] .replaybutton,
+html[data-aoa-hide-distractions] #typeans,
+html[data-aoa-hide-distractions] .timer {
+  display: none !important;
+}
+
+/* Dwell ring */
+.aoa-dwell-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  border: 2px solid var(--aoa-accent);
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--aoa-accent-rgb), 0.25) calc(var(--aoa-dwell-progress, 0) * 100%),
+    transparent calc(var(--aoa-dwell-progress, 0) * 100%)
+  );
+}
+
+/* ── Floating toolbar ── */
+.aoa-toolbar-root {
+  position: fixed;
+  z-index: 10050;
+  max-width: min(96vw, 420px);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: var(--aoa-text);
+  pointer-events: auto;
+}
+
+.aoa-toolbar-root.aoa-hidden {
+  display: none;
+}
+
+.aoa-toolbar-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  background: var(--aoa-surface);
+  border: 1px solid var(--aoa-border);
+  border-radius: 14px;
+  box-shadow: var(--aoa-shadow);
+  backdrop-filter: blur(12px);
+  cursor: grab;
+}
+
+.aoa-toolbar-root.is-collapsed .aoa-tb-label,
+.aoa-toolbar-root.is-collapsed .aoa-panel,
+.aoa-toolbar-root.is-collapsed .aoa-powered {
+  display: none;
+}
+
+.aoa-tb-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 52px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.aoa-tb-btn:hover,
+.aoa-tb-btn[aria-pressed='true'] {
+  background: rgba(var(--aoa-accent-rgb), 0.12);
+  border-color: rgba(var(--aoa-accent-rgb), 0.25);
+}
+
+.aoa-tb-icon {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.aoa-tb-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.aoa-panel {
+  margin-top: 8px;
+  background: var(--aoa-surface);
+  border: 1px solid var(--aoa-border);
+  border-radius: 14px;
+  box-shadow: var(--aoa-shadow);
+  max-height: min(60vh, 420px);
+  overflow: auto;
+}
+
+.aoa-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--aoa-border);
+}
+
+.aoa-panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.aoa-panel-close {
+  border: 0;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.aoa-panel-body {
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.aoa-field {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.aoa-field input[type='range'] {
+  width: 100%;
+}
+
+.aoa-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.aoa-opt,
+.aoa-primary {
+  border: 1px solid var(--aoa-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.aoa-opt[aria-pressed='true'],
+.aoa-primary {
+  background: rgba(var(--aoa-accent-rgb), 0.14);
+  border-color: rgba(var(--aoa-accent-rgb), 0.4);
+  color: #0d4f4f;
+  font-weight: 600;
+}
+
+.aoa-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.aoa-switch {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--aoa-border);
+  background: #ddd;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.aoa-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.aoa-switch.is-on {
+  background: var(--aoa-accent);
+  border-color: var(--aoa-accent);
+}
+
+.aoa-switch.is-on::after {
+  transform: translateX(18px);
+}
+
+.aoa-muted {
+  margin: 0;
+  color: var(--aoa-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.aoa-powered {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 10px;
+  color: var(--aoa-muted);
+}
+
+.aoa-powered a {
+  color: var(--aoa-accent);
+}
+
+/* Scanner */
+.aoa-scan-summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.aoa-score-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border: 4px solid var(--aoa-accent);
+  flex-shrink: 0;
+}
+
+.aoa-score-value {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.aoa-score-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aoa-issue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.aoa-issue-list > li {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--aoa-border);
+  border-radius: 8px;
+}
+
+.aoa-issue-score {
+  font-weight: 700;
+  color: var(--aoa-accent);
+  min-width: 28px;
+}
+
+.aoa-issue-title {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.aoa-issue-tags {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11px;
+  color: var(--aoa-muted);
+}
+
+/* Keep toolbar from covering entire card — compact default position */
+.aoa-toolbar-root {
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+}
+
+@media (max-width: 480px) {
+  .aoa-tb-label {
+    display: none;
+  }
+  .aoa-tb-btn {
+    min-width: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aoa-switch::after {
+    transition: none;
+  }
+}

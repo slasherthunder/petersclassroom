@@ -1,0 +1,10 @@
+{
+  "name": "Anki Omni Accessibility",
+  "mod": 1740009600,
+  "min_point_version": 45,
+  "max_point_version": 0,
+  "human_version": "0.1.0",
+  "homepage": "https://axolassist.com/anki-omni/",
+  "author": "Axol Assist",
+  "description": "Complete accessibility toolbar for Anki: visual, focus, motor, local TTS, and deck scanner."
+}
